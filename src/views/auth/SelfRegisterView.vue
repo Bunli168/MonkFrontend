@@ -1,0 +1,448 @@
+<template>
+<div>
+  <div class="py-4 container-fluid px-md-4">
+    <div>
+      <!-- Header Area -->
+      <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between mb-4 gap-3">
+        <div>
+          <h3 class="fw-bold mb-1">Attendance & Seating / វត្តមាន និង កៅអី</h3>
+          <p class="text-muted mb-0 subtitle">Manage your seating registration and absence permissions.</p>
+        </div>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-3 mt-sm-0 w-100 w-sm-auto" style="flex-shrink: 0;">
+          <!-- Button Register Seat -->
+          <button type="button" @click="showRegisterModal = true" class="btn btn-outline-primary btn-sm d-flex justify-content-center align-items-center gap-2 px-3 py-2 text-nowrap">
+            <Armchair :size="16" class="flex-shrink-0" />
+            <span class="text-truncate" style="max-width: 200px;">{{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}</span>
+          </button>
+          
+          <!-- Button Leave Request -->
+          <button type="button" @click="showLeaveModal = true" class="btn btn-primary btn-sm d-flex justify-content-center align-items-center gap-2 px-3 py-2 text-nowrap">
+            <CalendarRange :size="16" class="flex-shrink-0" />
+            <span>Leave Request / ស្នើសុំច្បាប់</span>
+          </button>
+        </div>
+      </div>
+
+
+
+      <!-- Tabs System for Absences and Leave Requests -->
+      <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2 border-0 shadow-sm" style="background-color: var(--surface-card);">
+        <div>
+          <TabList>
+            <Tab value="absences">
+              <div class="d-flex align-items-center gap-2">
+                <AlertCircle style="color: var(--danger-color);" :size="16" />
+                Absent & Permission / អវត្តមាន និង ច្បាប់
+              </div>
+            </Tab>
+            <Tab value="leave-requests">
+              <div class="d-flex align-items-center gap-2">
+                <CalendarRange style="color: var(--primary-color);" :size="16" />
+                Leave Request History / ប្រវត្តិនៃការសុំច្បាប់
+              </div>
+            </Tab>
+          </TabList>
+        </div>
+        <TabPanels class="p-0 bg-transparent mt-2">
+          <!-- Tab 1: Absent & Permission Table -->
+          <TabPanel value="absences">
+            <BaseTable 
+              :columns="attendanceColDefs" 
+              :rows="dailyAttendances" 
+              :totalRecords="dailyAttendances.length"
+              :loading="isAttendancesLoading"
+              :show-index="true"
+            >
+              <template #date="{ data: row }">
+                <span>{{ formatDate(row.date) }}</span>
+              </template>
+              <template #status="{ data: row }">
+                <BaseBadge v-if="row.status" :status="row.status.toUpperCase()" :label="row.status === 'permission' ? 'Permission' : 'Absent'" />
+              </template>
+              <template #notes="{ data: row }">
+                <span>{{ row.notes || '—' }}</span>
+              </template>
+            </BaseTable>
+          </TabPanel>
+
+          <!-- Tab 2: Leave Request History Table -->
+          <TabPanel value="leave-requests">
+            <BaseTable 
+              :columns="colDefs" 
+              :rows="myRequests" 
+              :totalRecords="myRequests.length"
+              :loading="isLoading"
+              :show-index="true"
+            >
+              <template #date_range="{ data: row }">
+                <span>{{ formatDate(row.start_date) }} <i class="fas fa-arrow-right text-muted mx-1"></i> {{ formatDate(row.end_date) }}</span>
+              </template>
+              <template #status="{ data: row }">
+                <BaseBadge v-if="row.status" :status="getBadgeStatusColor(row.status)" :label="formatStatus(row.status)" />
+              </template>
+              <template #approved_by="{ data: row }">
+                <span v-if="row.Approver && row.status !== 'pending'" class="text-muted">
+                  {{ row.Approver.UserProfile?.first_name_kh || '' }} {{ row.Approver.UserProfile?.last_name_kh || '' }}
+                </span>
+                <span v-else class="text-muted fst-italic">N/A</span>
+              </template>
+            </BaseTable>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </div>
+  </div>
+
+  <!-- Dialog Seating Registration -->
+  <BaseModal v-model="showRegisterModal" title="Seating Registration / ចុះឈ្មោះកៅអី" size="md">
+    <form @submit.prevent="submitRegistration" class="row g-4 form-container py-2">
+      <div class="col-md-6 form-group">
+        <label class="form-label custom-label">Seating Row</label>
+        <div class="input-wrapper">
+          <select v-model="form.seating_row_id" class="custom-select" :disabled="!rows.length || hasRegisteredSeat" required>
+            <option value="" disabled selected>Select your row</option>
+            <option v-for="row in rows" :key="row.id" :value="row.id">Row {{ row.row_num }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-6 form-group">
+        <label class="form-label custom-label">Seat Number</label>
+        <div class="input-wrapper">
+          <select v-model="form.seat_number" class="custom-select" :disabled="!form.seating_row_id || selectedRowCapacity === 0 || hasRegisteredSeat" required>
+            <option value="" disabled selected>Select your seat</option>
+            <option v-for="n in selectedRowCapacity" :key="n" :value="n" :disabled="takenSeats.includes(n)">
+              Seat {{ n }} {{ takenSeats.includes(n) ? '(Taken)' : '' }}
+            </option>
+          </select>
+          <div v-if="form.seating_row_id && selectedRowCapacity === 0" class="form-text text-warning mt-1" style="font-size: 0.8rem;">
+            No seats available in this row.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 mt-4" v-if="hasRegisteredSeat">
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-0 border-0" style="background-color: var(--surface-ground); color: var(--text-color);">
+          <Lock :size="16" class="text-primary" />
+          <span>You have successfully registered. To change your seating row or seat number, please contact your Kudi Admin.</span>
+        </div>
+      </div>
+
+      <div class="col-12 mt-4 text-end" v-if="!hasRegisteredSeat">
+        <BaseButton type="submit" variant="primary" :isLoading="isSubmitting" class="btn-premium px-5 py-2">
+          <span class="btn-text">{{ isSubmitting ? 'Registering...' : 'Register' }}</span>
+        </BaseButton>
+      </div>
+    </form>
+  </BaseModal>
+
+  <!-- Dialog Leave Request -->
+  <BaseModal v-model="showLeaveModal" title="New Leave Request / ស្នើសុំច្បាប់ថ្មី" size="md">
+    <form @submit.prevent="submitLeaveRequest" class="row g-3 py-2">
+      <div class="col-md-6">
+        <BaseDatePicker 
+          label="Start Date" 
+          v-model="leaveForm.start_date" 
+          required 
+          :minDate="today"
+        />
+      </div>
+      <div class="col-md-6">
+        <BaseDatePicker 
+          label="End Date" 
+          v-model="leaveForm.end_date" 
+          required 
+          :minDate="leaveForm.start_date || today"
+        />
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-medium mt-2">Reason for Leave</label>
+        <textarea class="form-control" v-model="leaveForm.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
+      </div>
+      <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-light border" @click="showLeaveModal = false">Cancel</button>
+        <BaseButton type="submit" variant="primary" :isLoading="isSubmittingLeave" class="btn-premium px-4">
+          Submit Request
+        </BaseButton>
+      </div>
+    </form>
+  </BaseModal>
+</div>
+</template>
+
+<script setup>
+import { ref, onMounted, watch, computed } from 'vue';
+import api from '@/api/api';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
+import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList } from '@lucide/vue';
+import BaseTable from '@/components/base/BaseTable.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import BaseBadge from '@/components/base/BaseBadge.vue';
+import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
+
+const authStore = useAuthStore();
+const toast = useToastStore();
+
+const showRegisterModal = ref(false);
+const showLeaveModal = ref(false);
+const isSubmitting = ref(false);
+const isSubmittingLeave = ref(false);
+const isLoading = ref(false);
+const isAttendancesLoading = ref(false);
+
+const activeTab = ref('absences');
+
+const summary = ref(null);
+const rows = ref([]);
+const myRequests = ref([]);
+const dailyAttendances = ref([]);
+
+const today = new Date().toISOString().split('T')[0];
+
+const form = ref({
+  seating_row_id: '',
+  seat_number: ''
+});
+
+const leaveForm = ref({
+  start_date: '',
+  end_date: '',
+  reason: ''
+});
+
+const selectedRowCapacity = ref(0);
+const takenSeats = ref([]);
+
+const hasRegisteredSeat = computed(() => {
+  return !!(authStore.user?.profile?.seating_row_id || authStore.user?.profile?.seating_row?.id) && 
+         !!authStore.user?.profile?.seat_number;
+});
+
+const attendanceColDefs = computed(() => {
+  return [
+    { field: 'date', header: 'Date', sortable: true },
+    { field: 'status', header: 'Status', sortable: true },
+    { field: 'notes', header: 'Notes / Reason', sortable: false }
+  ];
+});
+
+const colDefs = computed(() => {
+  return [
+    { field: 'date_range', header: 'Date Range', sortable: false },
+    { field: 'reason', header: 'Reason', sortable: false },
+    { field: 'status', header: 'Status', sortable: true },
+    { field: 'approved_by', header: 'Reviewed By', sortable: false }
+  ];
+});
+
+const getBadgeStatusColor = (status) => {
+  if (!status) return '';
+  if (status === 'pending_superadmin' || status === 'pending_mekudi' || status === 'pending') return 'PENDING';
+  return status.toUpperCase();
+};
+
+const formatStatus = (status) => {
+  if (!status) return '';
+  if (status === 'pending_superadmin' || status === 'pending_mekudi' || status === 'pending') return 'Pending';
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-GB');
+};
+
+watch(() => form.value.seating_row_id, async (newVal) => {
+  if (newVal) {
+    const row = rows.value.find(r => String(r.id) === String(newVal));
+    if (row) {
+      selectedRowCapacity.value = row.capacity;
+      try {
+        const response = await api.get(`/seating-rows/${row.id}/taken-seats`);
+        takenSeats.value = response.data.takenSeats || [];
+      } catch (e) {
+        console.error('Failed to fetch taken seats', e);
+        takenSeats.value = [];
+      }
+    } else {
+      selectedRowCapacity.value = 0;
+      takenSeats.value = [];
+    }
+  } else {
+    selectedRowCapacity.value = 0;
+    takenSeats.value = [];
+  }
+});
+
+const loadSummary = async () => {
+  try {
+    const response = await api.get('/attendances/my-summary');
+    summary.value = response.data?.data || null;
+  } catch (error) {
+    console.error('Failed to load summary', error);
+  }
+};
+
+const loadRows = async () => {
+  try {
+    const response = await api.get('/seating-rows');
+    rows.value = response.data?.data || response.data || [];
+  } catch (error) {
+    console.error('Failed to load rows', error);
+    rows.value = [];
+  }
+};
+
+const fetchRequests = async () => {
+  isLoading.value = true;
+  try {
+    const response = await api.get('/leave-requests/my');
+    myRequests.value = response.data || [];
+  } catch (error) {
+    console.error('Failed to load leave requests:', error);
+    toast.showToast('Failed to load requests', 'error');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const fetchDailyAttendances = async () => {
+  isAttendancesLoading.value = true;
+  try {
+    const response = await api.get('/attendances', { 
+      params: { 
+        user_id: authStore.user.id,
+      } 
+    });
+    const list = response.data?.data || response.data || [];
+    dailyAttendances.value = list.filter(a => a.status === 'absent' || a.status === 'permission');
+  } catch (error) {
+    console.error('Failed to load daily attendances:', error);
+  } finally {
+    isAttendancesLoading.value = false;
+  }
+};
+
+const submitRegistration = async () => {
+  if (!form.value.seating_row_id || !form.value.seat_number) {
+    toast.showToast('Please select both row and seat number', 'error');
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    const payload = {
+      seating_row_id: Number(form.value.seating_row_id),
+      seat_number: String(form.value.seat_number).trim()
+    };
+    await api.put(`/users/${authStore.user.id}/profile`, payload);
+    
+    // Refresh user info in authStore
+    const userRes = await api.get('/users/me');
+    authStore.user = userRes.data?.data || userRes.data;
+
+    toast.showToast('Registration successful.', 'success');
+    showRegisterModal.value = false;
+  } catch (error) {
+    toast.showToast(error.response?.data?.message || 'Failed to update registration', 'error');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const submitLeaveRequest = async () => {
+  isSubmittingLeave.value = true;
+  try {
+    await api.post('/leave-requests', leaveForm.value);
+    toast.showToast('Leave request submitted successfully', 'success');
+    showLeaveModal.value = false;
+    leaveForm.value = { start_date: '', end_date: '', reason: '' };
+    fetchRequests();
+    loadSummary();
+  } catch (error) {
+    console.error('Failed to submit request:', error);
+    toast.showToast(error.response?.data?.message || 'Failed to submit request', 'error');
+  } finally {
+    isSubmittingLeave.value = false;
+  }
+};
+
+onMounted(async () => {
+  await loadRows();
+  await loadSummary();
+  await fetchRequests();
+  await fetchDailyAttendances();
+
+  const profileUser = authStore.user;
+  if (profileUser) {
+    const profileRowId = profileUser.profile?.seating_row?.id || profileUser.profile?.seating_row_id;
+    if (profileRowId) {
+      form.value.seating_row_id = profileRowId.toString();
+    }
+    if (profileUser.profile?.seat_number) {
+      form.value.seat_number = String(profileUser.profile.seat_number);
+    }
+  }
+});
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.subtitle {
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.custom-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.custom-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  color: var(--text-color);
+  background: var(--surface-ground);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.custom-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+.custom-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.btn-premium {
+  font-weight: 500;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  border: none;
+}
+
+.btn-premium:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+}
+</style>

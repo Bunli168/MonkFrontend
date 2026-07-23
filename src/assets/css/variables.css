@@ -1,0 +1,156 @@
+:root {
+    --primary-color: rgb(0, 109, 128);
+    --primary-color-soft: color-mix(in srgb, var(--primary-color) 8%, transparent);
+    --primary-color-dark: rgb(0, 88, 103);
+
+    --success-color: #0d9467;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #06b6d4;
+    --secondary-color: #64748b;
+
+    --body-bg-color: #fff;
+    --card-bg-color: #EEF8F9;
+    --dashboard-bg-color: #f4f7f6;
+    --surface-ground: #f1f5f9;
+
+    --hero-grad-start: #ace1e9;
+    --hero-grad-mid1: #a4e0e8;
+    --hero-grad-mid2: #e6e2e2;
+    --hero-grad-end: #f5f5f5;
+
+    --border-radius: 10px;
+    --border-inner-padding: 0.5rem;
+    --border-inner-radius: calc(var(--border-radius) - var(--border-inner-padding));
+    --border-hover-color: #94a3b8;
+    /* 
+    1 applies padding equal to 0.25rem. 
+    2 applies padding equal to 0.5rem. 
+    3 applies padding equal to 1rem. 
+    4 applies padding equal to 1.5rem. 
+    */
+    --border-clr: rgba(15, 23, 42, 0.08);
+    --border-width: 2px;
+
+    /* Form Controls */
+    --control-height: 42px;
+
+    /* Global Padding Class */
+    --section-padding: 70px;
+
+    /* Global Typography Class */
+    --text-heading-color: #0f172a;
+    --truncate-1-lines-width: 250px;
+    --truncate-2-lines-width: 350px;
+    --truncate-3-lines-width: 500px;
+    --text-base: #334155;
+    --text-white: #fff;
+    --text-danger: var(--danger-color);
+    --text-warning: var(--warning-color);
+    --text-success: var(--success-color);
+    --text-info: var(--info-color);
+    --text-label: #090a1a;
+    --text-placeholder: #A1A1AA;
+
+    /* Sidebar */
+    --main-sidebar-width: 55px;
+    --sidebar-width: 180px;
+    --sidebar-header-height: 60px;
+    --sidebar-flower-filter: brightness(0) opacity(0.04);
+    --sidebar-bg-color: var(--surface-ground);
+    --main-sidebar-bg: #e2e8f0;
+    --sidebar-border-color: var(--border-clr);
+    --sidebar-element-bg: var(--surface-ground);
+    --sidebar-text-muted: #64748b;
+    --sidebar-text-hover: #475569;
+    --sidebar-text-active: var(--primary-color);
+}
+
+:root {
+    --p-tabs-tabpanel-padding: 16px 0 !important;
+    --p-tabs-tabpanel-background: var(--body-bg-color) !important;
+    --p-tabs-tablist-background: var(--body-bg-color) !important;
+    --p-tabs-tablist-border-color: var(--border-clr) !important;
+    --p-tabs-tablist-border-radius: var(--border-radius) !important;
+}
+
+[data-theme="dark"] {
+    --primary-color: rgb(38, 166, 187);
+    --primary-color-soft: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    --primary-color-dark: rgb(0, 139, 163);
+
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #06b6d4;
+    --secondary-color: #64748b;
+
+    --body-bg-color: #0f172a;
+    --card-bg-color: #1e293b;
+    --dashboard-bg-color: #0f172a;
+    --surface-ground: #1e293b;
+
+    /* Dark Mode Hero Gradient (Deep Teal to warm dark sand) */
+    --hero-grad-start: #0b2a33;
+    /* Very deep teal */
+    --hero-grad-mid1: #133842;
+    /* Deep teal */
+    --hero-grad-mid2: #1e293b;
+    /* Slate */
+    --hero-grad-end: #2e211b;
+    /* Dark warm sand */
+
+    --border-clr: rgba(255, 255, 255, 0.08);
+
+    /* Typography */
+    --text-heading-color: #ffffff;
+    --text-base: #cbd5e1;
+    --text-label: #f1f5f9;
+    --text-warning: var(--warning-color);
+    --text-success: var(--success-color);
+    --text-info: var(--info-color);
+
+    /* Sidebar */
+    --sidebar-bg-color: var(--card-bg-color);
+    --main-sidebar-bg: var(--body-bg-color);
+    --sidebar-text-muted: #94a3b8;
+    --sidebar-text-hover: #f1f5f9;
+}
+
+[data-theme="dark"] body {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg-color);
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: #1e293b;
+    border-color: var(--primary-color);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #1e293b;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
