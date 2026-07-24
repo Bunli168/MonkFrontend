@@ -57,7 +57,7 @@
                             </div>
                             <span class="fw-bold text-heading">My Profile Summary / ព័ត៌មានផ្ទាល់ខ្លួន</span>
                         </div>
-                        <router-link :to="{ name: authStore.isMonk ? 'pagoda-biography-survey' : 'pagoda-profile' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">
+                        <router-link :to="{ name: 'pagoda-profile' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">
                             Edit Details
                         </router-link>
                     </div>
@@ -124,43 +124,7 @@
                     </div>
                 </div>
 
-                <!-- Surveys Pending Section -->
-                <div v-if="!authStore.isMonk" class="d-flex flex-column gap-2 flex-grow-1">
-                    <!-- Title Card -->
-                    <div class="card p-3" style="background-color: var(--body-bg-color)">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded p-1 d-flex align-items-center justify-content-center" style="background-color: rgba(102, 16, 242, 0.1); color: var(--purple, #6f42c1);">
-                                    <ClipboardList :size="16" />
-                                </div>
-                                <span class="fw-bold text-heading">Surveys pending your feedback</span>
-                            </div>
-                            <router-link :to="{ name: 'pagoda-surveys' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">View all</router-link>
-                        </div>
-                    </div>
-                    
-                    <!-- Dynamic Surveys List -->
-                    <div v-if="surveyStudentStore.isLoading" class="card d-flex justify-content-center py-5" style="background-color: var(--body-bg-color)">
-                        <div class="spinner-border text-primary spinner-border-sm mx-auto" role="status"></div>
-                    </div>
-                    <div v-else-if="pendingSurveys.length > 0" class="row g-2">
-                        <div v-for="survey in pendingSurveys.slice(0, 4)" :key="survey.id" class="col-12 col-md-6">
-                            <div class="card p-3 h-100" style="background-color: var(--body-bg-color); cursor: pointer;" @click="router.push({ name: 'pagoda-survey', params: { id: survey.id } })">
-                                <div class="d-flex align-items-center justify-content-between h-100">
-                                    <div class="d-flex flex-column overflow-hidden me-2">
-                                        <span class="fw-medium text-heading text-truncate" style="font-size: 0.95rem;">{{ survey.title }}</span>
-                                        <span class="text-muted mt-1" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ survey.description || 'No description provided' }}</span>
-                                    </div>
-                                    <ChevronRight :size="18" class="text-muted" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else class="card d-flex flex-column align-items-center justify-content-center py-5" style="background-color: var(--body-bg-color)">
-                        <CheckCircle :size="32" class="text-muted mb-3 opacity-50" stroke-width="1.5" />
-                        <span class="text-muted" style="font-size: 0.95rem;">You're all caught up — no surveys waiting</span>
-                    </div>
-                </div>
+
 
             </div>
 
@@ -219,7 +183,6 @@
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
-import { useSurveyStudentStore } from '@/stores/surveys/surveyStudent';
 import { useOwnReportstore } from '@/stores/reports/ownReport';
 import Banner from '@/components/Banner.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
@@ -229,7 +192,6 @@ import { Newspaper, ClipboardList, CheckCircle, AlertTriangle, FileText, MapPin,
 
 const router = useRouter();
 const authStore = useAuthStore();
-const surveyStudentStore = useSurveyStudentStore();
 const ownReportStore = useOwnReportstore();
 
 const monkSurvey = ref(null);
@@ -350,9 +312,7 @@ const fetchWeather = async () => {
     }
 };
 
-const pendingSurveys = computed(() => {
-    return (surveyStudentStore.surveys || []).filter(survey => !survey.response?.isCompleted);
-});
+
 
 const activeReports = computed(() => {
     return (ownReportStore.ownReports || []).filter(report => report.status !== 'RESOLVED' && report.status !== 'REJECTED');
@@ -367,14 +327,14 @@ onMounted(async () => {
         currentDate.value = new Date();
     }, 60000);
 
-    if (surveyStudentStore.getAllSurveys) surveyStudentStore.getAllSurveys();
+
     ownReportStore.page = 1;
     if (ownReportStore.getAllOwnReports) ownReportStore.getAllOwnReports();
     fetchWeather();
     loadMonkSurvey();
     loadSummary();
 
-    if (surveyStudentStore.setupSocketListeners) surveyStudentStore.setupSocketListeners();
+
     if (ownReportStore.setupSocketListeners) ownReportStore.setupSocketListeners();
 });
 

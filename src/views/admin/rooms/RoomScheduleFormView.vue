@@ -6,7 +6,7 @@
             <!-- Step 1: Form View -->
             <div v-show="!showPreview">
                 <h4 class="fw-bold mb-3 text-heading">Create Event</h4>
-                <RoomScheduleForm ref="roomScheduleFormRef" />
+                <RoomScheduleForm ref="roomScheduleFormRef" :initialData="props.initialData" />
 
                 <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                     <BaseButton variant="outline-primary" @click="onCancel">Cancel</BaseButton>
@@ -103,6 +103,13 @@ import { CheckCircle, AlertTriangle, Trash2 } from '@lucide/vue';
 
 const emit = defineEmits(['close']);
 
+const props = defineProps({
+    initialData: {
+        type: Object,
+        default: null
+    }
+});
+
 const roomScheduleStore = useRoomScheduleStore();
 const roomScheduleFormRef = ref(null);
 const isSubmitting = ref(false);
@@ -125,6 +132,8 @@ const currentPage = ref(1);
 const perPage = ref(10);
 
 const onCancel = () => {
+    const formRef = roomScheduleFormRef.value;
+    if (formRef && formRef.resetForm) formRef.resetForm();
     emit('close');
 };
 

@@ -86,18 +86,7 @@ const routes = [
 				name: 'pagoda-reports',
 				component: () => import('@/views/pagoda/PagodaReportView.vue')
 			},
-			{
-				path: 'surveys',
-				name: 'pagoda-surveys',
-				component: () => import('@/views/pagoda/PagodaSurveyListView.vue'),
-				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI'] }
-			},
-			{
-				path: 'biography-survey',
-				name: 'pagoda-biography-survey',
-				component: () => import('@/views/pagoda/PagodaBiographySurveyView.vue'),
-				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI'] }
-			},
+
 			{
 				path: 'self-register',
 				name: 'self-register',
@@ -116,12 +105,7 @@ const routes = [
 				component: () => import('@/views/pagoda/PagodaStudentProfileSummaryView.vue'),
 				meta: { roles: ['STUDENT'] }
 			},
-			{
-				path: 'survey/:id',
-				name: 'pagoda-survey',
-				component: () => import('@/views/pagoda/PagodaSurveyView.vue'),
-				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI'] }
-			},
+
 			{
 				path: 'room',
 				name: 'pagoda-rooms',
@@ -221,12 +205,7 @@ const routes = [
 				component: () => import('@/views/admin/attendance/AttendanceView.vue'),
 				meta: { title: 'Attendance Management', roles: ['SuperAdmin', 'MEKUDI'] }
 			},
-			{
-				path: 'survey',
-				name: 'survey',
-				component: () => import('@/views/admin/surveys/SurveyView.vue'),
-				meta: { title: 'Surveys Management' }
-			},
+
 			{
 				path: 'kudi',
 				redirect: '/dashboard/system-settings'

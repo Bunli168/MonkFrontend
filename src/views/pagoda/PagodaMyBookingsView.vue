@@ -415,6 +415,16 @@ const createEventFormRef = ref(null);
 const isCreatingEvent = ref(false);
 const toastStore = useToastStore();
 
+watch(showCreateEventModal, (newVal) => {
+    if (newVal) {
+        setTimeout(() => {
+            if (createEventFormRef.value && createEventFormRef.value.resetForm) {
+                createEventFormRef.value.resetForm();
+            }
+        }, 50);
+    }
+});
+
 const handleCreateEvent = async () => {
     if (!createEventFormRef.value) return;
     const formData = await createEventFormRef.value.validateForm();

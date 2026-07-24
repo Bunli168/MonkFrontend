@@ -91,10 +91,12 @@
                         <div class="card-body p-0">
                             <BaseTable 
                                 :columns="colDefs" 
-                                :rows="filteredMonks" 
+                                :rows="paginatedMonks" 
                                 :loading="isLoadingMonks"
                                 :show-index="true"
-                                :per-page="50"
+                                :total-records="filteredMonks.length"
+                                v-model:page="page"
+                                v-model:per-page="perPage"
                             >
                                 <template #name="{ data: monk }">
                                     <div class="d-flex align-items-center gap-3 cursor-pointer" @click="cycleStatus(monk)">
@@ -125,10 +127,9 @@
 
                                 <template #absents="{ data: monk }">
                                     <div class="d-flex justify-content-center w-100">
-                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold" v-if="monk.netAbsents >= 9">
-                                            {{ monk.netAbsents }}
+                                        <span class="fw-bold text-danger" style="font-size: 1rem;">
+                                            {{ monk.netAbsents || 0 }}
                                         </span>
-                                        <span v-else class="text-muted">-</span>
                                     </div>
                                 </template>
                                 
@@ -184,7 +185,7 @@
 
 <script setup>
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseButton from '@/components/base/BaseButton.vue';
@@ -207,10 +208,22 @@ const getLocalDateString = () => {
 };
 
 const activeTab = ref('attendance');
+const page = ref(1);
+const perPage = ref(10);
 const selectedDate = ref(getLocalDateString());
 const searchQuery = ref('');
 const selectedRowFilter = ref('');
 const selectedStatusFilter = ref('');
+
+// Reset page on filters change
+const resetPage = () => {
+    page.value = 1;
+};
+
+watch(searchQuery, resetPage);
+watch(selectedRowFilter, resetPage);
+watch(selectedStatusFilter, resetPage);
+watch(selectedDate, resetPage);
 
 const monks = ref([]);
 const seatingRows = ref([]);
@@ -221,24 +234,22 @@ const selectedSeasonId = ref(null);
 const isLoadingMonks = ref(false);
 const isSaving = ref(false);
 
+const paginatedMonks = computed(() => {
+    const start = (page.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return filteredMonks.value.slice(start, end);
+});
+
 const colDefs = computed(() => {
     const cols = [
         { field: 'name', header: 'Monk Name' },
         { field: 'role', header: 'Role' },
         { field: 'kudi', header: 'Kudi', class: 'text-center' },
-        { field: 'phone', header: 'Phone' }
+        { field: 'phone', header: 'Phone' },
+        { field: 'row_number', header: 'Row' },
+        { field: 'seat_number', header: 'Seat' },
+        { field: 'absents', header: 'Absents', class: 'text-center' }
     ];
-    
-    if (false) {
-        cols.push({ field: 'absents', header: 'Absents', class: 'text-center' });
-    } else {
-        cols.push(
-            { field: 'row_number', header: 'Row' },
-            { field: 'seat_number', header: 'Seat' },
-            { field: 'status', header: 'Attendance', sortable: false, class: 'text-center', style: 'min-width: 150px;' },
-            { field: 'notes', header: 'Notes', sortable: false, style: 'min-width: 200px;' }
-        );
-    }
     
     return cols;
 });

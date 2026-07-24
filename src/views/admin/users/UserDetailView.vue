@@ -72,18 +72,13 @@
                         </li>
                     </ul>
 
-                    <div v-if="user?.role?.id === 3 || user?.role?.id === 7 || ['MONK', 'BHIKKHU'].includes(user?.role?.name?.toUpperCase())" class="mt-4 pt-3 border-top">
-                        <BaseButton variant="outline-primary" class="w-100 d-flex align-items-center justify-content-center gap-2" @click="showBiographySurveyModal = true">
-                            <BookOpen :size="16" />
-                            <span>Biography Survey</span>
-                        </BaseButton>
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <MonkBiographySurveyModal v-if="user?.id" v-model="showBiographySurveyModal" :userId="user.id" />
+
 </template>
 
 <script setup>
@@ -92,7 +87,7 @@ import { formatDate } from '@/utils/dateFormat.js';
 import { getAuthImageUrl } from '@/utils/imageUrl.js';
 import { BookOpen } from '@lucide/vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-import MonkBiographySurveyModal from './components/MonkBiographySurveyModal.vue';
+
 
 const props = defineProps({
     user: {

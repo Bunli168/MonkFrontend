@@ -11,7 +11,7 @@
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
 
-                <div v-if="false" class="kudi-select" style="min-width: 180px;">
+                <div class="kudi-select" style="min-width: 180px;">
                     <BaseSelect 
                         v-model="selectedKut" 
                         :options="kuts" 
@@ -77,18 +77,11 @@
             </template>
 
             <template #action="{ data }">
-                <BaseButton variant="outline-primary" size="sm" class="d-inline-flex align-items-center gap-2" @click="openSurvey(data)">
-                    <BookOpen :size="14" />
-                    <span>View Detail</span>
-                </BaseButton>
+                <span class="text-muted small">No Detail</span>
             </template>
         </BaseTable>
 
-        <MonkBiographySurveyModal 
-            v-if="selectedUserId" 
-            v-model="showSurveyModal" 
-            :userId="selectedUserId" 
-        />
+
     </div>
 </template>
 
@@ -101,7 +94,7 @@ import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
-import MonkBiographySurveyModal from './components/MonkBiographySurveyModal.vue';
+
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -196,123 +189,49 @@ const openSurvey = (user) => {
 const exportToCSV = async () => {
     try {
         isExporting.value = true;
-        const params = { roleIds: '2' };
-        if (selectedKut.value) {
-            params.kut_id = selectedKut.value;
-        }
-        const response = await api.get('/monk-surveys', { params });
-        if (response.data?.success && response.data.data) {
-            const surveys = response.data.data;
-            
-             const headers = [
-                'ល.រ ',
-                'តួនាទី ',
-                'គោត្តនាម-នាម ',
-                'សញ្ជាតិ ',
-                'ថ្ងៃខែឆ្នាំកំណើត ',
-                'លេខទូរស័ព្ទ ',
-                'ខេត្ត ',
-                'ស្រុក ',
-                'ឃុំ ',
-                'ភូមិ ',
-                'ព្រះឧបជ្ឈាយ៍ ',
-                'នាមឧបសម្បទាចារ្យ ',
-                'អនុស្សាវនាចារ្យ ',
-                'នាមបព្វជ្ជា ',
-                'ថ្ងៃខែឆ្នាំបព្វជ្ជា ',
-                'វត្តបព្វជ្ជា ',
-                'ខេត្ត ',
-                'ស្រុក ',
-                'ឃុំ ',
-                'អាសយដ្ឋានបច្ចុប្បន្ន - វត្ត ',
-                'អាសយដ្ឋានបច្ចុប្បន្ន - ខេត្ត ',
-                'អាសយដ្ឋានបច្ចុប្បន្ន - ស្រុក ',
-                'អាសយដ្ឋានបច្ចុប្បន្ន - ឃុំ '
+        const params = {
+            page: 1,
+            perPage: 10000,
+            roleIds: '2', // Admin (Mekudi)
+            search: searchQuery.value || undefined,
+            kutId: selectedKut.value || undefined
+        };
+        const response = await api.get('/users', { params });
+        const records = response.data?.data || response.data || [];
+
+        const headers = ['ល.រ (No.)', 'ឈ្មោះ (Name)', 'អ៊ីមែល (Email)', 'លេខទូរស័ព្ទ (Phone)', 'សាលា/សាកលវិទ្យាល័យ (School/University)', 'ឆ្នាំទី (Year)'];
+        const rows = records.map((user, index) => {
+            const profile = user.UserProfile || user.profile || {};
+            const fullName = `${user.lastName || ''} ${user.firstName || ''}`.trim();
+            const phone = profile.phone_number || profile.phone || '-';
+            const school = profile.university_name || '-';
+            const year = getYearLabel(profile.university_year);
+            return [
+                index + 1,
+                fullName,
+                user.email,
+                phone,
+                school,
+                year
             ];
+        });
 
-            // Sort surveys: Mekudi (2, 1) > Bhikkhu (7) > Samanera (3) > Others
-            const getRolePriority = (roleId) => {
-                if (roleId == 1 || roleId == 2) return 1; // SuperAdmin / Mekudi
-                if (roleId == 7) return 2; // Bhikkhu
-                if (roleId == 3) return 3; // Samanera
-                return 4; // Others
-            };
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(e => e.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(","))
+        ].join("\n");
 
-            surveys.sort((a, b) => {
-                const roleA = (a.User || a.user || {}).Role || (a.User || a.user || {}).role || {};
-                const roleIdA = roleA.id || (a.User || a.user || {}).role_id;
-                const roleB = (b.User || b.user || {}).Role || (b.User || b.user || {}).role || {};
-                const roleIdB = roleB.id || (b.User || b.user || {}).role_id;
-                
-                const pA = getRolePriority(roleIdA);
-                const pB = getRolePriority(roleIdB);
-                
-                if (pA !== pB) return pA - pB;
-                return (a.id || 0) - (b.id || 0);
-            });
-
-            const rows = surveys.map((survey, index) => {
-                const user = survey.User || survey.user || {};
-                const profile = user.UserProfile || user.profile || user.userProfile || {};
-                const role = user.Role || user.role || {};
-                
-                const roleId = role.id || user.role_id;
-                let roleLabel = role.name || '';
-                if (roleId == 1 || roleId == 2) roleLabel = 'មេកុដិ'; // Treat SuperAdmin/Admin as Mekudi in this context
-                else if (roleId == 7) roleLabel = 'ភិក្ខុ';
-                else if (roleId == 3) roleLabel = 'សាមណេរ';
-
-                const fullName = profile.first_name_kh || profile.last_name_kh
-                    ? `${profile.last_name_kh || ''} ${profile.first_name_kh || ''}`.trim()
-                    : (survey.surname_name || '').trim();
-                
-                const dob = profile.date_of_birth || survey.date_of_birth || '';
-                const phone = profile.phone_number || survey.phone_number || '';
-                
-                return [
-                    index + 1,
-                    roleLabel,
-                    fullName,
-                    survey.nationality || '',
-                    dob,
-                    phone,
-                    survey.pob_province || '',
-                    survey.pob_district || '',
-                    survey.pob_commune || '',
-                    survey.pob_village || '',
-                    survey.preceptor_name || '',
-                    survey.first_assistant_preceptor || '',
-                    survey.second_assistant_preceptor || '',
-                    survey.ordained_name || '',
-                    survey.ordination_date || '',
-                    survey.poo_wat || '',
-                    survey.poo_province || '',
-                    survey.poo_district || '',
-                    survey.poo_commune || '',
-                    survey.current_wat || '',
-                    survey.current_province || '',
-                    survey.current_district || '',
-                    survey.current_commune || ''
-                ];
-            });
-
-            const csvContent = [
-                headers.join(','),
-                ...rows.map(e => e.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(","))
-            ].join("\n");
-
-            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `monk_biography_surveys_${new Date().toISOString().slice(0,10)}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `mekudi_biographies_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     } catch (error) {
-        console.error('Failed to export surveys:', error);
+        console.error('Failed to export Mekudi:', error);
     } finally {
         isExporting.value = false;
     }
@@ -335,8 +254,6 @@ watch(selectedKut, () => {
 
 onMounted(() => {
     fetchMonks();
-    if (false) {
-        fetchKuts();
-    }
+    fetchKuts();
 });
 </script>

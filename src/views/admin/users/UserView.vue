@@ -24,7 +24,7 @@
                         Pending Users
                     </div>
                 </Tab>
-                <Tab v-if="authStore.isMonk" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
+                <Tab v-if="authStore.isMonk || authStore.isSuperAdmin" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <BookOpen style="color: var(--success-color);" :size="16" />
                         ប្រវត្តិរូបមេកុដិ
@@ -69,9 +69,8 @@
             <TabPanel v-if="false" value="all-pending-users">
                 <UserPendingView v-if="activeTab === 'all-pending-users'" />
             </TabPanel>
-            <TabPanel v-if="authStore.isMonk" value="my-biography">
-                <UserMekudiBiographyView v-if="activeTab === 'my-biography' && false" />
-                <PagodaBiographySurveyView v-else-if="activeTab === 'my-biography'" />
+            <TabPanel v-if="authStore.isMonk || authStore.isSuperAdmin" value="my-biography">
+                <UserMekudiBiographyView v-if="activeTab === 'my-biography'" />
             </TabPanel>
             <TabPanel value="biography-surveys">
                 <UserBiographySurveysView v-if="activeTab === 'biography-surveys'" />
@@ -92,10 +91,9 @@ import UserListView from './UserListView.vue';
 import UserPendingView from './UserPendingView.vue';
 import UserFormView from './UserFormView.vue';
 import UserBulkPreviewView from './UserBulkPreviewView.vue';
-import UserBiographySurveysView from './UserBiographySurveysView.vue';
+import UserBiographySurveysView from './UserMonkBiographyView.vue';
 import UserStudentBiographyView from './UserStudentBiographyView.vue';
 import UserMekudiBiographyView from './UserMekudiBiographyView.vue';
-import PagodaBiographySurveyView from '@/views/pagoda/PagodaBiographySurveyView.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { UserRoundCheck, MailWarning, UserPlus, FileDown, BookOpen, GraduationCap } from '@lucide/vue';
 
