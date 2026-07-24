@@ -18,28 +18,22 @@
                         All Verified Users
                     </div>
                 </Tab>
+                <Tab v-if="authStore.isMonk" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
+                    <div class="d-flex align-items-center gap-2">
+                        <ClipboardList style="color: var(--primary-color);" :size="16" />
+                        ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)
+                    </div>
+                </Tab>
                 <Tab v-if="false" value="all-pending-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <MailWarning style="color: var(--warning-color);" :size="16" />
                         Pending Users
                     </div>
                 </Tab>
-                <Tab v-if="authStore.isMonk || authStore.isSuperAdmin" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
-                    <div class="d-flex align-items-center gap-2">
-                        <BookOpen style="color: var(--success-color);" :size="16" />
-                        ប្រវត្តិរូបមេកុដិ
-                    </div>
-                </Tab>
                 <Tab value="biography-surveys" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <BookOpen style="color: var(--primary-color);" :size="16" />
-                        ប្រវត្តិរូបព្រះសង្ឃ
-                    </div>
-                </Tab>
-                <Tab value="bhikkhu-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
-                    <div class="d-flex align-items-center gap-2">
-                        <BookOpen style="color: var(--warning-color);" :size="16" />
-                        ប្រវត្តិរូបភិក្ខុ
+                        ប្រវត្តិព្រះសង្ឃ
                     </div>
                 </Tab>
                 <Tab value="student-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
@@ -72,17 +66,14 @@
             <TabPanel value="all-users">
                 <UserListView v-if="activeTab === 'all-users'" @new="activeTab = 'user-form'" @preview-bulk="activeTab = 'bulk-preview'" />
             </TabPanel>
+            <TabPanel v-if="authStore.isMonk" value="my-biography">
+                <PagodaMonkBiographyView v-if="activeTab === 'my-biography'" />
+            </TabPanel>
             <TabPanel v-if="false" value="all-pending-users">
                 <UserPendingView v-if="activeTab === 'all-pending-users'" />
             </TabPanel>
-            <TabPanel v-if="authStore.isMonk || authStore.isSuperAdmin" value="my-biography">
-                <UserMekudiBiographyView v-if="activeTab === 'my-biography'" />
-            </TabPanel>
             <TabPanel value="biography-surveys">
                 <UserBiographySurveysView v-if="activeTab === 'biography-surveys'" />
-            </TabPanel>
-            <TabPanel value="bhikkhu-biography">
-                <UserBhikkhuBiographyView v-if="activeTab === 'bhikkhu-biography'" />
             </TabPanel>
             <TabPanel value="student-biography">
                 <UserStudentBiographyView v-if="activeTab === 'student-biography'" />
@@ -104,8 +95,9 @@ import UserBiographySurveysView from './UserMonkBiographyView.vue';
 import UserBhikkhuBiographyView from './UserBhikkhuBiographyView.vue';
 import UserStudentBiographyView from './UserStudentBiographyView.vue';
 import UserMekudiBiographyView from './UserMekudiBiographyView.vue';
+import PagodaMonkBiographyView from '@/views/pagoda/PagodaMonkBiographyView.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { UserRoundCheck, MailWarning, UserPlus, FileDown, BookOpen, GraduationCap } from '@lucide/vue';
+import { UserRoundCheck, MailWarning, UserPlus, FileDown, BookOpen, GraduationCap, ClipboardList } from '@lucide/vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -114,9 +106,9 @@ const authStore = useAuthStore();
 const activeTab = ref('all-users');
 
 const VALID_TABS = computed(() => {
-    const tabs = ['all-users', 'user-form', 'biography-surveys', 'bhikkhu-biography', 'student-biography'];
-    if (false) tabs.push('all-pending-users');
+    const tabs = ['all-users'];
     if (authStore.isMonk) tabs.push('my-biography');
+    tabs.push('user-form', 'biography-surveys', 'student-biography');
     return tabs;
 });
 

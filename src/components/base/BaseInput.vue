@@ -14,37 +14,38 @@
 
         <Password v-if="type === 'password'" :inputId="id" v-model="internalValue" :placeholder="placeholder"
             :disabled="disabled" :required="required" class="w-100" :inputClass="['w-100', 'p-password-dynamic']" :feedback="false"
-            toggleMask :invalid="!!error" @blur="$emit('blur', $event)" @focus="$emit('focus', $event)"
+            toggleMask :invalid="!!error || !!internalError" @blur="onBlur" @focus="$emit('focus', $event)"
             :inputStyle="reduceRadius ? { borderRadius: `calc(var(--border-radius) - ${reduceRadius}rem) !important` } : {}" />
 
         <InputNumber v-else-if="type === 'number'" :inputId="id" v-model="internalValue" :placeholder="placeholder"
-            :disabled="disabled" :required="required" class="w-100" :inputClass="['w-100']" :invalid="!!error" @blur="$emit('blur', $event)"
+            :disabled="disabled" :required="required" class="w-100" :inputClass="['w-100']" :invalid="!!error || !!internalError" @blur="onBlur"
             @focus="$emit('focus', $event)" />
 
         <div v-else-if="type === 'textarea'" class="position-relative w-100 d-flex flex-column">
             <Textarea :id="id" v-model="internalValue" :placeholder="placeholder"
-                :disabled="disabled" :required="required" :class="['w-100', 'p-textarea-dynamic']" :rows="rows" autoResize :invalid="!!error"
+                :disabled="disabled" :required="required" :class="['w-100', 'p-textarea-dynamic']" :rows="rows" autoResize :invalid="!!error || !!internalError"
                 :maxlength="computedMaxlength"
-                @blur="$emit('blur', $event)" @focus="$emit('focus', $event)" />
+                @blur="onBlur" @focus="$emit('focus', $event)" />
         </div>
 
         <div v-else class="position-relative w-100 d-flex align-items-center">
             <component v-if="prefixIcon" :is="prefixIcon" class="input-icon-left" :size="18" />
             <InputText :id="id" :type="type" :placeholder="placeholder" :class="['w-100', { 'with-prefix': prefixIcon, 'with-suffix': clearable }]" :disabled="disabled"
                 :maxlength="computedMaxlength" :required="required"
-                v-model="internalValue" :invalid="!!error" @blur="$emit('blur', $event)" @focus="$emit('focus', $event)" />
+                v-model="internalValue" :invalid="!!error || !!internalError" @blur="onBlur" @focus="$emit('focus', $event)"
+                @keydown="onKeydown" />
             <button v-if="internalValue && clearable && !disabled" @click="onClear" class="clear-button btn p-0 position-absolute d-flex align-items-center justify-content-center" type="button" aria-label="Clear input">
                 <X :size="16" />
             </button>
         </div>
 
-        <small v-if="error" class="text-danger mt-1 d-block">{{ error }}</small>
+        <small v-if="error || internalError" class="text-danger mt-1 d-block">{{ error || internalError }}</small>
         <small v-else-if="hint" class="text-muted mt-1 d-block">{{ hint }}</small>
     </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { X } from '@lucide/vue';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
@@ -107,6 +108,14 @@ const props = defineProps({
     maxlength: {
         type: Number,
         default: null
+    },
+    preventNumbers: {
+        type: Boolean,
+        default: false
+    },
+    preventText: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -128,6 +137,32 @@ const internalValue = computed({
     get: () => props.modelValue,
     set: (val) => emit('update:modelValue', val)
 });
+
+const internalError = ref('');
+
+const validateInput = () => {
+    internalError.value = '';
+    const val = (internalValue.value || '').toString();
+    
+    if (props.preventNumbers && /[0-9០-៩]/.test(val)) {
+        internalError.value = 'Numbers are not allowed / មិនអនុញ្ញាតឱ្យបញ្ចូលលេខទេ';
+    } else if (props.preventText && /[^0-9០-៩\+\-\s]/.test(val)) {
+        internalError.value = 'Only numbers are allowed / អនុញ្ញាតឱ្យបញ្ចូលតែលេខប៉ុណ្ណោះ';
+    }
+};
+
+watch(() => internalValue.value, () => {
+    validateInput();
+});
+
+const onKeydown = (e) => {
+    // Keep empty as requested
+};
+
+const onBlur = (e) => {
+    validateInput();
+    emit('blur', e);
+};
 </script>
 
 <style scoped>

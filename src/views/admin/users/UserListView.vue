@@ -36,7 +36,7 @@
                     </BaseSelect>
                 </div>
 
-                <div class="kut-select">
+                <div class="kut-select" v-if="authStore.isSuperAdmin">
                     <BaseSelect 
                         v-model="searchAndFilter.filters.value.kutId" 
                         :options="kutOptions"

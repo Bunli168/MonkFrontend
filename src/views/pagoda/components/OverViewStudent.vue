@@ -88,41 +88,7 @@
                     </div>
                 </div>
 
-                <!-- Attendance Summary Section -->
-                <div class="card p-3" style="background-color: var(--body-bg-color)">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="rounded p-1 d-flex align-items-center justify-content-center" style="background-color: rgba(255, 193, 7, 0.1); color: var(--warning, #ffc107);">
-                                <ClipboardList :size="16" />
-                            </div>
-                            <span class="fw-bold text-heading">Attendance Summary / វត្តមាន</span>
-                        </div>
-                        <router-link :to="{ name: 'leave-request' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">
-                            Ask for Permission
-                        </router-link>
-                    </div>
-                    
-                    <div class="row g-3" style="font-size: 0.9rem;">
-                        <div class="col-6 d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 48px; height: 48px; background-color: rgba(220, 53, 69, 0.1); color: var(--danger);">
-                                <span class="fw-bold fs-4">{{ attendanceSummary?.absent || 0 }}</span>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Absent</h6>
-                                <small class="text-muted">Total times absent</small>
-                            </div>
-                        </div>
-                        <div class="col-6 d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 48px; height: 48px; background-color: rgba(255, 193, 7, 0.1); color: var(--warning);">
-                                <span class="fw-bold fs-4">{{ attendanceSummary?.permission || 0 }}</span>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Permission</h6>
-                                <small class="text-muted">Total times permitted</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
 
 

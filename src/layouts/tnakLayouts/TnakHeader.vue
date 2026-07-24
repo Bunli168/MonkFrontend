@@ -122,7 +122,7 @@ const headerPaths = computed(() => {
         paths.push({ label: 'Fine Ledger', path: 'pagoda-ledger', icon: FileText });
     }
     
-    if (systemStore.isSeasonOpen) {
+    if (systemStore.isSeasonOpen && (authStore.isMekudi || authStore.isMonk)) {
         paths.push({ label: 'Attendance', path: 'self-register', icon: ClipboardList });
     }
 

@@ -2,7 +2,7 @@
     <div style="background-color: var(--surface-ground);">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biography / ប្រវត្តិរូបព្រះសង្ឃ</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biographies / ប្រវត្តិព្រះសង្ឃ</h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
@@ -10,7 +10,7 @@
                     <FileDown :size="16" />
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
-                <div class="kudi-select" style="min-width: 180px;">
+                <div class="kudi-select" style="min-width: 180px;" v-if="authStore.isSuperAdmin">
                     <BaseSelect
                         v-model="selectedKut"
                         :options="kuts"
@@ -151,7 +151,7 @@ const fetchMonks = async () => {
         const params = {
             page: page.value,
             perPage: perPage.value,
-            roleIds: '3', // Monks only
+            roleIds: '2,3,7', // Mekudi, Monks, Bhikkhus
             search: searchQuery.value || undefined,
             kutId: selectedKut.value || undefined
         };
@@ -177,53 +177,86 @@ const exportToCSV = async () => {
         const response = await api.get('/monk-surveys');
         const records = response.data?.data || [];
 
-        const headers = [
-            'ល.រ (No.)',
-            'ឈ្មោះ (Surname-Name)',
-            'ឈ្មោះបំពាក់ (Ordained Name)',
-            'ថ្ងៃខែឆ្នាំកំណើត (Date of Birth)',
-            'ជាតិសាសន៍ (Nationality)',
-            'លេខទូរស័ព្ទ (Phone)',
-            'លេខអត្តសញ្ញាណ (Chhaya No.)',
-            'អ៊ីមែល (Email)',
-            'ព្រះឧបជ្ឈាយ៍ (Preceptor)',
-            'អ្នកជួយ១ (1st Assistant)',
-            'អ្នកជួយ២ (2nd Assistant)',
-            'ថ្ងៃបួស (Ordained Date)',
-            'វត្តបួស (Ordination Wat)',
-            'វត្តបច្ចុប្បន្ន (Current Wat)',
+        // Fetch locations to map IDs to names
+        let locData = { provinces: [], districts: [], communes: [], villages: [] };
+        try {
+            const locRes = await api.get('/locations/all');
+            if (locRes.data?.success && locRes.data?.data) {
+                locData = locRes.data.data;
+            }
+        } catch (e) {
+            console.error('Failed to fetch locations for export', e);
+        }
+
+        const getProvName = (id) => id ? locData.provinces?.find(p => String(p.id) === String(id))?.name || id : '';
+        const getDistName = (id) => id ? locData.districts?.find(d => String(d.id) === String(id))?.name || id : '';
+        const getCommName = (id) => id ? locData.communes?.find(c => String(c.id) === String(id))?.name || id : '';
+        const getVillName = (id) => id ? locData.villages?.find(v => String(v.id) === String(id))?.name || id : '';
+
+        const header1 = [
+            'ល.រ', 'អត្តលេខ',
+            'គោត្តនាមនិងនាម', '',
+            'ភេទ', '',
+            'ថ្ងៃខែឆ្នាំកំណើត',
+            'ទីកន្លែងកំណើត', '', '', '',
+            'អាសយដ្ឋានបច្ចុប្បន្ន', '', '', '',
+            'លេខទូរស័ព្ទ', 'ផ្សេងៗ'
         ];
 
-        const rows = records.map((survey, index) => {
+        const header2 = [
+            '', '',
+            'អក្សរខ្មែរ', 'អក្សរឡាតាំង',
+            'ភិក្ខុ', 'សាមណេរ',
+            '',
+            'ភូមិ', 'ឃុំ', 'ស្រុក', 'ខេត្ត',
+            'ភូមិ(វត្ត)', 'ឃុំ', 'ស្រុក', 'ខេត្ត',
+            '', ''
+        ];
+
+        const sortedRecords = [...records].sort((a, b) => {
+            const roleA = a.User?.role_id === 7 ? 0 : (a.User?.role_id === 3 ? 1 : 2);
+            const roleB = b.User?.role_id === 7 ? 0 : (b.User?.role_id === 3 ? 1 : 2);
+            return roleA - roleB;
+        });
+
+        const rows = sortedRecords.map((survey, index) => {
             const profile = survey.User?.UserProfile || {};
-            const phone = survey.phone_number || profile.phone_number || '-';
-            const dob = survey.date_of_birth
-                ? new Date(survey.date_of_birth).toLocaleDateString('en-GB')
-                : (profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString('en-GB') : '-');
-            const ordDate = survey.ordained_date
-                ? new Date(survey.ordained_date).toLocaleDateString('en-GB')
-                : '-';
+            const phone = survey.phone_number || profile.phone_number || '';
+            let dob = '';
+            if (survey.date_of_birth && !isNaN(new Date(survey.date_of_birth))) {
+                dob = new Date(survey.date_of_birth).toLocaleDateString('en-GB');
+            } else if (profile.date_of_birth && !isNaN(new Date(profile.date_of_birth))) {
+                dob = new Date(profile.date_of_birth).toLocaleDateString('en-GB');
+            }
+
+            // Role 7 = Bhikkhu, Role 3 = Samanera
+            const isBhikkhu = survey.User?.role_id === 7 ? 'ភិក្ខុ' : '';
+            const isSamanera = survey.User?.role_id === 3 ? 'សាមណេរ' : '';
 
             return [
-                index + 1,
-                survey.surname_name || '-',
-                survey.ordained_name || '-',
-                dob,
-                survey.nationality || '-',
-                phone,
-                profile.chhaya_number || '-',
-                survey.User?.email || '-',
-                survey.preceptor_name || '-',
-                survey.first_assistant_name || '-',
-                survey.second_assistant_name || '-',
-                ordDate,
-                survey.ordination_wat || '-',
-                survey.current_wat || '-',
+                index + 1, // ល.រ
+                profile.chhaya_number || '', // អត្តលេខ
+                survey.surname_name || '', // គោត្តនាមនិងនាម - អក្សរខ្មែរ
+                survey.latin_name || '', // គោត្តនាមនិងនាម - អក្សរឡាតាំង
+                isBhikkhu, // ភេទ - ភិក្ខុ
+                isSamanera, // ភេទ - សាមណេរ
+                dob, // ថ្ងៃខែឆ្នាំកំណើត
+                getVillName(survey.pob_village_id), // ទីកន្លែងកំណើត - ភូមិ
+                getCommName(survey.pob_commune_id), // ទីកន្លែងកំណើត - ឃុំ
+                getDistName(survey.pob_district_id), // ទីកន្លែងកំណើត - ស្រុក
+                getProvName(survey.pob_province_id), // ទីកន្លែងកំណើត - ខេត្ត
+                survey.current_wat || '', // អាសយដ្ឋានបច្ចុប្បន្ន - ភូមិ(វត្ត)
+                getCommName(survey.current_commune_id), // អាសយដ្ឋានបច្ចុប្បន្ន - ឃុំ
+                getDistName(survey.current_district_id), // អាសយដ្ឋានបច្ចុប្បន្ន - ស្រុក
+                getProvName(survey.current_province_id), // អាសយដ្ឋានបច្ចុប្បន្ន - ខេត្ត
+                phone, // លេខទូរស័ព្ទ
+                survey.current_job || '' // ផ្សេងៗ
             ];
         });
 
         const csvContent = [
-            headers.join(','),
+            header1.join(','),
+            header2.join(','),
             ...rows.map(e => e.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(','))
         ].join('\n');
 

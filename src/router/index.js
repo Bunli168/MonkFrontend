@@ -103,7 +103,7 @@ const routes = [
 				path: 'monk-biography',
 				name: 'pagoda-monk-biography',
 				component: () => import('@/views/pagoda/PagodaMonkBiographyView.vue'),
-				meta: { roles: ['MONK', 'BHIKKHU'] }
+				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI', 'ADMIN', 'SuperAdmin'] }
 			},
 			{
 				path: 'student-profile-summary',
@@ -181,7 +181,7 @@ const routes = [
 	{
 		path: '/dashboard',
 		component: () => import('@/layouts/dashboardLayouts/DashboardShell.vue'),
-		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN'] },
+		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
 		children: [
 			{
 				path: '',
@@ -194,6 +194,12 @@ const routes = [
 				name: 'dashboard-user',
 				component: () => import('@/views/admin/users/UserView.vue'),
 				meta: { title: 'Users Management' }
+			},
+			{
+				path: 'monk-biography',
+				name: 'dashboard-monk-biography',
+				component: () => import('@/views/pagoda/PagodaMonkBiographyView.vue'),
+				meta: { title: 'My Biography', roles: ['MONK', 'BHIKKHU', 'MEKUDI', 'ADMIN', 'SuperAdmin'] }
 			},
 			{
 				path: 'report',

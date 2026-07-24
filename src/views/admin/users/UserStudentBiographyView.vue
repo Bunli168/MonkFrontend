@@ -11,7 +11,7 @@
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
 
-                <div class="kudi-select" style="min-width: 180px;">
+                <div class="kudi-select" style="min-width: 180px;" v-if="authStore.isSuperAdmin">
                     <BaseSelect
                         v-model="selectedKut"
                         :options="kuts"

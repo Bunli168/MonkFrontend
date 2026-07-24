@@ -3,7 +3,7 @@
         <div class="w-100" style="max-width: 1000px;">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
                 <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title }}</h5>
-                <BaseButton v-if="!isEditing" variant="outline-primary" class="w-100 w-sm-auto" @click="startEdit">
+                <BaseButton v-if="!isEditing" variant="outline-primary" @click="startEdit">
                     Edit Profile / កែសម្រួលព័ត៌មាន
                 </BaseButton>
             </div>
@@ -40,10 +40,10 @@
                         <div class="p-3 rounded h-100" style="background-color: var(--surface-ground);">
                             <h6 class="fw-bold text-primary mb-3">Place of Birth / ទីកន្លែងកំណើត</h6>
                             <ul class="list-unstyled d-flex flex-column gap-2 mb-0" style="font-size: 0.95rem;">
-                                <li><strong class="text-secondary">Province:</strong> {{ form.pob_province || 'N/A' }}</li>
-                                <li><strong class="text-secondary">District:</strong> {{ form.pob_district || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Commune:</strong> {{ form.pob_commune || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Village:</strong> {{ form.pob_village || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Province:</strong> {{ getOptionLabel(pobLoc.provinceOptions, form.pob_province_id) || form.pob_province || 'N/A' }}</li>
+                                <li><strong class="text-secondary">District:</strong> {{ getOptionLabel(pobLoc.districtOptions, form.pob_district_id) || form.pob_district || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Commune:</strong> {{ getOptionLabel(pobLoc.communeOptions, form.pob_commune_id) || form.pob_commune || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Village:</strong> {{ getOptionLabel(pobLoc.villageOptions, form.pob_village_id) || form.pob_village || 'N/A' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -81,10 +81,10 @@
                         <div class="p-3 rounded h-100" style="background-color: var(--surface-ground);">
                             <h6 class="fw-bold text-primary mb-3">Parents' Address / អាសយដ្ឋានឪពុកម្ដាយ</h6>
                             <ul class="list-unstyled d-flex flex-column gap-2 mb-0" style="font-size: 0.95rem;">
-                                <li><strong class="text-secondary">Province:</strong> {{ form.parents_province || 'N/A' }}</li>
-                                <li><strong class="text-secondary">District:</strong> {{ form.parents_district || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Commune:</strong> {{ form.parents_commune || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Village:</strong> {{ form.parents_village || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Province:</strong> {{ getOptionLabel(parentsLoc.provinceOptions, form.parents_province_id) || form.parents_province || 'N/A' }}</li>
+                                <li><strong class="text-secondary">District:</strong> {{ getOptionLabel(parentsLoc.districtOptions, form.parents_district_id) || form.parents_district || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Commune:</strong> {{ getOptionLabel(parentsLoc.communeOptions, form.parents_commune_id) || form.parents_commune || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Village:</strong> {{ getOptionLabel(parentsLoc.villageOptions, form.parents_village_id) || form.parents_village || 'N/A' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -128,11 +128,11 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Surname-Name (គោត្តនាម-នាម) <span class="text-danger">*</span></label>
-                                    <BaseInput v-model="form.surname_name" placeholder="E.g., CHHOUN SINA" :required="currentStep === 1" />
+                                    <BaseInput v-model="form.surname_name" preventNumbers placeholder="E.g., CHHOUN SINA" :required="currentStep === 1" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Nationality (សញ្ជាតិ) <span class="text-danger">*</span></label>
-                                    <BaseInput v-model="form.nationality" placeholder="E.g., KHMER" :required="currentStep === 1" />
+                                    <BaseInput v-model="form.nationality" preventNumbers placeholder="E.g., KHMER" :required="currentStep === 1" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Date of Birth (ថ្ងៃ-ខែ-ឆ្នាំកំណើត) <span class="text-danger">*</span></label>
@@ -140,7 +140,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Phone Number (លេខទូរស័ព្ទ)</label>
-                                    <BaseInput v-model="form.phone_number" placeholder="Enter phone number" />
+                                    <BaseInput v-model="form.phone_number" preventText placeholder="Enter phone number" />
                                 </div>
 
                             </div>
@@ -176,18 +176,18 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Education Level (កំរិតបញ្ចប់)</label>
-                                    <BaseInput v-model="form.edu_level" placeholder="E.g., High School, Bachelor..." />
+                                    <BaseSelect v-model="form.edu_level" :options="eduLevelOptions" placeholder="ជ្រើសរើសកម្រិតសិក្សា..." />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">School / University (ត្រីស្ថានសិក្សា)</label>
-                                    <BaseInput v-model="form.edu_school" placeholder="Enter school name" />
+                                    <BaseInput v-model="form.edu_school" preventNumbers placeholder="Enter school name" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Specialty / Major (ជំនាញ)</label>
-                                    <BaseInput v-model="form.edu_specialty" placeholder="Enter specialty" />
+                                    <BaseInput v-model="form.edu_specialty" preventNumbers placeholder="Enter specialty" />
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label class="form-label">Grade / Class (ថ្នាក់/ថ្នាររី)</label>
+                                    <label class="form-label">Grade / Class (ថ្នាក់/ឆ្នាំទី)</label>
                                     <BaseInput v-model="form.edu_grade" placeholder="E.g., Grade 12..." />
                                 </div>
 
@@ -196,11 +196,11 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Current Job (ការងារបច្ចុប្បន្ន)</label>
-                                    <BaseInput v-model="form.current_job" placeholder="Enter current job" />
+                                    <BaseInput v-model="form.current_job" preventNumbers placeholder="Enter current job" />
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label class="form-label">Kudi Number (លេខគុយឌី)</label>
-                                    <BaseInput v-model="form.kudi_number" disabled />
+                                    <label class="form-label">Kudi Number (លេខកុដិស្នាក់នៅ)</label>
+                                    <BaseInput v-model="form.kudi_number" placeholder="Enter kudi number" />
                                 </div>
                             </div>
                         </div>
@@ -214,11 +214,11 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Father's Name (ឈ្មោះឪពុក)</label>
-                                    <BaseInput v-model="form.father_name" placeholder="Enter father's name" />
+                                    <BaseInput v-model="form.father_name" preventNumbers placeholder="Enter father's name" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Occupation (មុខរប)</label>
-                                    <BaseInput v-model="form.father_occupation" placeholder="Enter occupation" />
+                                    <BaseInput v-model="form.father_occupation" preventNumbers placeholder="Enter occupation" />
                                 </div>
 
                                 <div class="col-12 mt-4 mb-1">
@@ -226,11 +226,11 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Mother's Name (ឈ្មោះម្ដាយ)</label>
-                                    <BaseInput v-model="form.mother_name" placeholder="Enter mother's name" />
+                                    <BaseInput v-model="form.mother_name" preventNumbers placeholder="Enter mother's name" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Occupation (មុខរប)</label>
-                                    <BaseInput v-model="form.mother_occupation" placeholder="Enter occupation" />
+                                    <BaseInput v-model="form.mother_occupation" preventNumbers placeholder="Enter occupation" />
                                 </div>
 
                                 <div class="col-12 mt-4 mb-1">
@@ -339,10 +339,36 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm());
 
+const eduLevelOptions = [
+    { value: 'បឋមសិក្សា (Primary School)', label: 'បឋមសិក្សា (Primary School)' },
+    { value: 'អនុវិទ្យាល័យ (Secondary School)', label: 'អនុវិទ្យាល័យ (Secondary School)' },
+    { value: 'វិទ្យាល័យ (High School)', label: 'វិទ្យាល័យ (High School)' },
+    { value: 'បរិញ្ញាបត្រ (Bachelor Degree)', label: 'បរិញ្ញាបត្រ (Bachelor Degree)' },
+    { value: 'បរិញ្ញាបត្រជាន់ខ្ពស់ (Master Degree)', label: 'បរិញ្ញាបត្រជាន់ខ្ពស់ (Master Degree)' },
+    { value: 'បណ្ឌិត (Ph.D)', label: 'បណ្ឌិត (Ph.D)' },
+    { value: 'ពុទ្ធិកបឋមសិក្សា (ថ្នាក់ទី១ ដល់ទី៣)', label: 'ពុទ្ធិកបឋមសិក្សា (ថ្នាក់ទី១ ដល់ទី៣)' },
+    { value: 'ពុទ្ធិកមធ្យមសិក្សាបឋមភូមិ (ថ្នាក់ទី៧ ដល់ទី៩)', label: 'ពុទ្ធិកមធ្យមសិក្សាបឋមភូមិ (ថ្នាក់ទី៧ ដល់ទី៩)' },
+    { value: 'ពុទ្ធិកមធ្យមសិក្សាទុតិយភូមិ (ថ្នាក់ទី១០ ដល់ទី១២)', label: 'ពុទ្ធិកមធ្យមសិក្សាទុតិយភូមិ (ថ្នាក់ទី១០ ដល់ទី១២)' },
+    { value: 'ពុទ្ធិកឧត្តមសិក្សា (សាកលវិទ្យាល័យ)', label: 'ពុទ្ធិកឧត្តមសិក្សា (សាកលវិទ្យាល័យ)' },
+    { value: 'ផ្សេងៗ (Other)', label: 'ផ្សេងៗ (Other)' }
+];
+
+const getOptionLabel = (options, value) => {
+    if (!options || !value) return '';
+    const item = options.find(o => o.value == value);
+    return item ? item.label : '';
+};
+
 const fetchSurvey = async () => {
     try {
-        const res = await api.get('/student-surveys/me');
-        if (res.data?.success && res.data.data) {
+        let res;
+        try {
+            res = await api.get('/student-surveys/me');
+        } catch (apiError) {
+            if (apiError.response?.status !== 404) throw apiError;
+        }
+        
+        if (res?.data?.success && res.data.data) {
             const data = res.data.data;
             hasSurvey.value = true;
             isEditing.value = false;
@@ -366,6 +392,13 @@ const fetchSurvey = async () => {
             isEditing.value = false;
         }
 
+        // For own profile, fetch fresh from /users/me to guarantee profile data is loaded
+        try {
+            await authStore.fetchProfile();
+        } catch (e) {
+            console.error("Failed to fetch profile in biography view:", e);
+        }
+
         // Auto-fill from user profile if fields are empty
         const user = authStore.user;
         if (user) {
@@ -376,7 +409,9 @@ const fetchSurvey = async () => {
                     form.value.surname_name = `${p.last_name_kh || ''} ${p.first_name_kh || ''}`.trim();
                 }
                 if (!form.value.date_of_birth && p.date_of_birth) form.value.date_of_birth = p.date_of_birth;
+                if (!form.value.date_of_birth && p.dateOfBirth) form.value.date_of_birth = p.dateOfBirth;
                 if (!form.value.phone_number && (p.phone_number || p.phone)) form.value.phone_number = p.phone_number || p.phone;
+                if (!form.value.id_card_number && p.chhaya_number) form.value.id_card_number = p.chhaya_number;
                 
                 // Education
                 if (!form.value.edu_school && p.university_name) form.value.edu_school = p.university_name;

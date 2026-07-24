@@ -91,7 +91,7 @@
         </template>
 
         <template v-else>
-            <PagodaMonkBiographyView :user-id="authStore.user?.id" />
+            <PagodaMonkBiographyView />
         </template>
     </div>
 </template>

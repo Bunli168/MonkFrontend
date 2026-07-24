@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
     });
     const isMonk = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['MONK', 'BHIKKHU', 'ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(uRole);
+        return ['MONK', 'BHIKKHU', 'MEKUDI', 'ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(uRole);
     });
     const isBhikkhu = computed(() => {
         const uRole = userRole.value?.toUpperCase();

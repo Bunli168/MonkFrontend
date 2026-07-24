@@ -39,10 +39,10 @@
                         <div class="p-3 rounded h-100" style="background-color: var(--surface-ground);">
                             <h6 class="fw-bold text-primary mb-3">Place of Birth / ទីកន្លែងកំណើត</h6>
                             <ul class="list-unstyled d-flex flex-column gap-2 mb-0" style="font-size: 0.95rem;">
-                                <li><strong class="text-secondary">Province:</strong> {{ form.pob_province || 'N/A' }}</li>
-                                <li><strong class="text-secondary">District:</strong> {{ form.pob_district || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Commune:</strong> {{ form.pob_commune || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Village:</strong> {{ form.pob_village || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Province:</strong> {{ getOptionLabel(pobLoc.provinceOptions, form.pob_province_id) || form.pob_province || 'N/A' }}</li>
+                                <li><strong class="text-secondary">District:</strong> {{ getOptionLabel(pobLoc.districtOptions, form.pob_district_id) || form.pob_district || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Commune:</strong> {{ getOptionLabel(pobLoc.communeOptions, form.pob_commune_id) || form.pob_commune || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Village:</strong> {{ getOptionLabel(pobLoc.villageOptions, form.pob_village_id) || form.pob_village || 'N/A' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -80,10 +80,10 @@
                         <div class="p-3 rounded h-100" style="background-color: var(--surface-ground);">
                             <h6 class="fw-bold text-primary mb-3">Parents' Address / អាសយដ្ឋានឪពុកម្ដាយ</h6>
                             <ul class="list-unstyled d-flex flex-column gap-2 mb-0" style="font-size: 0.95rem;">
-                                <li><strong class="text-secondary">Province:</strong> {{ form.parents_province || 'N/A' }}</li>
-                                <li><strong class="text-secondary">District:</strong> {{ form.parents_district || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Commune:</strong> {{ form.parents_commune || 'N/A' }}</li>
-                                <li><strong class="text-secondary">Village:</strong> {{ form.parents_village || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Province:</strong> {{ getOptionLabel(parentsLoc.provinceOptions, form.parents_province_id) || form.parents_province || 'N/A' }}</li>
+                                <li><strong class="text-secondary">District:</strong> {{ getOptionLabel(parentsLoc.districtOptions, form.parents_district_id) || form.parents_district || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Commune:</strong> {{ getOptionLabel(parentsLoc.communeOptions, form.parents_commune_id) || form.parents_commune || 'N/A' }}</li>
+                                <li><strong class="text-secondary">Village:</strong> {{ getOptionLabel(parentsLoc.villageOptions, form.parents_village_id) || form.parents_village || 'N/A' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -107,19 +107,31 @@ import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { formatDate } from '@/utils/dateFormat';
 import api from '@/api/api';
+import { useLocation } from '@/composables/useLocation';
 
 const authStore = useAuthStore();
 const loading = ref(true);
 
+const pobLoc = useLocation();
+const parentsLoc = useLocation();
+
+const getOptionLabel = (options, value) => {
+    if (!options || !value) return '';
+    const item = options.find(o => o.value == value);
+    return item ? item.label : '';
+};
+
 const form = ref({
     surname_name: '', nationality: '', date_of_birth: null,
     pob_village: '', pob_commune: '', pob_district: '', pob_province: '',
+    pob_village_id: null, pob_commune_id: null, pob_district_id: null, pob_province_id: null,
     phone_number: '',
     edu_level: '', edu_school: '', edu_specialty: '', edu_grade: '',
     current_job: '', kudi_number: '',
     father_name: '', father_occupation: '',
     mother_name: '', mother_occupation: '',
     parents_village: '', parents_commune: '', parents_district: '', parents_province: '',
+    parents_village_id: null, parents_commune_id: null, parents_district_id: null, parents_province_id: null,
 });
 
 const fetchSurvey = async () => {
@@ -133,6 +145,15 @@ const fetchSurvey = async () => {
                     form.value[key] = data[key];
                 }
             });
+            
+            // Fetch names for IDs
+            if (form.value.pob_province_id) await pobLoc.fetchDistricts(form.value.pob_province_id);
+            if (form.value.pob_district_id) await pobLoc.fetchCommunes(form.value.pob_district_id);
+            if (form.value.pob_commune_id) await pobLoc.fetchVillages(form.value.pob_commune_id);
+
+            if (form.value.parents_province_id) await parentsLoc.fetchDistricts(form.value.parents_province_id);
+            if (form.value.parents_district_id) await parentsLoc.fetchCommunes(form.value.parents_district_id);
+            if (form.value.parents_commune_id) await parentsLoc.fetchVillages(form.value.parents_commune_id);
         }
 
         // Auto-fill from user profile if fields are empty
@@ -175,7 +196,11 @@ const fetchSurvey = async () => {
     }
 };
 
-onMounted(fetchSurvey);
+onMounted(async () => {
+    await pobLoc.fetchProvinces();
+    await parentsLoc.fetchProvinces();
+    await fetchSurvey();
+});
 </script>
 
 <style scoped>
