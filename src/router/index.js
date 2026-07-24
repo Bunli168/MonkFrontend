@@ -100,6 +100,12 @@ const routes = [
 				meta: { roles: ['STUDENT'] }
 			},
 			{
+				path: 'monk-biography',
+				name: 'pagoda-monk-biography',
+				component: () => import('@/views/pagoda/PagodaMonkBiographyView.vue'),
+				meta: { roles: ['MONK', 'BHIKKHU'] }
+			},
+			{
 				path: 'student-profile-summary',
 				name: 'pagoda-student-profile-summary',
 				component: () => import('@/views/pagoda/PagodaStudentProfileSummaryView.vue'),

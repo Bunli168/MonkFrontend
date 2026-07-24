@@ -1,0 +1,619 @@
+<template>
+    <div :class="['monk-biography-view h-100 d-flex flex-column align-items-center', hideHeader ? '' : 'pb-3']">
+        <div v-if="isLoading" class="d-flex justify-content-center align-items-center w-100 py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+        <div v-else class="w-100" style="max-width: 1000px;">
+            <div v-if="!hideHeader" class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
+                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title }}</h5>
+            </div>
+
+            <!-- Summary View (Read Only) - Modern Dashboard Style -->
+            <div v-if="!isEditing" class="mx-auto w-100 p-4" style="background-color: rgba(220, 225, 229, 0.4); border-radius: 12px; max-width: 1000px;">
+                
+                <!-- Header with Avatar and Name -->
+                <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-secondary" style="width: 75px; height: 75px; background-color: #e2e6ea; font-size: 2rem; flex-shrink: 0;">
+                        <img v-if="viewedUserAvatar || (!props.userId && authStore.user?.profile?.avatarUrl)" 
+                             :src="$authImg(viewedUserAvatar || authStore.user?.profile?.avatarUrl)" 
+                             class="w-100 h-100 rounded-circle object-fit-cover">
+                        <span v-else>{{ form.surname_name ? form.surname_name.charAt(0).toUpperCase() : 'M' }}</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1 fw-bold" style="color: #2b3035;">{{ form.surname_name || 'N/A' }}</h4>
+                        <div class="text-secondary" style="font-size: 0.95rem;">Ordained Name: <span class="text-primary">{{ form.ordained_name || '-' }}</span></div>
+                    </div>
+                    <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: #495057;">
+                        Edit Biography / កែសម្រួលប្រវត្តិរូប
+                    </BaseButton>
+                </div>
+
+                <!-- 2x2 Grid of Cards -->
+                <div class="row g-4">
+                    <!-- Personal Identity -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-3" style="color: #026bb4;">Personal Identity / អត្តសញ្ញាណបុគ្គល</h6>
+                                <div class="mb-2 text-secondary">Nationality: <span class="text-dark">{{ form.nationality || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Date of Birth: <span class="text-dark">{{ formatDate(form.date_of_birth) || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Phone Number: <span class="text-dark">{{ form.phone_number || 'N/A' }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Place of Birth -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-3" style="color: #026bb4;">Place of Birth / ទីកន្លែងកំណើត</h6>
+                                <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(pobLoc.provinces, form.pob_province_id, 'province') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(pobLoc.districts, form.pob_district_id, 'district') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(pobLoc.communes, form.pob_commune_id, 'commune') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Village: <span class="text-dark">{{ getLocationName(pobLoc.villages, form.pob_village_id, 'village') || 'N/A' }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ordination Details -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-3" style="color: #026bb4;">Ordination Details / ព័ត៌មានបញ្ញត្តិ</h6>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-2 text-secondary">Preceptor Name: <span class="text-dark">{{ form.preceptor_name || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">First Assistant: <span class="text-dark">{{ form.first_assistant_name || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Second Assistant: <span class="text-dark">{{ form.second_assistant_name || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Ordained Date: <span class="text-dark">{{ formatDate(form.ordained_date) || 'N/A' }}</span></div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-2 text-secondary">Wat / Pagoda: <span class="text-dark">{{ form.ordination_wat || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(ordLoc.provinces, form.ordination_province_id, 'province') || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(ordLoc.districts, form.ordination_district_id, 'district') || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(ordLoc.communes, form.ordination_commune_id, 'commune') || 'N/A' }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Address -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-3" style="color: #026bb4;">Current Address / អាសយដ្ឋានបច្ចុប្បន្ន</h6>
+                                <div class="mb-2 text-secondary">Wat / Pagoda: <span class="text-dark">{{ form.current_wat || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(currLoc.provinces, form.current_province_id, 'province') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(currLoc.districts, form.current_district_id, 'district') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(currLoc.communes, form.current_commune_id, 'commune') || 'N/A' }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit View (Wizard Form) -->
+            <div v-else :class="['mx-auto w-100', hideHeader ? '' : 'card p-4']" :style="hideHeader ? { paddingBottom: '1rem' } : { backgroundColor: 'var(--body-bg-color)', borderRadius: 'var(--border-radius)', border: '1px solid var(--border-color, rgba(0,0,0,0.06))', maxWidth: '1000px' }">
+                <h5 v-if="!hideHeader" class="fw-bold mb-4 text-primary">Biography Survey / ប្រវត្តិរូបសង្ខេប</h5>
+                
+                <form @submit.prevent="currentStep === 5 ? saveSurvey() : currentStep++">
+                    
+                    <!-- Step Indicator -->
+                    <div class="d-flex align-items-center justify-content-between mb-5 position-relative d-none d-sm-flex">
+                        <!-- Connecting Line -->
+                        <div class="position-absolute top-50 start-0 w-100 translate-middle-y" style="height: 1px; background-color: var(--border-color, rgba(255,255,255,0.1)); z-index: 1;"></div>
+                        
+                        <!-- Steps -->
+                        <div v-for="(step, index) in ['Personal Identity', 'Place of Birth', 'Ordination', 'Place of Ordination', 'Current Address']" :key="index" 
+                             class="d-flex align-items-center position-relative" style="z-index: 2; padding: 0 15px;" :style="{ backgroundColor: 'var(--surface-ground, var(--body-bg-color, #1e1e24))' }">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white me-2"
+                                 :style="currentStep === index + 1 ? 'background-color: #3b82f6;' : 'background-color: #4b5563;'"
+                                 style="width: 28px; height: 28px; font-size: 0.85rem;">
+                                {{ index + 1 }}
+                            </div>
+                            <span :style="currentStep === index + 1 ? 'color: #ef4444;' : 'color: #6b7280;'" style="font-size: 0.9rem;">
+                                {{ step }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <fieldset :disabled="isReadOnly" class="border-0 p-0 m-0">
+
+                    <!-- Step 1: Personal Identity -->
+                    <div v-show="currentStep === 1" class="step-content">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <h6 class="fw-bold mb-0" style="color: var(--text-heading-color);">Personal Identity / អត្តសញ្ញាណបុគ្គល</h6>
+                            <BaseAvatarUpload v-model="avatarFile" :defaultImage="authStore.user?.profile?.avatarUrl" :isLoading="saving" />
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Surname-Name (គោត្តនាម-នាម) <span class="text-danger">*</span></label>
+                                <BaseInput v-model="form.surname_name" placeholder="E.g., CHHOUN SINA" :required="currentStep === 1" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Nationality (សញ្ជាតិ) <span class="text-danger">*</span></label>
+                                <BaseInput v-model="form.nationality" :error="errors.nationality" placeholder="E.g., KHMER" :required="currentStep === 1" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Date of Birth (ថ្ងៃ-ខែ-ឆ្នាំកំណើត) <span class="text-danger">*</span></label>
+                                <BaseDatePicker v-model="form.date_of_birth" placeholder="Select date" :required="currentStep === 1" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Phone Number (លេខទូរស័ព្ទ)</label>
+                                <BaseInput v-model="form.phone_number" :error="errors.phone_number" placeholder="Enter phone number" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Place of Birth -->
+                    <div v-show="currentStep === 2" class="step-content">
+                        <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Place of Birth / ទីកន្លែងកំណើត</h6>
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Province (រាជធានី/ខេត្ត)</label>
+                                <BaseSelect v-model="form.pob_province_id" :options="pobLoc.provinceOptions" placeholder="Select province" @update:modelValue="onPobProvinceChange" :loading="pobLoc.isLoadingProvinces" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">District (ក្រុង/ស្រុក/ខណ្ឌ)</label>
+                                <BaseSelect v-model="form.pob_district_id" :options="pobLoc.districtOptions" placeholder="Select district" :disabled="!form.pob_province_id" @update:modelValue="onPobDistrictChange" :loading="pobLoc.isLoadingDistricts" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Commune (ឃុំ/សង្កាត់)</label>
+                                <BaseSelect v-model="form.pob_commune_id" :options="pobLoc.communeOptions" placeholder="Select commune" :disabled="!form.pob_district_id" @update:modelValue="onPobCommuneChange" :loading="pobLoc.isLoadingCommunes" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">Village (ភូមិ)</label>
+                                <BaseSelect v-model="form.pob_village_id" :options="pobLoc.villageOptions" placeholder="Select village" :disabled="!form.pob_commune_id" :loading="pobLoc.isLoadingVillages" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Ordination Details -->
+                    <div v-show="currentStep === 3" class="step-content">
+                        <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Ordination Details / ព័ត៌មានឧបសម្បទា</h6>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-12">
+                                <BaseInput v-model="form.preceptor_name" label="នាមព្រះឧបជ្ឈាយ៍ (Preceptor Name)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseInput v-model="form.first_assistant_name" label="នាមកម្មវាចាចារ្យ (First Assistant)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3" :error="errors.first_assistant_name" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseInput v-model="form.second_assistant_name" label="នាមអនុស្សាវនាចារ្យ (Second Assistant)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3" :error="errors.second_assistant_name" />
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <BaseInput v-model="form.ordained_name" label="នាមបញ្ញត្តិ (Ordained Name/Chhaya)" placeholder="នាមបញ្ញត្តិ..." :required="currentStep === 3" :error="errors.ordained_name" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" style="color: var(--text-color);">ថ្ងៃ-ខែ-ឆ្នាំឧបសម្បទា (Ordination Date) <span class="text-danger">*</span></label>
+                                <BaseDatePicker v-model="form.ordained_date" placeholder="Select date" :required="currentStep === 3" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Place of Ordination -->
+                    <div v-show="currentStep === 4" class="step-content">
+                        <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Place of Ordination / ទីកន្លែងឧបសម្បទា</h6>
+                        
+                        <div class="row g-4">
+                            <!-- Wat spans full width -->
+                            <div class="col-12 col-md-6">
+                                <BaseInput v-model="form.ordination_wat" label="វត្ត (Wat)" placeholder="ឈ្មោះវត្ត..." :required="currentStep === 4" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.ordination_province_id" label="ខេត្ត/រាជធានី (Province)" placeholder="ខេត្ត/រាជធានី..." :required="currentStep === 4" :options="ordLoc.provinceOptions" @update:modelValue="onOrdProvinceChange" :loading="ordLoc.isLoadingProvinces" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.ordination_district_id" label="ក្រុង/ស្រុក/ខណ្ឌ (District)" placeholder="ក្រុង/ស្រុក/ខណ្ឌ..." :required="currentStep === 4" :options="ordLoc.districtOptions" :disabled="!form.ordination_province_id" @update:modelValue="onOrdDistrictChange" :loading="ordLoc.isLoadingDistricts" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.ordination_commune_id" label="ឃុំ/សង្កាត់ (Commune)" placeholder="ឃុំ/សង្កាត់..." :required="currentStep === 4" :options="ordLoc.communeOptions" :disabled="!form.ordination_district_id" @update:modelValue="onOrdCommuneChange" :loading="ordLoc.isLoadingCommunes" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Current Address -->
+                    <div v-show="currentStep === 5" class="step-content">
+                        <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Current Address / អាសយដ្ឋានបច្ចុប្បន្ន</h6>
+                        <div class="row g-4">
+                            <!-- Wat spans full width -->
+                            <div class="col-12 col-md-6">
+                                <BaseInput v-model="form.current_wat" label="វត្ត (Wat)" placeholder="Enter wat name" :required="currentStep === 5" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.current_province_id" label="ខេត្ត/រាជធានី (Province)" placeholder="Enter province" :options="currLoc.provinceOptions" @update:modelValue="onCurrProvinceChange" :loading="currLoc.isLoadingProvinces" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.current_district_id" label="ស្រុក/ខណ្ឌ (District)" placeholder="Enter district" :options="currLoc.districtOptions" :disabled="!form.current_province_id" @update:modelValue="onCurrDistrictChange" :loading="currLoc.isLoadingDistricts" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <BaseSelect v-model="form.current_commune_id" label="ឃុំ/សង្កាត់ (Commune)" placeholder="Enter commune" :options="currLoc.communeOptions" :disabled="!form.current_district_id" @update:modelValue="onCurrCommuneChange" :loading="currLoc.isLoadingCommunes" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    </fieldset>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between mt-5 w-100">
+                        <BaseButton v-if="currentStep === 1" type="button" variant="outline-secondary" @click="cancelEdit" style="border-radius: 20px; padding: 0.5rem 1.5rem;">
+                            {{ isReadOnly ? 'Close' : 'Previous' }}
+                        </BaseButton>
+                        <BaseButton v-if="currentStep > 1" type="button" variant="outline-secondary" @click="currentStep--" style="border-radius: 20px; padding: 0.5rem 1.5rem;">
+                            Previous
+                        </BaseButton>
+                        
+                        <BaseButton v-if="currentStep < 5" type="submit" variant="danger" style="border-radius: 20px; padding: 0.5rem 2rem; background-color: #e11d48; border-color: #e11d48;">
+                            Next
+                        </BaseButton>
+                        
+                        <BaseButton v-if="currentStep === 5 && !isReadOnly" type="button" @click="saveSurvey" variant="danger" :isLoading="saving" style="border-radius: 20px; padding: 0.5rem 2rem; background-color: #e11d48; border-color: #e11d48;">
+                            Save
+                        </BaseButton>
+                        
+                        <BaseButton v-if="currentStep === 5 && isReadOnly" type="button" @click="cancelEdit" variant="danger" style="border-radius: 20px; padding: 0.5rem 2rem; background-color: #e11d48; border-color: #e11d48;">
+                            Close
+                        </BaseButton>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+
+const props = defineProps({
+    title: {
+        type: String,
+        default: 'Monk Profile Summary / ប្រវត្តិរូបសង្ខេប (ភិក្ខុ)'
+    },
+    userId: {
+        type: [String, Number],
+        default: null
+    },
+    hideHeader: {
+        type: Boolean,
+        default: false
+    },
+    isReadOnly: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const emit = defineEmits(['close']);
+
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/users/user';
+import { useToastStore } from '@/stores/toast';
+import { formatDate } from '@/utils/dateFormat';
+import api from '@/api/api';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
+import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
+import { useLocation } from '@/composables/useLocation';
+
+const authStore  = useAuthStore();
+const userStore   = useUserStore();
+const avatarFile  = ref(null);
+const viewedUserAvatar = ref('');
+const toastStore = useToastStore();
+
+const saving      = ref(false);
+const isLoading   = ref(true);
+const isEditing   = ref(false);
+const hasSurvey   = ref(false);
+const currentStep = ref(1);
+
+const pobLoc = useLocation();
+const ordLoc = useLocation();
+const currLoc = useLocation();
+
+const defaultForm = () => ({
+    surname_name: '', nationality: 'ខ្មែរ', date_of_birth: null,
+    pob_village: '', pob_commune: '', pob_district: '', pob_province: '',
+    pob_village_id: null, pob_commune_id: null, pob_district_id: null, pob_province_id: null,
+    preceptor_name: '', first_assistant_name: '', second_assistant_name: '',
+    ordained_name: '', ordained_date: null,
+    ordination_wat: '', ordination_province: '', ordination_district: '', ordination_commune: '',
+    ordination_province_id: null, ordination_district_id: null, ordination_commune_id: null,
+    current_wat: '', current_province: '', current_district: '', current_commune: '',
+    current_province_id: null, current_district_id: null, current_commune_id: null,
+    phone_number: ''
+});
+
+const form = ref(defaultForm());
+const errors = ref({ phone_number: '', nationality: '', first_assistant_name: '', second_assistant_name: '', ordained_name: '' });
+
+const validatePhone = () => {
+    const val = form.value.phone_number;
+    if (!val) {
+        errors.value.phone_number = '';
+        return true;
+    }
+    if (/[^0-9 ]/.test(val)) {
+        errors.value.phone_number = 'Phone number can only contain numbers and spaces';
+        return false;
+    }
+    errors.value.phone_number = '';
+    return true;
+};
+
+const validateNationality = () => {
+    const val = form.value.nationality;
+    if (!val) {
+        errors.value.nationality = '';
+        return true;
+    }
+    if (/[0-9]/.test(val)) {
+        errors.value.nationality = 'Nationality cannot contain numbers';
+        return false;
+    }
+    errors.value.nationality = '';
+    return true;
+};
+
+watch(() => form.value.phone_number, () => {
+    validatePhone();
+});
+
+watch(() => form.value.nationality, () => {
+    validateNationality();
+});
+
+const validateNoNumbers = (field, label) => {
+    const val = form.value[field];
+    if (!val) {
+        errors.value[field] = '';
+        return true;
+    }
+    if (/[0-9]/.test(val)) {
+        errors.value[field] = `${label} cannot contain numbers`;
+        return false;
+    }
+    errors.value[field] = '';
+    return true;
+};
+
+watch(() => form.value.first_assistant_name, () => validateNoNumbers('first_assistant_name', 'Name'));
+watch(() => form.value.second_assistant_name, () => validateNoNumbers('second_assistant_name', 'Name'));
+watch(() => form.value.ordained_name, () => validateNoNumbers('ordained_name', 'Name'));
+
+
+const fetchSurvey = async () => {
+    try {
+        // Ensure all province lists are loaded (needed for read-only name lookups)
+        await Promise.all([
+            pobLoc.fetchProvinces(),
+            ordLoc.fetchProvinces(),
+            currLoc.fetchProvinces()
+        ]);
+
+        const endpoint = props.userId ? `/monk-surveys/${props.userId}` : `/monk-surveys/me`;
+        const res = await api.get(endpoint);
+
+        // For own profile, fetch fresh from /users/me to guarantee profile data is loaded
+        let ownProfile = null;
+        if (!props.userId) {
+            try {
+                await authStore.getProfile();
+                ownProfile = authStore.user?.profile || null;
+            } catch (e) { /* ignore */ }
+        }
+
+        if (res.data?.success && res.data.data) {
+            const data = res.data.data;
+            hasSurvey.value = true;
+            isEditing.value = false;
+            Object.keys(form.value).forEach(key => {
+                if (data[key] !== undefined && data[key] !== null) {
+                    form.value[key] = data[key];
+                }
+            });
+            
+            // Load the viewed user's avatar
+            // Backend returns raw column: avatar_url (not avatarUrl)
+            viewedUserAvatar.value = data.User?.UserProfile?.avatar_url || ownProfile?.avatarUrl || '';
+
+            // Load cascading data
+            if (form.value.pob_province_id) await pobLoc.fetchDistricts(form.value.pob_province_id);
+            if (form.value.pob_district_id) await pobLoc.fetchCommunes(form.value.pob_district_id);
+            if (form.value.pob_commune_id) await pobLoc.fetchVillages(form.value.pob_commune_id);
+
+            if (form.value.ordination_province_id) await ordLoc.fetchDistricts(form.value.ordination_province_id);
+            if (form.value.ordination_district_id) await ordLoc.fetchCommunes(form.value.ordination_district_id);
+
+            if (form.value.current_province_id) await currLoc.fetchDistricts(form.value.current_province_id);
+            if (form.value.current_district_id) await currLoc.fetchCommunes(form.value.current_district_id);
+
+            // Auto-fill empty survey fields from user profile
+            const up = data.User?.UserProfile || null;
+            if (props.userId && up) {
+                // Admin viewing another user — snake_case fields from raw UserProfile
+                if (!form.value.surname_name) form.value.surname_name = `${up.last_name_kh || ''} ${up.first_name_kh || ''}`.trim();
+                if (!form.value.date_of_birth && up.date_of_birth) form.value.date_of_birth = up.date_of_birth;
+                if (!form.value.phone_number && up.phone_number) form.value.phone_number = up.phone_number;
+            } else if (!props.userId && ownProfile) {
+                // Own profile — camelCase fields from /users/me formatted response
+                if (!form.value.surname_name) form.value.surname_name = `${ownProfile.last_name_kh || ''} ${ownProfile.first_name_kh || ''}`.trim();
+                if (!form.value.date_of_birth && ownProfile.dateOfBirth) form.value.date_of_birth = ownProfile.dateOfBirth;
+                if (!form.value.phone_number && ownProfile.phone) form.value.phone_number = ownProfile.phone;
+            }
+        } else {
+            hasSurvey.value = false;
+
+            // Even when no survey exists, auto-fill from own profile
+            if (ownProfile) {
+                if (!form.value.surname_name) form.value.surname_name = `${ownProfile.last_name_kh || ''} ${ownProfile.first_name_kh || ''}`.trim();
+                if (!form.value.date_of_birth && ownProfile.dateOfBirth) form.value.date_of_birth = ownProfile.dateOfBirth;
+                if (!form.value.phone_number && ownProfile.phone) form.value.phone_number = ownProfile.phone;
+                if (ownProfile.avatarUrl) viewedUserAvatar.value = ownProfile.avatarUrl;
+            }
+        }
+        if (!form.value.nationality) form.value.nationality = 'KHMER';
+    } catch (error) {
+        console.error('Failed to load monk survey:', error);
+    }
+};
+
+const startEdit = () => {
+    currentStep.value = 1;
+    isEditing.value   = true;
+};
+
+const onPobProvinceChange = async (val) => {
+    form.value.pob_district_id = null;
+    form.value.pob_commune_id = null;
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchDistricts(val);
+};
+
+const onPobDistrictChange = async (val) => {
+    form.value.pob_commune_id = null;
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchCommunes(val);
+};
+
+const onPobCommuneChange = async (val) => {
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchVillages(val);
+};
+
+const onOrdProvinceChange = async (val) => {
+    form.value.ordination_district_id = null;
+    form.value.ordination_commune_id = null;
+    if (val) await ordLoc.fetchDistricts(val);
+};
+
+const onOrdDistrictChange = async (val) => {
+    form.value.ordination_commune_id = null;
+    if (val) await ordLoc.fetchCommunes(val);
+};
+
+const onOrdCommuneChange = async (val) => {
+    // Ordination does not store village
+};
+
+const onCurrProvinceChange = async (val) => {
+    form.value.current_district_id = null;
+    form.value.current_commune_id = null;
+    if (val) await currLoc.fetchDistricts(val);
+};
+
+const onCurrDistrictChange = async (val) => {
+    form.value.current_commune_id = null;
+    if (val) await currLoc.fetchCommunes(val);
+};
+
+const onCurrCommuneChange = async (val) => {
+    // Current Address does not store village
+};
+
+const cancelEdit = () => {
+    currentStep.value = 1;
+    isEditing.value = false;
+    emit('close');
+};
+
+const handleNextOrSave = () => {
+    if (currentStep.value < 5) {
+        currentStep.value++;
+    } else {
+        saveSurvey();
+    }
+};
+
+const getLocationName = (list, code, type) => {
+    if (!code) return '';
+    const item = list.find(l => l[`${type}_code`] === code);
+    return item ? (item[`${type}_kh`] || item[`${type}_en`]) : code;
+};
+
+const saveSurvey = async () => {
+    if (!validatePhone() || !validateNationality() || 
+        !validateNoNumbers('first_assistant_name', 'Name') ||
+        !validateNoNumbers('second_assistant_name', 'Name') ||
+        !validateNoNumbers('ordained_name', 'Name')) {
+        toastStore.showToast('Please fix validation errors before saving', 'error');
+        return;
+    }
+    saving.value = true;
+    try {
+        const payload = { ...form.value };
+        if (payload.date_of_birth instanceof Date) {
+            payload.date_of_birth = payload.date_of_birth.toISOString().split('T')[0];
+        }
+        if (payload.ordained_date instanceof Date) {
+            payload.ordained_date = payload.ordained_date.toISOString().split('T')[0];
+        }
+
+        const endpoint = props.userId ? `/monk-surveys/${props.userId}` : `/monk-surveys/me`;
+        const res = await api.put(endpoint, payload);
+
+        // Upload avatar if a new file was selected
+        if (avatarFile.value) {
+            const fd = new FormData();
+            fd.append('avatar', avatarFile.value);
+            await userStore.uploadProfileAvatar(fd);
+            await authStore.fetchCurrentUser();
+        }
+
+        if (res.data?.success) {
+            toastStore.showToast('Survey saved successfully', 'success');
+            hasSurvey.value = true;
+            await fetchSurvey();
+            isEditing.value = false;
+            currentStep.value = 1;
+            emit('close');
+        }
+    } catch (error) {
+        toastStore.showToast('Failed to save survey', 'error');
+        console.error(error);
+    } finally {
+        saving.value = false;
+    }
+};
+
+onMounted(async () => {
+    isLoading.value = true;
+    await fetchSurvey();
+    isLoading.value = false;
+});
+</script>
+
+<style scoped>
+.formal-document {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6;
+    border-radius: 4px !important;
+    padding: 2rem 1rem;
+    font-family: 'Khmer OS Battambang', 'Suwannaphum', sans-serif;
+    color: #212529;
+}
+
+.khmer-muol {
+    font-family: 'Khmer OS Muol Light', 'Suwannaphum', serif;
+}
+
+.dotted-line {
+    border-bottom: 2px dotted #adb5bd;
+    display: inline-block;
+    min-height: 1.5rem;
+    line-height: 1.2;
+}
+
+.photo-box {
+    position: relative;
+    z-index: 10;
+}
+</style>

@@ -76,7 +76,18 @@
             <template #wat="{ data }">
                 <span>{{ data?.UserProfile?.from_wat || data?.profile?.from_wat || '-' }}</span>
             </template>
+
+            <template #actions="{ data }">
+                <BaseButton variant="outline-primary" size="sm" @click="viewBiography(data)">
+                    View Biography
+                </BaseButton>
+            </template>
         </BaseTable>
+
+        <!-- Biography Modal -->
+        <BaseModal v-model="showBiographyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
+            <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" />
+        </BaseModal>
     </div>
 </template>
 
@@ -88,7 +99,9 @@ import api from '@/api/api';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
 import { useAuthStore } from '@/stores/auth';
+import PagodaMonkBiographyView from '@/views/pagoda/PagodaMonkBiographyView.vue';
 
 const authStore = useAuthStore();
 
@@ -115,8 +128,22 @@ const colDefs = ref([
     { field: 'role', label: 'Role / ឋានៈ', sortable: false },
     { field: 'email', label: 'Email Address', sortable: false },
     { field: 'phone', label: 'Phone Number', sortable: false },
-    { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false }
+    { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false },
+    { field: 'actions', label: 'Actions', sortable: false, width: '120px' }
 ]);
+
+const showBiographyModal = ref(false);
+const selectedUser = ref(null);
+
+const viewBiography = (user) => {
+    selectedUser.value = user;
+    showBiographyModal.value = true;
+};
+
+const closeBiography = () => {
+    showBiographyModal.value = false;
+    selectedUser.value = null;
+};
 
 const fetchMonks = async () => {
     isLoading.value = true;
@@ -124,7 +151,7 @@ const fetchMonks = async () => {
         const params = {
             page: page.value,
             perPage: perPage.value,
-            roleIds: '3,7', // Monks and Bhikkhus
+            roleIds: '3', // Monks only
             search: searchQuery.value || undefined,
             kutId: selectedKut.value || undefined
         };
@@ -145,28 +172,53 @@ const fetchMonks = async () => {
 const exportToCSV = async () => {
     try {
         isExporting.value = true;
-        const params = {
-            page: 1,
-            perPage: 10000,
-            roleIds: '3,7', // Monks & Bhikkhus
-            search: searchQuery.value || undefined,
-            kutId: selectedKut.value || undefined
-        };
-        const response = await api.get('/users', { params });
-        const records = response.data?.data || response.data || [];
 
-        const headers = ['ល.រ (No.)', 'ឈ្មោះ (Name)', 'អ៊ីមែល (Email)', 'លេខទូរស័ព្ទ (Phone)', 'វត្តកំណើត (Wat Origin)'];
-        const rows = records.map((monk, index) => {
-            const profile = monk.UserProfile || monk.profile || {};
-            const fullName = `${monk.lastName || ''} ${monk.firstName || ''}`.trim();
-            const phone = profile.phone_number || profile.phone || '-';
-            const wat = profile.from_wat || '-';
+        // Fetch all monk surveys with user profile data
+        const response = await api.get('/monk-surveys');
+        const records = response.data?.data || [];
+
+        const headers = [
+            'ល.រ (No.)',
+            'ឈ្មោះ (Surname-Name)',
+            'ឈ្មោះបំពាក់ (Ordained Name)',
+            'ថ្ងៃខែឆ្នាំកំណើត (Date of Birth)',
+            'ជាតិសាសន៍ (Nationality)',
+            'លេខទូរស័ព្ទ (Phone)',
+            'លេខអត្តសញ្ញាណ (Chhaya No.)',
+            'អ៊ីមែល (Email)',
+            'ព្រះឧបជ្ឈាយ៍ (Preceptor)',
+            'អ្នកជួយ១ (1st Assistant)',
+            'អ្នកជួយ២ (2nd Assistant)',
+            'ថ្ងៃបួស (Ordained Date)',
+            'វត្តបួស (Ordination Wat)',
+            'វត្តបច្ចុប្បន្ន (Current Wat)',
+        ];
+
+        const rows = records.map((survey, index) => {
+            const profile = survey.User?.UserProfile || {};
+            const phone = survey.phone_number || profile.phone_number || '-';
+            const dob = survey.date_of_birth
+                ? new Date(survey.date_of_birth).toLocaleDateString('en-GB')
+                : (profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString('en-GB') : '-');
+            const ordDate = survey.ordained_date
+                ? new Date(survey.ordained_date).toLocaleDateString('en-GB')
+                : '-';
+
             return [
                 index + 1,
-                fullName,
-                monk.email,
+                survey.surname_name || '-',
+                survey.ordained_name || '-',
+                dob,
+                survey.nationality || '-',
                 phone,
-                wat
+                profile.chhaya_number || '-',
+                survey.User?.email || '-',
+                survey.preceptor_name || '-',
+                survey.first_assistant_name || '-',
+                survey.second_assistant_name || '-',
+                ordDate,
+                survey.ordination_wat || '-',
+                survey.current_wat || '-',
             ];
         });
 

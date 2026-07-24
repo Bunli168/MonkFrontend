@@ -1,9 +1,8 @@
 <template>
     <div style="background-color: var(--surface-ground);">
-        <template v-if="authStore.isSuperAdmin">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Mekudi Biography / ប្រវត្តិរូបមេកុដិ</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Bhikkhu Biography / ប្រវត្តិរូបភិក្ខុ</h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
@@ -25,7 +24,7 @@
                 <div class="search-input">
                     <BaseInput
                         v-model="searchQuery"
-                        placeholder="Search mekudi..."
+                        placeholder="Search monks..."
                         :prefixIcon="Search"
                         clearable
                         @clear="onSearchClear"
@@ -36,12 +35,12 @@
 
         <BaseTable
             :columns="colDefs"
-            :rows="mekudis"
+            :rows="monks"
             :loading="isLoading"
             :total-records="totalRecords"
             v-model:page="page"
             v-model:per-page="perPage"
-            @refresh-data="fetchMekudis"
+            @refresh-data="fetchMonks"
         >
             <template #username="{ data }">
                 <div class="d-flex align-items-center gap-3">
@@ -60,8 +59,9 @@
             </template>
 
             <template #role="{ data }">
-                <span class="badge rounded-pill border bg-primary bg-opacity-10 text-primary border-primary">
-                    មេកុដិ
+                <span class="badge rounded-pill border"
+                      :class="data?.role?.name?.toLowerCase()?.includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
+                    {{ getRoleDisplayName(data?.role?.name) }}
                 </span>
             </template>
 
@@ -88,11 +88,6 @@
         <BaseModal v-model="showBiographyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
             <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" />
         </BaseModal>
-        </template>
-
-        <template v-else>
-            <PagodaMonkBiographyView :user-id="authStore.user?.id" />
-        </template>
     </div>
 </template>
 
@@ -110,7 +105,15 @@ import PagodaMonkBiographyView from '@/views/pagoda/PagodaMonkBiographyView.vue'
 
 const authStore = useAuthStore();
 
-const mekudis = ref([]);
+const getRoleDisplayName = (roleName) => {
+    if (!roleName) return '-';
+    const name = roleName.toUpperCase();
+    if (name === 'MONK') return 'សាមណេរ';
+    if (name === 'BHIKKHU') return 'ភិក្ខុ';
+    return roleName;
+};
+
+const monks = ref([]);
 const isLoading = ref(false);
 const isExporting = ref(false);
 const totalRecords = ref(0);
@@ -119,9 +122,6 @@ const perPage = ref(10);
 const searchQuery = ref('');
 const selectedKut = ref(null);
 const kuts = ref([]);
-
-const showBiographyModal = ref(false);
-const selectedUser = ref(null);
 
 const colDefs = ref([
     { field: 'username', label: 'Full Name', sortable: false },
@@ -132,29 +132,8 @@ const colDefs = ref([
     { field: 'actions', label: 'Actions', sortable: false, width: '120px' }
 ]);
 
-const fetchMekudis = async () => {
-    isLoading.value = true;
-    try {
-        const params = {
-            page: page.value,
-            perPage: perPage.value,
-            roleIds: '2', // Admin (Mekudi)
-            search: searchQuery.value || undefined,
-            kutId: selectedKut.value || undefined
-        };
-        const response = await api.get('/users', { params });
-        mekudis.value = response.data?.data || response.data || [];
-        if (response.data?.meta) {
-            totalRecords.value = response.data.meta.totalItems;
-        } else {
-            totalRecords.value = mekudis.value.length;
-        }
-    } catch (error) {
-        console.error('Failed to fetch mekudis:', error);
-    } finally {
-        isLoading.value = false;
-    }
-};
+const showBiographyModal = ref(false);
+const selectedUser = ref(null);
 
 const viewBiography = (user) => {
     selectedUser.value = user;
@@ -166,31 +145,82 @@ const closeBiography = () => {
     selectedUser.value = null;
 };
 
-const exportToCSV = async () => {
+const fetchMonks = async () => {
+    isLoading.value = true;
     try {
-        isExporting.value = true;
         const params = {
-            page: 1,
-            perPage: 10000,
-            roleIds: '2',
+            page: page.value,
+            perPage: perPage.value,
+            roleIds: '7', // Bhikkhus only
             search: searchQuery.value || undefined,
             kutId: selectedKut.value || undefined
         };
         const response = await api.get('/users', { params });
-        const records = response.data?.data || response.data || [];
+        monks.value = response.data?.data || response.data || [];
+        if (response.data?.meta) {
+            totalRecords.value = response.data.meta.totalItems;
+        } else {
+            totalRecords.value = monks.value.length;
+        }
+    } catch (error) {
+        console.error('Failed to fetch monks:', error);
+    } finally {
+        isLoading.value = false;
+    }
+};
 
-        const headers = ['ល.រ (No.)', 'ឈ្មោះ (Name)', 'អ៊ីមែល (Email)', 'លេខទូរស័ព្ទ (Phone)', 'វត្តកំណើត (Wat Origin)'];
-        const rows = records.map((mekudi, index) => {
-            const profile = mekudi.UserProfile || mekudi.profile || {};
-            const fullName = `${mekudi.lastName || ''} ${mekudi.firstName || ''}`.trim();
-            const phone = profile.phone_number || profile.phone || '-';
-            const wat = profile.from_wat || '-';
+const exportToCSV = async () => {
+    try {
+        isExporting.value = true;
+
+        // Fetch all monk surveys with user profile data
+        const response = await api.get('/monk-surveys');
+        const records = response.data?.data || [];
+
+        const headers = [
+            'ល.រ (No.)',
+            'ឈ្មោះ (Surname-Name)',
+            'ឈ្មោះបំពាក់ (Ordained Name)',
+            'ថ្ងៃខែឆ្នាំកំណើត (Date of Birth)',
+            'ជាតិសាសន៍ (Nationality)',
+            'លេខទូរស័ព្ទ (Phone)',
+            'លេខអត្តសញ្ញាណ (Chhaya No.)',
+            'អ៊ីមែល (Email)',
+            // Ordination
+            'ព្រះឧបជ្ឈាយ៍ (Preceptor)',
+            'អ្នកជួយ១ (1st Assistant)',
+            'អ្នកជួយ២ (2nd Assistant)',
+            'ថ្ងៃបួស (Ordained Date)',
+            'វត្តបួស (Ordination Wat)',
+            // Current Address
+            'វត្តបច្ចុប្បន្ន (Current Wat)',
+        ];
+
+        const rows = records.map((survey, index) => {
+            const profile = survey.User?.UserProfile || {};
+            const phone = survey.phone_number || profile.phone_number || '-';
+            const dob = survey.date_of_birth
+                ? new Date(survey.date_of_birth).toLocaleDateString('en-GB')
+                : (profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString('en-GB') : '-');
+            const ordDate = survey.ordained_date
+                ? new Date(survey.ordained_date).toLocaleDateString('en-GB')
+                : '-';
+
             return [
                 index + 1,
-                fullName,
-                mekudi.email,
+                survey.surname_name || '-',
+                survey.ordained_name || '-',
+                dob,
+                survey.nationality || '-',
                 phone,
-                wat
+                profile.chhaya_number || '-',
+                survey.User?.email || '-',
+                survey.preceptor_name || '-',
+                survey.first_assistant_name || '-',
+                survey.second_assistant_name || '-',
+                ordDate,
+                survey.ordination_wat || '-',
+                survey.current_wat || '-',
             ];
         });
 
@@ -202,13 +232,13 @@ const exportToCSV = async () => {
         const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.setAttribute('href', URL.createObjectURL(blob));
-        link.setAttribute('download', `mekudi_biographies_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute('download', `bhikkhu_biographies_${new Date().toISOString().slice(0, 10)}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error('Failed to export Mekudis:', error);
+        console.error('Failed to export Monks:', error);
     } finally {
         isExporting.value = false;
     }
@@ -217,12 +247,12 @@ const exportToCSV = async () => {
 const onSearchClear = () => {
     searchQuery.value = '';
     page.value = 1;
-    fetchMekudis();
+    fetchMonks();
 };
 
-watch([page, perPage], () => { fetchMekudis(); });
-watch(searchQuery, () => { page.value = 1; fetchMekudis(); });
-watch(selectedKut, () => { page.value = 1; fetchMekudis(); });
+watch([page, perPage], () => { fetchMonks(); });
+watch(searchQuery, () => { page.value = 1; fetchMonks(); });
+watch(selectedKut, () => { page.value = 1; fetchMonks(); });
 
 const fetchKuts = async () => {
     try {
@@ -241,7 +271,7 @@ const fetchKuts = async () => {
 };
 
 onMounted(() => {
-    fetchMekudis();
+    fetchMonks();
     fetchKuts();
 });
 </script>

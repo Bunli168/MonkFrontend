@@ -98,6 +98,9 @@ const headerPaths = computed(() => {
     if (authStore.isStudent && !authStore.isMonk) {
         paths.push({ label: 'ប្រវត្តិរូបនិស្សិត', path: 'pagoda-student-biography', icon: ClipboardList });
     }
+    if (authStore.isMonk) {
+        paths.push({ label: 'ប្រវត្តិរូបសង្ខេប', path: 'pagoda-monk-biography', icon: ClipboardList });
+    }
     if (authStore.isTeacher || authStore.isAdmin || authStore.isMekudi) {
         paths.push({ label: 'Users', path: 'pagoda-users', icon: Users });
     }

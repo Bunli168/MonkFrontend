@@ -5,7 +5,7 @@
             <span v-if="required" style="color: var(--danger-color)">*</span>
         </label>
         <component :is="selectComponent" :id="id" v-model="internalValue" :options="options" v-bind="optionProps"
-            :placeholder="placeholder" :disabled="disabled" :showClear="clearable" :filter="filter" :multiple="multiple"
+            :placeholder="placeholder" :disabled="disabled" :required="required" :showClear="clearable" :filter="filter" :multiple="multiple"
             :loading="loading" :invalid="!!error" :class="['w-100']">
             <template #dropdownicon>
                 <ChevronDown v-if="!disabled" size="18" />

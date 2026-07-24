@@ -13,17 +13,17 @@
         </div>
 
         <Password v-if="type === 'password'" :inputId="id" v-model="internalValue" :placeholder="placeholder"
-            :disabled="disabled" class="w-100" :inputClass="['w-100', 'p-password-dynamic']" :feedback="false"
+            :disabled="disabled" :required="required" class="w-100" :inputClass="['w-100', 'p-password-dynamic']" :feedback="false"
             toggleMask :invalid="!!error" @blur="$emit('blur', $event)" @focus="$emit('focus', $event)"
             :inputStyle="reduceRadius ? { borderRadius: `calc(var(--border-radius) - ${reduceRadius}rem) !important` } : {}" />
 
         <InputNumber v-else-if="type === 'number'" :inputId="id" v-model="internalValue" :placeholder="placeholder"
-            :disabled="disabled" class="w-100" :inputClass="['w-100']" :invalid="!!error" @blur="$emit('blur', $event)"
+            :disabled="disabled" :required="required" class="w-100" :inputClass="['w-100']" :invalid="!!error" @blur="$emit('blur', $event)"
             @focus="$emit('focus', $event)" />
 
         <div v-else-if="type === 'textarea'" class="position-relative w-100 d-flex flex-column">
             <Textarea :id="id" v-model="internalValue" :placeholder="placeholder"
-                :disabled="disabled" :class="['w-100', 'p-textarea-dynamic']" :rows="rows" autoResize :invalid="!!error"
+                :disabled="disabled" :required="required" :class="['w-100', 'p-textarea-dynamic']" :rows="rows" autoResize :invalid="!!error"
                 :maxlength="computedMaxlength"
                 @blur="$emit('blur', $event)" @focus="$emit('focus', $event)" />
         </div>
@@ -31,7 +31,7 @@
         <div v-else class="position-relative w-100 d-flex align-items-center">
             <component v-if="prefixIcon" :is="prefixIcon" class="input-icon-left" :size="18" />
             <InputText :id="id" :type="type" :placeholder="placeholder" :class="['w-100', { 'with-prefix': prefixIcon, 'with-suffix': clearable }]" :disabled="disabled"
-                :maxlength="computedMaxlength"
+                :maxlength="computedMaxlength" :required="required"
                 v-model="internalValue" :invalid="!!error" @blur="$emit('blur', $event)" @focus="$emit('focus', $event)" />
             <button v-if="internalValue && clearable && !disabled" @click="onClear" class="clear-button btn p-0 position-absolute d-flex align-items-center justify-content-center" type="button" aria-label="Clear input">
                 <X :size="16" />

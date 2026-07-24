@@ -5,7 +5,7 @@
             <div v-if="!isEditing" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
                     <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Monk Profile Summary / ព័ត៌មានផ្ទាល់ខ្លួន</h5>
-                    <BaseButton variant="outline-primary" class="w-100 w-md-auto" @click="isEditing = true">
+                    <BaseButton variant="outline-primary" @click="isEditing = true">
                         Edit Profile / កែសម្រួលព័ត៌មាន
                     </BaseButton>
                 </div>
@@ -80,11 +80,11 @@
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label class="form-label">First Name (នាម) <span class="text-danger">*</span></label>
-                                <BaseInput v-model="formData.UserProfile.first_name_kh" placeholder="Enter first name" :required="currentStep === 1" />
+                                <BaseInput v-model="formData.UserProfile.first_name_kh" placeholder="Enter first name" :required="currentStep === 1" :error="errors.first_name_kh" @input="validateFirstName" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Last Name (គោត្តនាម) <span class="text-danger">*</span></label>
-                                <BaseInput v-model="formData.UserProfile.last_name_kh" placeholder="Enter last name" :required="currentStep === 1" />
+                                <BaseInput v-model="formData.UserProfile.last_name_kh" placeholder="Enter last name" :required="currentStep === 1" :error="errors.last_name_kh" @input="validateLastName" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Date of Birth (ថ្ងៃខែឆ្នាំកំណើត) <span class="text-danger">*</span></label>
@@ -92,11 +92,11 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">ID Number (លេខអត្តសញ្ញាណប័ណ្ណ) <span class="text-danger">*</span></label>
-                                <BaseInput v-model="formData.UserProfile.chhaya_number" placeholder="Enter ID number" :required="currentStep === 1" />
+                                <BaseInput v-model="formData.UserProfile.chhaya_number" placeholder="Enter ID number" :required="currentStep === 1" :error="errors.chhaya_number" @input="validateIdNumber" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Phone Number (លេខទូរស័ព្ទ) <span class="text-danger">*</span></label>
-                                <BaseInput v-model="formData.UserProfile.phone_number" placeholder="Enter phone number" :required="currentStep === 1" />
+                                <BaseInput v-model="formData.UserProfile.phone_number" placeholder="Enter phone number" :required="currentStep === 1" :error="errors.phone_number" @input="validatePhone" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Email (អ៊ីមែល)</label>
@@ -167,7 +167,7 @@
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
                                 <label class="form-label">University / School (រៀននៅ)</label>
-                                <BaseInput v-model="formData.UserProfile.university_name" placeholder="Enter university or school name" />
+                                <BaseInput v-model="formData.UserProfile.university_name" placeholder="Enter university or school name" :error="errors.university_name" @input="validateUniversity" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Year (ឆ្នាំទី)</label>
@@ -382,10 +382,79 @@ const formData = ref({
 });
 
 const handleNextOrSave = () => {
+    if (currentStep.value === 1) {
+        if (!validateFirstName() || !validateLastName() || !validateIdNumber() || !validatePhone()) {
+            return;
+        }
+    }
+
     if (currentStep.value < steps.length) {
         currentStep.value++;
     } else {
         saveProfile();
+    }
+};
+
+const errors = ref({
+    first_name_kh: '',
+    last_name_kh: '',
+    chhaya_number: '',
+    phone_number: '',
+    university_name: ''
+});
+
+const validateFirstName = () => {
+    const val = formData.value.UserProfile.first_name_kh;
+    if (val && /[0-9]/.test(val)) {
+        errors.value.first_name_kh = 'First name cannot contain numbers';
+        return false;
+    } else {
+        errors.value.first_name_kh = '';
+        return true;
+    }
+};
+
+const validateLastName = () => {
+    const val = formData.value.UserProfile.last_name_kh;
+    if (val && /[0-9]/.test(val)) {
+        errors.value.last_name_kh = 'Last name cannot contain numbers';
+        return false;
+    } else {
+        errors.value.last_name_kh = '';
+        return true;
+    }
+};
+
+const validateIdNumber = () => {
+    const val = formData.value.UserProfile.chhaya_number;
+    if (val && /[^0-9 ]/.test(val)) {
+        errors.value.chhaya_number = 'ID Number can only contain numbers and spaces';
+        return false;
+    } else {
+        errors.value.chhaya_number = '';
+        return true;
+    }
+};
+
+const validatePhone = () => {
+    const val = formData.value.UserProfile.phone_number;
+    if (val && /[^0-9 ]/.test(val)) {
+        errors.value.phone_number = 'Phone number can only contain numbers and spaces';
+        return false;
+    } else {
+        errors.value.phone_number = '';
+        return true;
+    }
+};
+
+const validateUniversity = () => {
+    const val = formData.value.UserProfile.university_name;
+    if (val && /[0-9]/.test(val)) {
+        errors.value.university_name = 'University / School name cannot contain numbers';
+        return false;
+    } else {
+        errors.value.university_name = '';
+        return true;
     }
 };
 
@@ -420,11 +489,11 @@ const loadProfile = async () => {
                     isEditing.value = false;
                 } else {
                     hasExistingProfile.value = false;
-                    isEditing.value = true;
+                    isEditing.value = false;
                 }
             } else {
                 hasExistingProfile.value = false;
-                isEditing.value = true;
+                isEditing.value = false;
             }
 
             if (user.Addresses && user.Addresses.length > 0) {
@@ -480,7 +549,8 @@ const saveProfile = async () => {
         const response = await api.put('/auth/profile', payload);
         if (response.data?.success) {
             toastStore.showToast('Profile information saved successfully', 'success');
-            await authStore.getProfile(); // if authStore handles fetching
+            await authStore.getProfile();
+            await loadProfile();
             hasExistingProfile.value = true;
             isEditing.value = false;
         }

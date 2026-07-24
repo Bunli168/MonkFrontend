@@ -9,6 +9,7 @@
             v-model="internalValue" 
             :placeholder="placeholder"
             :disabled="disabled"
+            :required="required"
             :showIcon="showIcon"
             :inline="inline"
             iconDisplay="input"

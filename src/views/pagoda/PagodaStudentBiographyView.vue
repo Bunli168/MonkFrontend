@@ -2,7 +2,7 @@
     <div class="student-biography-view pb-3 h-100 d-flex flex-column align-items-center">
         <div class="w-100" style="max-width: 1000px;">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
-                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Student Profile Summary / ព័ត៌មានសិស្ស (ប្រវត្តិរូបសង្ខេប)</h5>
+                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title }}</h5>
                 <BaseButton v-if="!isEditing" variant="outline-primary" class="w-100 w-sm-auto" @click="startEdit">
                     Edit Profile / កែសម្រួលព័ត៌មាន
                 </BaseButton>
@@ -153,19 +153,19 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Province (រាជធានី/ខេត្ត) <span class="text-danger">*</span></label>
-                                    <BaseInput v-model="form.pob_province" placeholder="Enter province" :required="currentStep === 2" />
+                                    <BaseSelect v-model="form.pob_province_id" :options="pobLoc.provinceOptions" placeholder="Select province" :required="currentStep === 2" @update:modelValue="onPobProvinceChange" :loading="pobLoc.isLoadingProvinces" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">District (ក្រុង/ស្រុក/ខណ្ឌ)</label>
-                                    <BaseInput v-model="form.pob_district" placeholder="Enter district" />
+                                    <BaseSelect v-model="form.pob_district_id" :options="pobLoc.districtOptions" placeholder="Select district" :disabled="!form.pob_province_id" @update:modelValue="onPobDistrictChange" :loading="pobLoc.isLoadingDistricts" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Commune (ឃុំ/សង្កាត់)</label>
-                                    <BaseInput v-model="form.pob_commune" placeholder="Enter commune" />
+                                    <BaseSelect v-model="form.pob_commune_id" :options="pobLoc.communeOptions" placeholder="Select commune" :disabled="!form.pob_district_id" @update:modelValue="onPobCommuneChange" :loading="pobLoc.isLoadingCommunes" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Village (ភូមិ)</label>
-                                    <BaseInput v-model="form.pob_village" placeholder="Enter village" />
+                                    <BaseSelect v-model="form.pob_village_id" :options="pobLoc.villageOptions" placeholder="Select village" :disabled="!form.pob_commune_id" :loading="pobLoc.isLoadingVillages" />
                                 </div>
                             </div>
                         </div>
@@ -238,19 +238,19 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Province (ខេត្ត/រាជធានី)</label>
-                                    <BaseInput v-model="form.parents_province" placeholder="Enter province" />
+                                    <BaseSelect v-model="form.parents_province_id" :options="parentsLoc.provinceOptions" placeholder="Select province" @update:modelValue="onParentsProvinceChange" :loading="parentsLoc.isLoadingProvinces" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">District (ស្រុក/ខណ្ឌ)</label>
-                                    <BaseInput v-model="form.parents_district" placeholder="Enter district" />
+                                    <BaseSelect v-model="form.parents_district_id" :options="parentsLoc.districtOptions" placeholder="Select district" :disabled="!form.parents_province_id" @update:modelValue="onParentsDistrictChange" :loading="parentsLoc.isLoadingDistricts" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Commune (ឃុំ/សង្កាត់)</label>
-                                    <BaseInput v-model="form.parents_commune" placeholder="Enter commune" />
+                                    <BaseSelect v-model="form.parents_commune_id" :options="parentsLoc.communeOptions" placeholder="Select commune" :disabled="!form.parents_district_id" @update:modelValue="onParentsCommuneChange" :loading="parentsLoc.isLoadingCommunes" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Village (ភូមិ)</label>
-                                    <BaseInput v-model="form.parents_village" placeholder="Enter village" />
+                                    <BaseSelect v-model="form.parents_village_id" :options="parentsLoc.villageOptions" placeholder="Select village" :disabled="!form.parents_commune_id" :loading="parentsLoc.isLoadingVillages" />
                                 </div>
                             </div>
                         </div>
@@ -283,6 +283,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+
+const props = defineProps({
+    title: {
+        type: String,
+        default: 'Student Profile Summary / ព័ត៌មានសិស្ស (ប្រវត្តិរូបសង្ខេប)'
+    }
+});
+
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/users/user';
 import { useToastStore } from '@/stores/toast';
@@ -290,8 +298,10 @@ import { formatDate } from '@/utils/dateFormat';
 import api from '@/api/api';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
+import { useLocation } from '@/composables/useLocation';
 
 const authStore  = useAuthStore();
 const userStore  = useUserStore();
@@ -310,9 +320,13 @@ const steps = [
     { name: 'Parents & Family' },
 ];
 
+const pobLoc = useLocation();
+const parentsLoc = useLocation();
+
 const defaultForm = () => ({
     surname_name: '', nationality: 'ខ្មែរ', date_of_birth: null,
     pob_village: '', pob_commune: '', pob_district: '', pob_province: '',
+    pob_village_id: null, pob_commune_id: null, pob_district_id: null, pob_province_id: null,
     occupation: '', current_address: '',
     phone_number: '', id_card_number: '', other_number: '',
     edu_level: '', edu_school: '', edu_specialty: '', edu_grade: '',
@@ -320,6 +334,7 @@ const defaultForm = () => ({
     father_name: '', father_occupation: '',
     mother_name: '', mother_occupation: '',
     parents_village: '', parents_commune: '', parents_district: '', parents_province: '',
+    parents_village_id: null, parents_commune_id: null, parents_district_id: null, parents_province_id: null,
 });
 
 const form = ref(defaultForm());
@@ -336,6 +351,16 @@ const fetchSurvey = async () => {
                     form.value[key] = data[key];
                 }
             });
+            
+            // Load cascading data for Place of Birth
+            if (form.value.pob_province_id) await pobLoc.fetchDistricts(form.value.pob_province_id);
+            if (form.value.pob_district_id) await pobLoc.fetchCommunes(form.value.pob_district_id);
+            if (form.value.pob_commune_id) await pobLoc.fetchVillages(form.value.pob_commune_id);
+
+            // Load cascading data for Parents Address
+            if (form.value.parents_province_id) await parentsLoc.fetchDistricts(form.value.parents_province_id);
+            if (form.value.parents_district_id) await parentsLoc.fetchCommunes(form.value.parents_district_id);
+            if (form.value.parents_commune_id) await parentsLoc.fetchVillages(form.value.parents_commune_id);
         } else {
             hasSurvey.value = false;
             isEditing.value = false;
@@ -365,6 +390,20 @@ const fetchSurvey = async () => {
                         if (!form.value.pob_district && birthAddress.district) form.value.pob_district = birthAddress.district;
                         if (!form.value.pob_commune && birthAddress.commune) form.value.pob_commune = birthAddress.commune;
                         if (!form.value.pob_village && birthAddress.village) form.value.pob_village = birthAddress.village;
+                        
+                        if (!form.value.pob_province_id && birthAddress.province_id) {
+                            form.value.pob_province_id = birthAddress.province_id;
+                            await pobLoc.fetchDistricts(birthAddress.province_id);
+                        }
+                        if (!form.value.pob_district_id && birthAddress.district_id) {
+                            form.value.pob_district_id = birthAddress.district_id;
+                            await pobLoc.fetchCommunes(birthAddress.district_id);
+                        }
+                        if (!form.value.pob_commune_id && birthAddress.commune_id) {
+                            form.value.pob_commune_id = birthAddress.commune_id;
+                            await pobLoc.fetchVillages(birthAddress.commune_id);
+                        }
+                        if (!form.value.pob_village_id && birthAddress.village_id) form.value.pob_village_id = birthAddress.village_id;
                     }
                 }
             }
@@ -383,6 +422,42 @@ const fetchSurvey = async () => {
 const startEdit = () => {
     currentStep.value = 1;
     isEditing.value   = true;
+};
+
+const onPobProvinceChange = async (val) => {
+    form.value.pob_district_id = null;
+    form.value.pob_commune_id = null;
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchDistricts(val);
+};
+
+const onPobDistrictChange = async (val) => {
+    form.value.pob_commune_id = null;
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchCommunes(val);
+};
+
+const onPobCommuneChange = async (val) => {
+    form.value.pob_village_id = null;
+    if (val) await pobLoc.fetchVillages(val);
+};
+
+const onParentsProvinceChange = async (val) => {
+    form.value.parents_district_id = null;
+    form.value.parents_commune_id = null;
+    form.value.parents_village_id = null;
+    if (val) await parentsLoc.fetchDistricts(val);
+};
+
+const onParentsDistrictChange = async (val) => {
+    form.value.parents_commune_id = null;
+    form.value.parents_village_id = null;
+    if (val) await parentsLoc.fetchCommunes(val);
+};
+
+const onParentsCommuneChange = async (val) => {
+    form.value.parents_village_id = null;
+    if (val) await parentsLoc.fetchVillages(val);
 };
 
 const cancelEdit = () => {
@@ -430,7 +505,11 @@ const saveSurvey = async () => {
     }
 };
 
-onMounted(fetchSurvey);
+onMounted(async () => {
+    await pobLoc.fetchProvinces();
+    await parentsLoc.fetchProvinces();
+    await fetchSurvey();
+});
 </script>
 
 <style scoped>

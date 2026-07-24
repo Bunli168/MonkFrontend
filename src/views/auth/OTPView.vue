@@ -406,11 +406,7 @@ const onSubmit = async () => {
         if (result.requirePasswordChange) {
             router.push({ name: 'change-password' })
         } else {
-            if (authStore.isAdmin) {
-                router.push({ name: 'dashboard' });
-            } else {
-                router.push({ name: 'pagoda-overview' });
-            }
+            router.push({ name: 'dashboard' });
         }
     } finally {
         isLoading.value = false;

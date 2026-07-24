@@ -35,6 +35,14 @@
                         </template>
                     </BaseSelect>
                 </div>
+
+                <div class="kut-select">
+                    <BaseSelect 
+                        v-model="searchAndFilter.filters.value.kutId" 
+                        :options="kutOptions"
+                        placeholder="Kudi / កុដិ"
+                    />
+                </div>
                 
 
 
@@ -421,7 +429,7 @@ const filterOptions = computed(() => {
         { label: 'All Users', value: null, badge: userStore.roleStats['all'], variant: 'primary' }
     ];
     
-    if (false) {
+    if (authStore.isSuperAdmin) {
         options.push({ label: 'មេកុដិ', value: 2, badge: userStore.roleStats[2], variant: 'success' });
     }
     
@@ -598,13 +606,17 @@ const colDefs = computed(() => {
 }
 
 .status-select,
-.search-input {
+.search-input,
+.kut-select {
     width: 100%;
 }
 
 @media (min-width: 576px) {
     .status-select {
         width: 150px;
+    }
+    .kut-select {
+        width: 180px;
     }
     .search-input {
         width: 300px;
