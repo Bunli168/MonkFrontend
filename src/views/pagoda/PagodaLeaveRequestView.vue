@@ -2,7 +2,7 @@
     <div class="pagoda-leave-requests-view container-xl py-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
             <div>
-                <h4 class="fw-bold mb-1">Leave Requests</h4>
+                <h4 class="fw-bold mb-1" style="color: var(--text-heading-color);">Leave Requests</h4>
                 <p class="text-muted mb-0">Submit and track your requests for leave or absence.</p>
             </div>
             <button class="btn btn-primary d-flex align-items-center gap-2" @click="showForm = true">
@@ -10,10 +10,12 @@
             </button>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4" v-if="showForm">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">New Leave Request</h5>
-                <button type="button" class="btn-close" @click="showForm = false"></button>
+        <div class="card border-0 shadow-sm mb-4" v-if="showForm" style="background-color: var(--surface-card);">
+            <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">
+                    {{ isEditing ? 'Edit Leave Request' : 'New Leave Request' }}
+                </h5>
+                <button type="button" class="btn-close" @click="cancelForm"></button>
             </div>
             <div class="card-body">
                 <form @submit.prevent="submitRequest">
@@ -39,7 +41,7 @@
                             <textarea class="form-control" v-model="formData.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
                         </div>
                         <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-light border" @click="showForm = false">Cancel</button>
+                            <button type="button" class="btn btn-light border" @click="cancelForm">Cancel</button>
                             <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" :disabled="isSubmitting">
                                 <i class="fas fa-paper-plane" v-if="!isSubmitting"></i>
                                 <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -51,24 +53,35 @@
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom py-3">
-                <h5 class="mb-0 fw-bold">My Requests History</h5>
+        <div class="card border-0 shadow-sm" style="background-color: var(--surface-card);">
+            <div class="card-header bg-transparent border-bottom py-3">
+                <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">My Requests History</h5>
             </div>
             <div class="card-body p-0">
                 <BaseTable 
                     :columns="colDefs" 
-                    :rows="myRequests" 
+                    :rows="paginatedRequests" 
+                    :totalRecords="myRequests.length"
                     :loading="isLoading"
                     :show-index="true"
+                    :page="currentPage"
+                    :perPage="perPage"
+                    @update:page="currentPage = $event"
+                    @update:perPage="perPage = $event"
                 >
                     <template #date_range="{ data: row }">
                         <span>{{ formatDate(row.start_date) }} <i class="fas fa-arrow-right text-muted mx-1"></i> {{ formatDate(row.end_date) }}</span>
                     </template>
+                    <template #reason="{ data: row }">
+                        <div class="text-truncate" style="max-width: 250px;" :title="row.reason">
+                            {{ row.reason || '—' }}
+                        </div>
+                    </template>
                     <template #status="{ data: row }">
-                        <span class="badge rounded-pill" :class="getStatusClass(row.status)">
-                            {{ row.status.charAt(0).toUpperCase() + row.status.slice(1) }}
-                        </span>
+                        <div class="d-flex justify-content-center">
+                            <BaseBadge v-if="row.status" :status="row.status" :label="formatStatus(row.status)" />
+                            <span v-else>—</span>
+                        </div>
                     </template>
                     <template #approved_by="{ data: row }">
                         <span v-if="row.Approver && row.status !== 'pending'" class="text-muted">
@@ -76,9 +89,22 @@
                         </span>
                         <span v-else class="text-muted fst-italic">N/A</span>
                     </template>
+                    <template #actions="{ data: row }">
+                        <BaseActionMenu v-if="getActionItems(row).length > 0" :items="getActionItems(row)" />
+                    </template>
                 </BaseTable>
             </div>
         </div>
+
+        <BaseModal v-model="showConfirmModal" title="Confirm Delete" size="sm">
+            <p class="mb-4 text-muted fw-medium">Are you sure you want to delete this leave request?</p>
+            <div class="d-flex justify-content-end gap-2">
+                <BaseButton type="button" variant="outline" @click="showConfirmModal = false">Cancel</BaseButton>
+                <BaseButton type="button" variant="danger" :isLoading="isDeleting" @click="executeDelete">
+                    Delete
+                </BaseButton>
+            </div>
+        </BaseModal>
     </div>
 </template>
 
@@ -88,12 +114,33 @@ import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseBadge from '@/components/base/BaseBadge.vue';
+import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
+import { FileEdit, Trash2 } from '@lucide/vue';
 
 const toast = useToastStore();
 const showForm = ref(false);
 const isSubmitting = ref(false);
 const isLoading = ref(false);
 const myRequests = ref([]);
+
+const isEditing = ref(false);
+const editId = ref(null);
+
+const showConfirmModal = ref(false);
+const isDeleting = ref(false);
+const deleteId = ref(null);
+
+const currentPage = ref(1);
+const perPage = ref(10);
+
+const paginatedRequests = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return myRequests.value.slice(start, end);
+});
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -108,14 +155,15 @@ const colDefs = computed(() => {
         { field: 'date_range', header: 'Date Range', sortable: false },
         { field: 'reason', header: 'Reason', sortable: false },
         { field: 'status', header: 'Status', sortable: true, class: 'text-center' },
-        { field: 'approved_by', header: 'Reviewed By', sortable: false }
+        { field: 'approved_by', header: 'Reviewed By', sortable: false },
+        { field: 'actions', header: 'Actions', sortable: false, class: 'text-end' }
     ];
 });
 
-const getStatusClass = (status) => {
-    if (status === 'approved') return 'bg-success bg-opacity-10 text-success';
-    if (status === 'rejected') return 'bg-danger bg-opacity-10 text-danger';
-    return 'bg-warning bg-opacity-10 text-warning';
+const formatStatus = (status) => {
+    if (!status) return '';
+    if (status === 'pending_mekudi' || status === 'pending_superadmin' || status === 'pending') return 'Pending';
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 };
 
 const formatDate = (dateStr) => {
@@ -137,13 +185,80 @@ const fetchRequests = async () => {
     }
 };
 
+const getActionItems = (row) => {
+    if (row.status === 'approved' || row.status === 'rejected') return [];
+    return [
+        {
+            label: 'Edit',
+            icon: FileEdit,
+            iconClass: 'text-primary',
+            command: () => openEdit(row)
+        },
+        {
+            label: 'Delete',
+            icon: Trash2,
+            iconClass: 'text-danger',
+            command: () => openDelete(row.id)
+        }
+    ];
+};
+
+const openEdit = (row) => {
+    isEditing.value = true;
+    editId.value = row.id;
+    formData.value = {
+        start_date: new Date(row.start_date).toISOString().split('T')[0],
+        end_date: new Date(row.end_date).toISOString().split('T')[0],
+        reason: row.reason
+    };
+    showForm.value = true;
+};
+
+const openDelete = (id) => {
+    deleteId.value = id;
+    showConfirmModal.value = true;
+};
+
+const executeDelete = async () => {
+    isDeleting.value = true;
+    try {
+        await api.delete(`/leave-requests/${deleteId.value}`);
+        toast.showToast('Leave request deleted successfully', 'success');
+        showConfirmModal.value = false;
+        fetchRequests();
+    } catch (error) {
+        console.error('Failed to delete request:', error);
+        toast.showToast(error.response?.data?.message || 'Failed to delete request', 'error');
+    } finally {
+        isDeleting.value = false;
+    }
+};
+
+const cancelForm = () => {
+    showForm.value = false;
+    isEditing.value = false;
+    editId.value = null;
+    formData.value = { start_date: '', end_date: '', reason: '' };
+};
+
 const submitRequest = async () => {
     isSubmitting.value = true;
     try {
-        await api.post('/leave-requests', formData.value);
-        toast.showToast('Leave request submitted successfully', 'success');
-        showForm.value = false;
-        formData.value = { start_date: '', end_date: '', reason: '' };
+        const payload = {
+            ...formData.value,
+            start_date: new Date(formData.value.start_date).toISOString().split('T')[0],
+            end_date: new Date(formData.value.end_date).toISOString().split('T')[0]
+        };
+        
+        if (isEditing.value) {
+            await api.put(`/leave-requests/${editId.value}`, payload);
+            toast.showToast('Leave request updated successfully', 'success');
+        } else {
+            await api.post('/leave-requests', payload);
+            toast.showToast('Leave request submitted successfully', 'success');
+        }
+        
+        cancelForm();
         fetchRequests();
     } catch (error) {
         console.error('Failed to submit request:', error);

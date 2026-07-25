@@ -3,23 +3,25 @@
   <div class="py-4 container-fluid px-md-4">
     <div>
       <!-- Header Area -->
-      <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between mb-4 gap-3">
-        <div>
-          <h3 class="fw-bold mb-1">Attendance & Seating / វត្តមាន និង កៅអី</h3>
-          <p class="text-muted mb-0 subtitle">Manage your seating registration and absence permissions.</p>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div class="flex-grow-1">
+          <h3 class="fw-bold mb-1 text-nowrap">Attendance & Seating / វត្តមាន និង កៅអី</h3>
+          <p class="text-muted mb-0 subtitle text-nowrap">Manage your seating registration and absence permissions.</p>
         </div>
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-3 mt-sm-0 w-100 w-sm-auto" style="flex-shrink: 0;">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end flex-shrink-0">
           <!-- Button Register Seat -->
-          <button type="button" @click="showRegisterModal = true" class="btn btn-outline-primary btn-sm d-flex justify-content-center align-items-center gap-2 px-3 py-2 text-nowrap">
+          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center gap-2">
             <Armchair :size="16" class="flex-shrink-0" />
-            <span class="text-truncate" style="max-width: 200px;">{{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}</span>
-          </button>
+            <span class="text-truncate" style="max-width: 250px;">
+              {{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}
+            </span>
+          </BaseButton>
           
           <!-- Button Leave Request -->
-          <button type="button" @click="showLeaveModal = true" class="btn btn-primary btn-sm d-flex justify-content-center align-items-center gap-2 px-3 py-2 text-nowrap">
+          <BaseButton type="button" @click="showLeaveModal = true" variant="primary" class="d-flex align-items-center gap-2">
             <CalendarRange :size="16" class="flex-shrink-0" />
             <span>Leave Request / ស្នើសុំច្បាប់</span>
-          </button>
+          </BaseButton>
         </div>
       </div>
 
@@ -54,10 +56,13 @@
               :show-index="true"
             >
               <template #date="{ data: row }">
-                <span>{{ formatDate(row.date) }}</span>
+                <span style="white-space: nowrap;">{{ row.dateDisplay || formatDate(row.date) }}</span>
               </template>
               <template #status="{ data: row }">
                 <BaseBadge v-if="row.status" :status="row.status.toUpperCase()" :label="row.status === 'permission' ? 'Permission' : 'Absent'" />
+              </template>
+              <template #duration="{ data: row }">
+                <span>{{ row.duration }}</span>
               </template>
               <template #notes="{ data: row }">
                 <span>{{ row.notes || '—' }}</span>
@@ -75,7 +80,7 @@
               :show-index="true"
             >
               <template #date_range="{ data: row }">
-                <span>{{ formatDate(row.start_date) }} <i class="fas fa-arrow-right text-muted mx-1"></i> {{ formatDate(row.end_date) }}</span>
+                <span>{{ formatDate(row.start_date) }} <ArrowRight class="text-muted mx-1" :size="14" /> {{ formatDate(row.end_date) }}</span>
               </template>
               <template #status="{ data: row }">
                 <BaseBadge v-if="row.status" :status="getBadgeStatusColor(row.status)" :label="formatStatus(row.status)" />
@@ -85,6 +90,9 @@
                   {{ row.Approver.UserProfile?.first_name_kh || '' }} {{ row.Approver.UserProfile?.last_name_kh || '' }}
                 </span>
                 <span v-else class="text-muted fst-italic">N/A</span>
+              </template>
+              <template #actions="{ data: row }">
+                <BaseActionMenu v-if="getActionItems(row).length > 0" :items="getActionItems(row)" />
               </template>
             </BaseTable>
           </TabPanel>
@@ -167,19 +175,32 @@
       </div>
     </form>
   </BaseModal>
+
+  <BaseModal v-model="showConfirmModal" title="Confirm Delete" size="sm">
+    <p class="mb-4 text-muted fw-medium">Are you sure you want to delete this leave request?</p>
+    <div class="d-flex justify-content-end gap-2">
+      <BaseButton type="button" variant="outline" @click="showConfirmModal = false">Cancel</BaseButton>
+      <BaseButton type="button" variant="danger" :isLoading="isDeleting" @click="executeDelete">
+        Delete
+      </BaseButton>
+    </div>
+  </BaseModal>
 </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import api from '@/api/api';
+import { socket } from '@/utils/socket';
 import { useAuthStore } from '@/stores/auth';
 import { useToastStore } from '@/stores/toast';
-import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList } from '@lucide/vue';
+import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList, ArrowRight, FileEdit, Trash2 } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
+import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 
 const authStore = useAuthStore();
@@ -191,6 +212,12 @@ const isSubmitting = ref(false);
 const isSubmittingLeave = ref(false);
 const isLoading = ref(false);
 const isAttendancesLoading = ref(false);
+
+const isEditing = ref(false);
+const editId = ref(null);
+const showConfirmModal = ref(false);
+const isDeleting = ref(false);
+const deleteId = ref(null);
 
 const activeTab = ref('absences');
 
@@ -224,6 +251,7 @@ const attendanceColDefs = computed(() => {
   return [
     { field: 'date', header: 'Date', sortable: true },
     { field: 'status', header: 'Status', sortable: true },
+    { field: 'duration', header: 'Duration / ចំនួនថ្ងៃ', sortable: false },
     { field: 'notes', header: 'Notes / Reason', sortable: false }
   ];
 });
@@ -233,7 +261,8 @@ const colDefs = computed(() => {
     { field: 'date_range', header: 'Date Range', sortable: false },
     { field: 'reason', header: 'Reason', sortable: false },
     { field: 'status', header: 'Status', sortable: true },
-    { field: 'approved_by', header: 'Reviewed By', sortable: false }
+    { field: 'approved_by', header: 'Reviewed By', sortable: false },
+    { field: 'actions', header: 'Actions', sortable: false, class: 'text-end' }
   ];
 });
 
@@ -254,6 +283,69 @@ const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-GB');
 };
+
+const getActionItems = (row) => {
+  const items = [];
+  if (row.status === 'pending' || row.status === 'pending_mekudi' || row.status === 'pending_superadmin') {
+    items.push({
+      label: 'Edit',
+      icon: FileEdit,
+      command: () => editLeave(row),
+      iconClass: 'text-primary',
+      textClass: 'text-primary'
+    });
+    items.push({
+      label: 'Delete',
+      icon: Trash2,
+      command: () => confirmDelete(row),
+      iconClass: 'text-danger',
+      textClass: 'text-danger'
+    });
+  }
+  return items;
+};
+
+const editLeave = (row) => {
+  isEditing.value = true;
+  editId.value = row.id;
+  leaveForm.value = {
+    start_date: row.start_date,
+    end_date: row.end_date,
+    reason: row.reason
+  };
+  showLeaveModal.value = true;
+};
+
+const confirmDelete = (row) => {
+  deleteId.value = row.id;
+  showConfirmModal.value = true;
+};
+
+const executeDelete = async () => {
+  if (!deleteId.value) return;
+  isDeleting.value = true;
+  try {
+    await api.delete(`/leave-requests/${deleteId.value}`);
+    toast.showToast('Leave request deleted successfully', 'success');
+    showConfirmModal.value = false;
+    deleteId.value = null;
+    fetchRequests();
+    loadSummary();
+  } catch (error) {
+    console.error('Delete request error:', error);
+    toast.showToast(error.response?.data?.message || 'Failed to delete leave request', 'error');
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+watch(showLeaveModal, (val) => {
+  if (!val) {
+    isEditing.value = false;
+    editId.value = null;
+    leaveForm.value = { start_date: '', end_date: '', reason: '' };
+  }
+});
 
 watch(() => form.value.seating_row_id, async (newVal) => {
   if (newVal) {
@@ -318,7 +410,53 @@ const fetchDailyAttendances = async () => {
       } 
     });
     const list = response.data?.data || response.data || [];
-    dailyAttendances.value = list.filter(a => a.status === 'absent' || a.status === 'permission');
+    
+    // Group consecutive permission records
+    const absencesAndPerms = list.filter(a => a.status === 'absent' || a.status === 'permission');
+    absencesAndPerms.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const grouped = [];
+    let currentGroup = null;
+
+    for (const record of absencesAndPerms) {
+      if (record.status === 'absent') {
+        grouped.push({ ...record, dateDisplay: formatDate(record.date) });
+        currentGroup = null;
+      } else if (record.status === 'permission') {
+        if (!currentGroup || currentGroup.notes !== record.notes) {
+          currentGroup = { ...record, start_date: record.date, end_date: record.date, count: 1 };
+          grouped.push(currentGroup);
+        } else {
+          const prevDate = new Date(currentGroup.end_date);
+          const currDate = new Date(record.date);
+          const diffTime = Math.abs(currDate - prevDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            currentGroup.end_date = record.date;
+            currentGroup.count += 1;
+          } else {
+            currentGroup = { ...record, start_date: record.date, end_date: record.date, count: 1 };
+            grouped.push(currentGroup);
+          }
+        }
+      }
+    }
+
+    dailyAttendances.value = grouped.map(g => {
+      if (g.status === 'permission' && g.start_date !== g.end_date) {
+         g.dateDisplay = `${formatDate(g.start_date)} ➔ ${formatDate(g.end_date)}`;
+         g.duration = `${g.count} day(s)`;
+      } else if (!g.dateDisplay) {
+         g.dateDisplay = formatDate(g.start_date || g.date);
+         g.duration = '1 day';
+      } else {
+         g.duration = '1 day';
+      }
+      g.sortDate = new Date(g.start_date || g.date).getTime();
+      return g;
+    }).sort((a, b) => b.sortDate - a.sortDate);
+
   } catch (error) {
     console.error('Failed to load daily attendances:', error);
   } finally {
@@ -356,10 +494,21 @@ const submitRegistration = async () => {
 const submitLeaveRequest = async () => {
   isSubmittingLeave.value = true;
   try {
-    await api.post('/leave-requests', leaveForm.value);
-    toast.showToast('Leave request submitted successfully', 'success');
+    const payload = {
+      ...leaveForm.value,
+      start_date: new Date(leaveForm.value.start_date).toISOString().split('T')[0],
+      end_date: new Date(leaveForm.value.end_date).toISOString().split('T')[0]
+    };
+
+    if (isEditing.value && editId.value) {
+      await api.put(`/leave-requests/${editId.value}`, payload);
+      toast.showToast('Leave request updated successfully', 'success');
+    } else {
+      await api.post('/leave-requests', payload);
+      toast.showToast('Leave request submitted successfully', 'success');
+    }
+    
     showLeaveModal.value = false;
-    leaveForm.value = { start_date: '', end_date: '', reason: '' };
     fetchRequests();
     loadSummary();
   } catch (error) {
@@ -368,6 +517,12 @@ const submitLeaveRequest = async () => {
   } finally {
     isSubmittingLeave.value = false;
   }
+};
+
+const handleLeaveUpdated = () => {
+  fetchRequests();
+  fetchDailyAttendances();
+  loadSummary();
 };
 
 onMounted(async () => {
@@ -386,6 +541,12 @@ onMounted(async () => {
       form.value.seat_number = String(profileUser.profile.seat_number);
     }
   }
+
+  socket.on('leave_request_updated', handleLeaveUpdated);
+});
+
+onUnmounted(() => {
+  socket.off('leave_request_updated', handleLeaveUpdated);
 });
 </script>
 

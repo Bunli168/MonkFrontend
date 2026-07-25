@@ -22,6 +22,12 @@
                             Member Request Permission
                         </div>
                     </Tab>
+                    <Tab value="my-leave-request">
+                        <div class="d-flex align-items-center gap-2">
+                            <FileText style="color: var(--info-color);" :size="16" />
+                            My Leave Request
+                        </div>
+                    </Tab>
                     <Tab value="manage-rows" v-if="false">
                         <div class="d-flex align-items-center gap-2">
                             <Settings style="color: var(--info-color);" :size="16" />
@@ -40,6 +46,9 @@
                 <TabPanel value="request-permission">
                     <MemberRequestPermissionView v-if="activeTab === 'request-permission'" />
                 </TabPanel>
+                <TabPanel value="my-leave-request">
+                    <PagodaLeaveRequestView v-if="activeTab === 'my-leave-request'" />
+                </TabPanel>
                 <TabPanel value="manage-rows" v-if="false">
                     <SeatingRowSettings v-if="activeTab === 'manage-rows'" />
                 </TabPanel>
@@ -56,6 +65,7 @@ import { ClipboardList, FileText, Settings } from '@lucide/vue';
 import TakerTakeAttendanceView from './TakerTakeAttendanceView.vue';
 import TakerAbsentPermissionView from './TakerAbsentPermissionView.vue';
 import MemberRequestPermissionView from './MemberRequestPermissionView.vue';
+import PagodaLeaveRequestView from '@/views/pagoda/PagodaLeaveRequestView.vue';
 import SeatingRowSettings from '@/views/admin/settings/SeatingRowSettings.vue';
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 
