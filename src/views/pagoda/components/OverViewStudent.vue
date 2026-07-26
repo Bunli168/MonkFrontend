@@ -46,19 +46,20 @@
 
         <!-- Main Layout Grid -->
         <div class="row g-3">
-            <!-- Left Column: Surveys & Reports -->
-            <div class="col-12 col-lg-8 d-flex flex-column gap-3">
+            <!-- Left Column: Profile Summary -->
+            <div class="col-12 d-flex flex-column gap-3">
                 <!-- Profile Summary Section -->
                 <div class="card p-3" style="background-color: var(--body-bg-color)">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
                         <div class="d-flex align-items-center gap-2">
                             <div class="rounded p-1 d-flex align-items-center justify-content-center" style="background-color: rgba(40, 167, 69, 0.1); color: var(--success, #28a745);">
                                 <User :size="16" />
                             </div>
                             <span class="fw-bold text-heading">My Profile Summary / ព័ត៌មានផ្ទាល់ខ្លួន</span>
                         </div>
-                        <router-link :to="{ name: 'pagoda-profile' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">
-                            Edit Details
+                        <router-link :to="{ name: 'pagoda-profile' }" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 text-nowrap rounded-pill px-3 py-1 fw-medium shadow-sm" style="font-size: 0.85rem;">
+                            <Edit :size="14" />
+                            <span>Edit Details</span>
                         </router-link>
                     </div>
                     
@@ -87,59 +88,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-            </div>
-
-            <!-- Right Column: Weather & Reports -->
-            <div class="col-12 col-lg-4 d-flex flex-column">
-                <div class="row g-3 flex-grow-1 flex-lg-column">
-
-                    <div class="col-12 flex-grow-1 d-flex flex-column">
-                        <!-- My Active Reports Section -->
-                        <div class="d-flex flex-column gap-2 flex-grow-1">
-                            <!-- Title Card -->
-                            <div class="card p-3" style="background-color: var(--body-bg-color)">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded p-1 d-flex align-items-center justify-content-center" style="background-color: rgba(220, 53, 69, 0.1); color: var(--danger, #dc3545);">
-                                            <AlertTriangle :size="16" />
-                                        </div>
-                                        <span class="fw-bold text-heading">My active reports</span>
-                                    </div>
-                                    <router-link :to="{ name: 'pagoda-reports' }" class="text-primary text-decoration-none fw-medium" style="font-size: 0.9rem;">View all</router-link>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Reports List -->
-                            <div v-if="ownReportStore.isLoading" class="card d-flex justify-content-center py-5" style="background-color: var(--body-bg-color)">
-                                <div class="spinner-border text-primary spinner-border-sm mx-auto" role="status"></div>
-                            </div>
-                            <div v-else-if="activeReports.length > 0" class="row g-2">
-                                <div v-for="report in activeReports.slice(0, 4)" :key="report.id" class="col-12">
-                                    <div class="card p-3 h-100" style="background-color: var(--body-bg-color); cursor: pointer;" @click="router.push({ name: 'pagoda-reports' })">
-                                        <div class="d-flex align-items-center justify-content-between h-100">
-                                            <div class="d-flex flex-column overflow-hidden me-2">
-                                                <span class="fw-medium text-heading text-truncate" style="font-size: 0.95rem;">{{ report.title }}</span>
-                                                <div class="d-flex align-items-center gap-2 mt-1">
-                                                    <BaseBadge :status="report.status" size="sm" />
-                                                </div>
-                                            </div>
-                                            <ChevronRight :size="18" class="text-muted" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else class="card d-flex flex-column align-items-center justify-content-center py-5" style="background-color: var(--body-bg-color)">
-                                <FileText :size="32" class="text-muted mb-3 opacity-50" stroke-width="1.5" />
-                                <span class="text-muted" style="font-size: 0.95rem;">No active reports found</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -149,16 +97,13 @@
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
-import { useOwnReportstore } from '@/stores/reports/ownReport';
 import Banner from '@/components/Banner.vue';
-import BaseBadge from '@/components/base/BaseBadge.vue';
 import api from '@/api/api';
 import { formatDate } from '@/utils/dateFormat';
-import { Newspaper, ClipboardList, CheckCircle, AlertTriangle, FileText, MapPin, CloudSun, ChevronRight, Sun, Cloud, CloudFog, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, User } from '@lucide/vue';
+import { MapPin, CloudSun, Sun, Cloud, CloudFog, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, User, Edit } from '@lucide/vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const ownReportStore = useOwnReportstore();
 
 const monkSurvey = ref(null);
 const attendanceSummary = ref(null);
@@ -280,10 +225,6 @@ const fetchWeather = async () => {
 
 
 
-const activeReports = computed(() => {
-    return (ownReportStore.ownReports || []).filter(report => report.status !== 'RESOLVED' && report.status !== 'REJECTED');
-});
-
 const currentDate = ref(new Date());
 let timer = null;
 let weatherInterval = null;
@@ -293,15 +234,9 @@ onMounted(async () => {
         currentDate.value = new Date();
     }, 60000);
 
-
-    ownReportStore.page = 1;
-    if (ownReportStore.getAllOwnReports) ownReportStore.getAllOwnReports();
     fetchWeather();
     loadMonkSurvey();
     loadSummary();
-
-
-    if (ownReportStore.setupSocketListeners) ownReportStore.setupSocketListeners();
 });
 
 onUnmounted(() => {

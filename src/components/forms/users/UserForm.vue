@@ -1,6 +1,6 @@
 <template>
     <form class="card p-3" style="background-color: var(--body-bg-color);">
-        <div class="mb-3" v-if="!initialData">
+        <div class="mb-3" v-if="!initialData && authStore.isSuperAdmin">
             <BaseSelectButton v-model="creationMode" :options="modeOptions" />
         </div>
 
@@ -146,11 +146,18 @@ const autoRoles = computed(() => {
     }));
 });
 
-const creationMode = ref('email');
-const modeOptions = [
-    { label: 'Custom Email', value: 'email' },
-    { label: 'Auto Generate', value: 'auto' }
-];
+const creationMode = ref(authStore.isSuperAdmin ? 'email' : 'auto');
+const modeOptions = computed(() => {
+    if (authStore.isSuperAdmin) {
+        return [
+            { label: 'Custom Email', value: 'email' },
+            { label: 'Auto Generate', value: 'auto' }
+        ];
+    }
+    return [
+        { label: 'Auto Generate', value: 'auto' }
+    ];
+});
 
 const props = defineProps({
     initialData: Object
@@ -212,6 +219,7 @@ const initForm = () => {
             seating_row_id: props.initialData?.seating_row_id || null
         });
     } else {
+        creationMode.value = authStore.isSuperAdmin ? 'email' : 'auto';
         resetForm();
     }
 };
