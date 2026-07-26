@@ -31,6 +31,11 @@
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-envelope-open-text" style="color: var(--warning-color, #ffc107);"></i>
                             Leave Requests
+                            <span
+                                v-if="leaveViewRef?.pendingCount > 0"
+                                class="badge rounded-pill ms-1"
+                                style="background: #ef4444; color: #fff; font-size: 0.68rem; padding: 2px 7px; line-height: 1.5;"
+                            >{{ leaveViewRef.pendingCount }}</span>
                         </div>
                     </Tab>
                     <Tab value="takers">
@@ -171,7 +176,7 @@
 
                 <!-- Leave Requests Tab -->
                 <TabPanel value="leave">
-                    <AdminLeaveRequestsView v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
+                    <AdminLeaveRequestsView ref="leaveViewRef" v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
                 </TabPanel>
 
                 <!-- Takers Tab -->
@@ -197,6 +202,7 @@ import { useAuthStore } from '@/stores/auth';
 
 const toast = useToastStore();
 const authStore = useAuthStore();
+const leaveViewRef = ref(null);
 
 // State
 // Helper to get local date string YYYY-MM-DD

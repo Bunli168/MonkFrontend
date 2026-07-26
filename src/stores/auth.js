@@ -206,6 +206,23 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const updateMyPassword = async (payload) => {
+        try {
+            const response = await api.put('/auth/change-password', payload);
+            toastStore.showToast(response?.data?.message || 'ប្តូរពាក្យសម្ងាត់ជោគជ័យ!', 'success');
+            // After changing password, all other sessions are invalidated on the server.
+            // Force a logout here so the user must re-authenticate with the new password.
+            setTimeout(() => {
+                clearAuth();
+                window.location.href = '/login';
+            }, 1500);
+            return true;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
+    };
+
     const getProfile = async () => {
         try {
             const response = await api.get('/users/me');
@@ -263,6 +280,21 @@ export const useAuthStore = defineStore('auth', () => {
             return false;
         }
     }
+
+    const unlinkTelegram = async () => {
+        try {
+            const res = await api.post('auth/unlink-telegram');
+            toastStore.showToast(res?.data?.message || 'Telegram account unlinked', 'success');
+            if (user.value) {
+                user.value.telegram_chat_id = null;
+                user.value.telegram_username = null;
+            }
+            return true;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
+    };
 
     const logout = async (callApi = true) => {
         clearAuth();
@@ -325,6 +357,7 @@ export const useAuthStore = defineStore('auth', () => {
         resendOtp,
         enableTotp,
         disableTotp,
+        unlinkTelegram,
         verifyTotpSetup,
         changeDefaultPassword,
         hasRole,
@@ -336,6 +369,7 @@ export const useAuthStore = defineStore('auth', () => {
         clearAuth,
         setTokens,
         forgotPassword,
-        resetPassword
+        resetPassword,
+        updateMyPassword
     };
 });

@@ -139,6 +139,12 @@ const filteredRequests = computed(() => {
     return requests.value;
 });
 
+const pendingCount = computed(() => {
+    return requests.value.filter(r =>
+        r.status === 'pending' || r.status === 'pending_mekudi' || r.status === 'pending_superadmin'
+    ).length;
+});
+
 const currentPage = ref(1);
 const perPage = ref(10);
 
@@ -262,6 +268,8 @@ const executeStatusUpdate = async () => {
 onMounted(() => {
     fetchRequests();
 });
+
+defineExpose({ pendingCount });
 </script>
 
 <style scoped>

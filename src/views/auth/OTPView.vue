@@ -276,7 +276,9 @@
                     <p class="hero-desc animate-slide-up delay-1">
                         {{ mfaType === 'totp' 
                             ? 'Please open your Authenticator App and enter the 6-digit code to securely log in to your account.'
-                            : 'We add an extra layer of security to your account. Please enter the one-time password sent to you.' 
+                            : mfaType === 'telegram'
+                            ? 'សូមពិនិត្យមើលកូដសុវត្ថិភាព ៦ ខ្ទង់ដែលបានផ្ញើទៅកាន់ Telegram Bot របស់អ្នក (Please check your Telegram Bot).'
+                            : 'We add an extra layer of security to your account. Please enter the one-time password sent to your email.' 
                         }}
                     </p>
 
@@ -331,11 +333,13 @@
                 <div class="otp-form-inner">
                     <Logo class="brand-icon" />
                     <h1 class="h3 mb-4 font-weight-bold">
-                        {{ mfaType === 'totp' ? 'Authenticator App' : 'Enter OTP Code' }}
+                        {{ mfaType === 'totp' ? 'Authenticator App' : mfaType === 'telegram' ? 'Telegram OTP Code' : 'Enter OTP Code' }}
                     </h1>
                     <p class="text-muted mb-4">
                         {{ mfaType === 'totp' 
                             ? 'Enter the 6-digit code from your Authenticator App (e.g. Google Authenticator).'
+                            : mfaType === 'telegram'
+                            ? 'សូមពិនិត្យមើលកូដ ៦ ខ្ទង់ដែលបានផ្ញើទៅកាន់ Telegram Bot របស់អ្នក (Please check your Telegram Bot).'
                             : 'Please check your email for the 6-digit code we just sent you.' 
                         }}
                     </p>

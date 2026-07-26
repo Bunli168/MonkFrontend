@@ -37,31 +37,28 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { MapPin, Calendar, Armchair, GraduationCap, Home, Settings } from '@lucide/vue';
+import { MapPin, Calendar, Armchair, Home, Settings } from '@lucide/vue';
 import LocationSettings from '@/views/admin/reports/ProvinceDistrictCommuneView.vue';
 import RetreatEventSettings from './RetreatEventSettings.vue';
 import SeatingRowSettings from './SeatingRowSettings.vue';
-import UniversitySettings from './UniversitySettings.vue';
 import KudiSettings from '@/views/admin/kuts/KutView.vue';
 
 const tabs = [
     { id: 'kudi', label: 'Kudi Numbers', icon: Home },
     { id: 'seating-rows', label: 'Seating Rows', icon: Armchair },
-   { id: 'universities', label: 'Universities', icon: GraduationCap },
    { id: 'retreat-events', label: 'Retreat Events', icon: Calendar },
    { id: 'locations', label: 'Locations', icon: MapPin }
 ];
 
-const activeTab = ref('locations');
+const activeTab = ref('kudi');
 
 const activeComponent = computed(() => {
     switch (activeTab.value) {
         case 'locations': return LocationSettings;
         case 'retreat-events': return RetreatEventSettings;
-        case 'universities': return UniversitySettings;
         case 'kudi': return KudiSettings;
         case 'seating-rows': return SeatingRowSettings;
-        default: return LocationSettings;
+        default: return KudiSettings;
     }
 });
 </script>
