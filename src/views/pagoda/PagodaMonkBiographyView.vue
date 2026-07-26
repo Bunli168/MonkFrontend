@@ -1,168 +1,10 @@
 <template>
     <div :class="['monk-biography-view h-100 d-flex flex-column align-items-center', hideHeader ? '' : 'pb-3']">
-        <div v-if="isLoading" class="d-flex justify-content-center align-items-center w-100 py-5 no-print">
+        <div v-if="isLoading" class="d-flex justify-content-center align-items-center w-100 py-5">
             <div class="spinner-border text-primary" role="status"></div>
         </div>
         
-        <!-- Print Layout (Hidden on Screen) -->
-        <div class="print-only formal-document w-100 position-relative" v-if="!isLoading && form">
-            <div class="text-center mb-4 mt-2">
-                <div class="khmer-muol fs-5 mb-1">ព្រះរាជាណាចក្រកម្ពុជា</div>
-                <div class="khmer-muol fs-6 mb-4">ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
-                <div class="khmer-muol fs-5 mb-0" style="text-decoration: underline;">ប្រវត្តិរូបសង្ខេប ({{ isSamanera ? 'សាមណេរ' : 'ភិក្ខុ' }})</div>
-            </div>
-            
-            <!-- The 4x6 photo box on top right -->
-            <div class="position-absolute" style="top: 0; right: 0; width: 4cm; height: 6cm; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                ៤x៦
-            </div>
-
-            <!-- Personal Info -->
-            <div class="print-row mt-5">
-                <span class="print-label">-គោត្តនាម-នាម :</span>
-                <span class="print-value khmer-muol">{{ form.surname_name }}</span>
-                <span class="print-label mx-2">អក្សរឡាតាំង :</span>
-                <span class="print-value text-uppercase">{{ form.latin_name }}</span>
-                <span class="print-label mx-2">សញ្ជាតិ :</span>
-                <span class="print-value flex-grow-1">{{ form.nationality }}</span>
-            </div>
-            <div class="print-sub-label">
-                -Surname-Name: <span style="margin-right: 170px;"></span> Nationality:
-            </div>
-
-            <div class="print-row">
-                <span class="print-label">-ថ្ងៃ-ខែ-ឆ្នាំកំណើត: ថ្ងៃ.........</span>
-                <span class="print-value" style="width: 40px;">{{ extractDatePart(form.date_of_birth, 'day') }}</span>
-                <span class="print-label">ខែ.........</span>
-                <span class="print-value" style="width: 40px;">{{ extractDatePart(form.date_of_birth, 'month') }}</span>
-                <span class="print-label">ឆ្នាំ.........</span>
-                <span class="print-value" style="width: 60px;">{{ extractDatePart(form.date_of_birth, 'year') }}</span>
-                <span class="print-label">ស័ក ព.ស......... ត្រូវនឹងថ្ងៃទី.........ខែ.........ឆ្នាំ.........</span>
-            </div>
-            <div class="print-sub-label">-Date of Birth :</div>
-
-            <div class="print-row">
-                <span class="print-label">-ទីកន្លែងកំណើត : ភូមិ.........</span>
-                <span class="print-value" style="width: 150px;">{{ getLocationName(pobLoc.villages, form.pob_village_id, 'village') }}</span>
-                <span class="print-label">ឃុំ/សង្កាត់.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(pobLoc.communes, form.pob_commune_id, 'commune') }}</span>
-            </div>
-            <div class="print-row mt-1">
-                <span class="print-label" style="padding-left: 100px;">ក្រុង/ស្រុក/ខណ្ឌ.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(pobLoc.districts, form.pob_district_id, 'district') }}</span>
-                <span class="print-label">ខេត្ត/រាជធានី.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(pobLoc.provinces, form.pob_province_id, 'province') }}</span>
-            </div>
-            <div class="print-sub-label">
-                -Place of Birth : Village: <span style="margin-right: 150px;"></span> Commune: <span style="margin-right: 150px;"></span> District: <span style="margin-right: 150px;"></span> Province:
-            </div>
-
-            <div class="print-row mt-2">
-                <span class="print-label">-នាមព្រះឧបជ្ឈាយ៍:</span>
-                <span class="print-value flex-grow-1">{{ form.preceptor_name }}</span>
-            </div>
-            <div class="print-sub-label">-Preceptor's Name:</div>
-
-            <template v-if="!isSamanera">
-                <div class="print-row mt-2">
-                    <span class="print-label">-នាមឧបសម្បទាចារ្យ:</span>
-                    <span class="print-value flex-grow-1">{{ form.first_assistant_name }}</span>
-                </div>
-                <div class="print-sub-label">-First Assistant Preceptor's Name:</div>
-
-                <div class="print-row mt-2">
-                    <span class="print-label">-នាមអនុស្សាវនាចារ្យ:</span>
-                    <span class="print-value flex-grow-1">{{ form.second_assistant_name }}</span>
-                </div>
-                <div class="print-sub-label">-Second Assistant Preceptor's Name:</div>
-            </template>
-
-            <div class="print-row mt-2">
-                <span class="print-label">-នាមបញ្ញត្តិ:</span>
-                <span class="print-value flex-grow-1">{{ form.ordained_name }}</span>
-            </div>
-            <div class="print-sub-label">-Ordained Name:</div>
-
-            <div class="print-row mt-2">
-                <span class="print-label">-{{ isSamanera ? 'ថ្ងៃ-ខែ-ឆ្នាំបព្វជ្ជា' : 'ថ្ងៃ-ខែ-ឆ្នាំឧបសម្បទា' }}: ថ្ងៃ.........</span>
-                <span class="print-value" style="width: 40px;">{{ extractDatePart(form.ordained_date, 'day') }}</span>
-                <span class="print-label">ខែ.........</span>
-                <span class="print-value" style="width: 40px;">{{ extractDatePart(form.ordained_date, 'month') }}</span>
-                <span class="print-label">ឆ្នាំ.........</span>
-                <span class="print-value" style="width: 60px;">{{ extractDatePart(form.ordained_date, 'year') }}</span>
-                <span class="print-label">ស័ក ព.ស......... ត្រូវនឹងថ្ងៃទី.........ខែ.........ឆ្នាំ.........ម៉ោង.........</span>
-            </div>
-            <div class="print-sub-label">-Date of {{ isSamanera ? 'Ordination' : 'Higher Ordination' }}:</div>
-
-            <div class="print-row mt-2">
-                <span class="print-label">-{{ isSamanera ? 'ទីកន្លែងបព្វជ្ជា' : 'ទីកន្លែងឧបសម្បទា' }}: វត្ត.........</span>
-                <span class="print-value flex-grow-1">{{ form.ordination_wat }}</span>
-                <span class="print-label">ឃុំ/សង្កាត់.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(ordLoc.communes, form.ordination_commune_id, 'commune') }}</span>
-            </div>
-            <div class="print-row mt-1">
-                <span class="print-label" style="padding-left: 130px;">ក្រុង/ស្រុក/ខណ្ឌ.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(ordLoc.districts, form.ordination_district_id, 'district') }}</span>
-                <span class="print-label">រាជធានី/ខេត្ត.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(ordLoc.provinces, form.ordination_province_id, 'province') }}</span>
-            </div>
-            <div class="print-sub-label">
-                -Place of Higher Ordination: Wat: <span style="margin-right: 120px;"></span> Commune: <span style="margin-right: 120px;"></span> District: <span style="margin-right: 120px;"></span> Province:
-            </div>
-
-            <div class="print-row mt-2">
-                <span class="print-label">-អាសយដ្ឋានបច្ចុប្បន្ន: វត្ត.........</span>
-                <span class="print-value flex-grow-1">{{ form.current_wat }}</span>
-                <span class="print-label">ឃុំ/សង្កាត់.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(currLoc.communes, form.current_commune_id, 'commune') }}</span>
-            </div>
-            <div class="print-row mt-1">
-                <span class="print-label" style="padding-left: 130px;">ក្រុង/ស្រុក/ខណ្ឌ.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(currLoc.districts, form.current_district_id, 'district') }}</span>
-                <span class="print-label">រាជធានី/ខេត្ត.........</span>
-                <span class="print-value flex-grow-1">{{ getLocationName(currLoc.provinces, form.current_province_id, 'province') }}</span>
-            </div>
-            <div class="print-sub-label">
-                -Current Address: Wat: <span style="margin-right: 120px;"></span> Commune: <span style="margin-right: 120px;"></span> District: <span style="margin-right: 120px;"></span> Province:
-            </div>
-
-            <div class="mt-4 mb-2" style="font-size: 1.1rem; padding-left: 2rem;">
-                ខ្ញុំព្រះករុណា សូមធានាទទួលខុសត្រូវចំពោះមុខច្បាប់ថា ព័ត៌មានដែលបានបំពេញខាងលើនេះ ពិតជាត្រឹមត្រូវប្រាកដមែន ។
-            </div>
-            
-            <div class="print-row mb-4">
-                <span class="print-label">-លេខទូរស័ព្ទ (+855) </span>
-                <span class="print-value" style="width: 150px; margin-left: 5px;">{{ form.phone_number }}</span>
-            </div>
-
-            <!-- Signatures: Top Row (Left/Right) -->
-            <div class="d-flex justify-content-between mt-4 px-3">
-                <div class="text-center" style="width: 45%;">
-                    <div class="khmer-muol mb-2">{{ isSamanera ? 'បានឃើញ និងឯកភាព' : 'បានឃើញ និងទទួលស្គាល់' }}</div>
-                    <div>វត្តតាតែន, ថ្ងៃទី.........ខែ.........ឆ្នាំ២០២...</div>
-                    <div class="khmer-muol" style="margin-top: 3rem;">{{ isSamanera ? 'ព្រះគ្រូមេកុដិលេខ.........' : 'មេកុដិលេខ.........' }}</div>
-                </div>
-                
-                <div class="text-center" style="width: 45%;">
-                    <div class="mb-2">ថ្ងៃទី.........ខែ.........ឆ្នាំ.........ស័ក ព.ស.២៥៦...</div>
-                    <div>វត្តតាតែន, ថ្ងៃទី.........ខែ.........ឆ្នាំ២០២...</div>
-                    <div class="khmer-muol" style="margin-top: 3rem;">ហត្ថលេខាសាមីអង្គ</div>
-                </div>
-            </div>
-
-            <!-- Signatures: Bottom Row (Center) -->
-            <div class="text-center" style="margin-top: 2rem;">
-                <div class="khmer-muol mb-2">បានឃើញ និងឯកភាព</div>
-                <div>វត្តតាតែន, ថ្ងៃទី.........ខែ.........ឆ្នាំ២០២...</div>
-                <div class="khmer-muol" style="margin-top: 3rem;">ព្រះចៅអធិការវត្តតាតែន</div>
-            </div>
-            
-            <div class="mt-4">
-                <u>សូមភ្ជាប់មកជាមួយ៖</u>
-            </div>
-        </div>
-
-        <div v-if="!isLoading" class="w-100 no-print" style="max-width: 1000px;">
+        <div v-if="!isLoading" class="w-100" style="max-width: 1000px;">
             <div v-if="!hideHeader" class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
                 <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title || `Monk Profile Summary / ប្រវត្តិរូបសង្ខេប (${isSamanera ? 'សាមណេរ' : 'ភិក្ខុ'})` }}</h5>
             </div>
@@ -183,9 +25,6 @@
                         <div class="text-secondary" style="font-size: 0.95rem;">Ordained Name: <span class="text-primary">{{ form.ordained_name || '-' }}</span></div>
                     </div>
                     <div class="d-flex gap-2">
-                        <BaseButton variant="outline-primary" @click="printBiography" style="background-color: transparent;">
-                            <Printer :size="18" class="me-2"/> Print / បោះពុម្ព
-                        </BaseButton>
                         <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: #495057;">
                             Edit / កែសម្រួល
                         </BaseButton>
@@ -466,7 +305,6 @@ import { formatDate } from '@/utils/dateFormat';
 import api from '@/api/api';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
-import { Printer } from '@lucide/vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
@@ -536,11 +374,6 @@ const extractDatePart = (dateString, part) => {
     if (part === 'year') return date.getFullYear().toString();
     return '';
 };
-
-const printBiography = () => {
-    window.print();
-};
-
 const validatePhone = () => {
     const val = form.value.phone_number;
     if (!val) {
@@ -832,72 +665,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.formal-document {
-    background-color: #ffffff !important;
-    padding: 1cm;
-    font-family: 'Khmer OS Battambang', 'Suwannaphum', sans-serif;
-    color: #212529;
-}
-
 .khmer-muol {
     font-family: 'Khmer OS Muol Light', 'Suwannaphum', serif;
-}
-
-.print-row {
-    display: flex;
-    align-items: flex-end;
-    margin-bottom: 6px;
-    font-size: 1.15rem;
-    line-height: 1.4;
-}
-.print-label {
-    white-space: nowrap;
-}
-.print-value {
-    border-bottom: 2px dotted #000;
-    text-align: center;
-    color: #000;
-    min-height: 1.5rem;
-    font-size: 1.05rem;
-}
-.print-sub-label {
-    font-size: 0.85rem;
-    color: #555;
-    margin-top: 0px;
-    margin-bottom: 12px;
-}
-
-.print-only {
-    display: none;
-}
-
-@media print {
-    body {
-        background-color: #fff !important;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .print-only, .print-only * {
-        visibility: visible;
-    }
-    .print-only {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0 !important;
-    }
-    
-    /* Hide everything else */
-    .no-print,
-    .app-sidebar,
-    .app-header,
-    .monk-biography-view > *:not(.print-only) {
-        display: none !important;
-    }
 }
 
 .dotted-line {

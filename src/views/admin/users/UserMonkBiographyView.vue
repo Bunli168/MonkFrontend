@@ -65,6 +65,10 @@
                 </span>
             </template>
 
+            <template #kut="{ data }">
+                <span class="fw-medium text-dark">{{ data?.profile?.kut?.name || data?.UserProfile?.Kut?.name || data?.UserProfile?.kut?.name || '-' }}</span>
+            </template>
+
             <template #email="{ data }">
                 <span>{{ data?.email }}</span>
             </template>
@@ -126,6 +130,7 @@ const kuts = ref([]);
 const colDefs = ref([
     { field: 'username', label: 'Full Name', sortable: false },
     { field: 'role', label: 'Role / ឋានៈ', sortable: false },
+    { field: 'kut', label: 'Kudi / កុដិ', sortable: false },
     { field: 'email', label: 'Email Address', sortable: false },
     { field: 'phone', label: 'Phone Number', sortable: false },
     { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false },
@@ -233,11 +238,29 @@ const exportToCSV = async () => {
             const isBhikkhu = survey.User?.role_id === 7 ? 'ភិក្ខុ' : '';
             const isSamanera = survey.User?.role_id === 3 ? 'សាមណេរ' : '';
 
+            const hasKhmer = (str) => /[\u1780-\u17FF\u19E0-\u19FF]/.test(str || '');
+            let khmerName = '';
+            let latinName = '';
+
+            if (hasKhmer(survey.surname_name)) {
+                khmerName = survey.surname_name;
+                latinName = survey.latin_name || `${profile.first_name_en || ''} ${profile.last_name_en || ''}`.trim() || '';
+            } else {
+                // If surname_name is Latin/English (e.g., 'khmer kon', 'Sa Rak', 'Phi Bunli'), put it in Latin column
+                latinName = survey.latin_name || survey.surname_name || `${profile.first_name_en || ''} ${profile.last_name_en || ''}`.trim() || '';
+                const profKhName = `${profile.last_name_kh || ''} ${profile.first_name_kh || ''}`.trim();
+                if (hasKhmer(profKhName)) {
+                    khmerName = profKhName;
+                } else {
+                    khmerName = ''; // Leave blank so Latin text is NEVER displayed under អក្សរខ្មែរ
+                }
+            }
+
             return [
                 index + 1, // ល.រ
                 profile.chhaya_number || '', // អត្តលេខ
-                survey.surname_name || '', // គោត្តនាមនិងនាម - អក្សរខ្មែរ
-                survey.latin_name || '', // គោត្តនាមនិងនាម - អក្សរឡាតាំង
+                khmerName, // គោត្តនាមនិងនាម - អក្សរខ្មែរ
+                latinName, // គោត្តនាមនិងនាម - អក្សរឡាតាំង
                 isBhikkhu, // ភេទ - ភិក្ខុ
                 isSamanera, // ភេទ - សាមណេរ
                 dob, // ថ្ងៃខែឆ្នាំកំណើត

@@ -21,7 +21,7 @@
                 <Tab v-if="authStore.isMonk" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <ClipboardList style="color: var(--primary-color);" :size="16" />
-                        ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)
+                        <span>{{ authStore.isSuperAdmin ? 'ប្រវត្តិរូបមេកុដិ (Mekudi Biography)' : 'ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)' }}</span>
                     </div>
                 </Tab>
                 <Tab v-if="false" value="all-pending-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
@@ -67,7 +67,7 @@
                 <UserListView v-if="activeTab === 'all-users'" @new="activeTab = 'user-form'" @preview-bulk="activeTab = 'bulk-preview'" />
             </TabPanel>
             <TabPanel v-if="authStore.isMonk" value="my-biography">
-                <PagodaMonkBiographyView v-if="activeTab === 'my-biography'" />
+                <UserMekudiBiographyView v-if="activeTab === 'my-biography'" />
             </TabPanel>
             <TabPanel v-if="false" value="all-pending-users">
                 <UserPendingView v-if="activeTab === 'all-pending-users'" />

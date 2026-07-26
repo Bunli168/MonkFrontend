@@ -159,6 +159,18 @@ const getStatusColor = (status) => {
 
 const filteredMonks = computed(() => {
     return monks.value.filter(monk => {
+        // Filter by Role: only show Monk, Bhikkhu, and Mekudi (Admin)
+        const roleStr = (monk.role || '').toLowerCase();
+        const isTargetRole = ['monk', 'bhikkhu', 'mekudi', 'admin'].some(r => roleStr === r || (roleStr.includes(r) && !roleStr.includes('super')));
+        if (!isTargetRole) {
+            return false;
+        }
+
+        // Filter: only show monks with netAbsents >= 9
+        if ((monk.netAbsents || 0) < 9) {
+            return false;
+        }
+
         const matchesSearch = monk.fullName.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
                               (monk.phone && monk.phone.includes(searchQuery.value)) ||
                               (monk.chhaya_number && monk.chhaya_number.includes(searchQuery.value));

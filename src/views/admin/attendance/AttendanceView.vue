@@ -256,8 +256,15 @@ const colDefs = computed(() => {
 
 const filteredMonks = computed(() => {
     return monks.value.filter(monk => {
-        // SuperAdmin filter: only show monks with netAbsents >= 9
-        if (false && (monk.netAbsents || 0) < 9) {
+        // Filter by Role: only show Monk, Bhikkhu, and Mekudi (Admin)
+        const roleStr = (monk.role || '').toLowerCase();
+        const isTargetRole = ['monk', 'bhikkhu', 'mekudi', 'admin'].some(r => roleStr === r || (roleStr.includes(r) && !roleStr.includes('super')));
+        if (!isTargetRole) {
+            return false;
+        }
+
+        // Filter: only show monks with netAbsents >= 9
+        if ((monk.netAbsents || 0) < 9) {
             return false;
         }
 

@@ -6,7 +6,7 @@
                 <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 0;">
                     <BaseFilter v-model="statusFilter" :options="filterOptions" :wrap="true" />
                 </div>
-                <BaseButton v-if="!authStore.isAdmin" @click="showModal = true" variant="primary">
+                <BaseButton v-if="!authStore.isAdmin && !authStore.isAttendanceTaker" @click="showModal = true" variant="primary">
                     <i class="fas fa-plus me-1"></i> New Request
                 </BaseButton>
             </div>
@@ -14,8 +14,14 @@
             <!-- Table -->
             <BaseTable 
                 :columns="colDefs" 
-                :rows="filteredRequests" 
+                :rows="paginatedRequests" 
+                :totalRecords="filteredRequests.length"
                 :loading="isLoading"
+                :show-index="true"
+                :page="currentPage"
+                :perPage="perPage"
+                @update:page="currentPage = $event"
+                @update:perPage="perPage = $event"
                 @refresh-data="fetchRequests"
             >
                 <template #monk="{ data: row }">
@@ -43,7 +49,9 @@
                 </template>
 
                 <template #reason="{ data: row }">
-                    <span class="text-muted small">{{ row.reason || '—' }}</span>
+                    <div class="text-truncate text-muted small" style="max-width: 250px;" :title="row.reason">
+                        {{ row.reason || '—' }}
+                    </div>
                 </template>
                 
                 <template #status="{ data: row }">
@@ -149,7 +157,7 @@ const filterOptions = computed(() => {
 
 const colDefs = computed(() => {
     const cols = [];
-    if (authStore.isAdmin) {
+    if (authStore.isAdmin || authStore.isAttendanceTaker) {
         cols.push({ field: 'monk', header: 'Monk', sortable: false });
     }
     cols.push(
@@ -165,13 +173,22 @@ const filteredRequests = computed(() => {
     if (!statusFilter.value) return requests.value;
     // Note: Backend handles 'pending' combining 'pending_mekudi' and 'pending' 
     // for Admin. But for regular members we do client-side filtering if it's '/my' endpoint
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdmin && !authStore.isAttendanceTaker) {
         if (statusFilter.value === 'pending') {
             return requests.value.filter(req => req.status === 'pending_mekudi' || req.status === 'pending' || req.status === 'pending_superadmin');
         }
         return requests.value.filter(req => req.status === statusFilter.value);
     }
     return requests.value; // For Admins, backend filters
+});
+
+const currentPage = ref(1);
+const perPage = ref(10);
+
+const paginatedRequests = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return filteredRequests.value.slice(start, end);
 });
 
 const formatDate = (dateStr) => {
@@ -202,7 +219,7 @@ const getBadgeStatusColor = (status) => {
 const fetchRequests = async () => {
     isLoading.value = true;
     try {
-        if (authStore.isAdmin) {
+        if (authStore.isAdmin || authStore.isAttendanceTaker) {
             const response = await api.get('/leave-requests', {
                 params: { status: statusFilter.value }
             });
@@ -220,7 +237,8 @@ const fetchRequests = async () => {
 };
 
 watch(statusFilter, () => {
-    if (authStore.isAdmin) {
+    currentPage.value = 1;
+    if (authStore.isAdmin || authStore.isAttendanceTaker) {
         fetchRequests();
     }
 });
@@ -248,7 +266,7 @@ const getActionItems = (row) => {
     }
 
     if (isAwaitingAdmin) {
-        if (!authStore.isAdmin) return [];
+        if (!authStore.isAdmin && !authStore.isAttendanceTaker) return [];
         return [
             {
                 label: 'Approve',

@@ -10,8 +10,14 @@
         <!-- Table -->
         <BaseTable 
             :columns="colDefs" 
-            :rows="filteredRequests" 
+            :rows="paginatedRequests" 
+            :totalRecords="filteredRequests.length"
             :loading="isLoading"
+            :show-index="true"
+            :page="currentPage"
+            :perPage="perPage"
+            @update:page="currentPage = $event"
+            @update:perPage="perPage = $event"
             @refresh-data="fetchRequests"
         >
             <template #monk="{ data: row }">
@@ -39,7 +45,9 @@
             </template>
 
             <template #reason="{ data: row }">
-                <span class="text-muted small">{{ row.reason || '—' }}</span>
+                <div class="text-truncate text-muted small" style="max-width: 250px;" :title="row.reason">
+                    {{ row.reason || '—' }}
+                </div>
             </template>
             
             <template #status="{ data: row }">
@@ -131,6 +139,15 @@ const filteredRequests = computed(() => {
     return requests.value;
 });
 
+const currentPage = ref(1);
+const perPage = ref(10);
+
+const paginatedRequests = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return filteredRequests.value.slice(start, end);
+});
+
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
@@ -174,6 +191,7 @@ const fetchRequests = async () => {
 };
 
 watch([statusFilter, () => props.seasonId], () => {
+    currentPage.value = 1;
     fetchRequests();
 });
 

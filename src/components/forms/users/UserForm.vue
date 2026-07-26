@@ -13,7 +13,7 @@
                 <BaseSelect :disabled="initialData ? true : false" v-model="roleId" :options="roles"
                     label="User Role" placeholder="Select Role" required :error="errors.roleId" />
             </div>
-            <div class="mb-3" v-if="false">
+            <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
@@ -36,7 +36,7 @@
                 <BaseSelect v-model="roleId" :options="autoRoles"
                     label="User Role" placeholder="Select Role" required :error="errors.roleId" />
             </div>
-            <div class="mb-3" v-if="false">
+            <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
@@ -107,7 +107,7 @@ watch(kut_id, (newKutId) => {
 });
 
 onMounted(() => {
-    if (false) {
+    if (authStore.isSuperAdmin) {
         fetchKuts();
     }
     if (kut_id.value) {
@@ -119,7 +119,7 @@ onMounted(() => {
 const roles = computed(() => {
     let availableRoles = userStore.userRoles;
     
-    if (!false) {
+    if (!authStore.isSuperAdmin) {
         // Admins and non-admins can only create Monk (3), Student (4), or Bhikkhu (7)
         availableRoles = availableRoles.filter(r => r.id === 3 || r.id === 4 || r.id === 7);
     }
@@ -132,12 +132,12 @@ const roles = computed(() => {
 const autoRoles = computed(() => {
     let availableRoles = userStore.userRoles;
     
-    if (false) {
-        // SuperAdmin can auto-generate Admin (2), Monk (3), Student (4), Bhikkhu (7)
-        availableRoles = availableRoles.filter(r => r.id === 2 || r.id === 3 || r.id === 4 || r.id === 7);
-    } else {
+    if (!authStore.isSuperAdmin) {
         // Admins can only auto-generate Monk (3), Student (4), Bhikkhu (7)
         availableRoles = availableRoles.filter(r => r.id === 3 || r.id === 4 || r.id === 7);
+    } else {
+        // SuperAdmin cannot be auto-generated (must use Custom Email)
+        availableRoles = availableRoles.filter(r => r.id !== 1 && r.name !== 'SuperAdmin');
     }
     
     return availableRoles.map(r => ({ 

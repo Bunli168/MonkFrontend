@@ -65,6 +65,10 @@
                 </span>
             </template>
 
+            <template #kut="{ data }">
+                <span class="fw-medium text-dark">{{ data?.profile?.kut?.name || data?.UserProfile?.Kut?.name || data?.UserProfile?.kut?.name || '-' }}</span>
+            </template>
+
             <template #email="{ data }">
                 <span>{{ data?.email }}</span>
             </template>
@@ -126,6 +130,7 @@ const kuts = ref([]);
 const colDefs = ref([
     { field: 'username', label: 'Full Name', sortable: false },
     { field: 'role', label: 'Role / ឋានៈ', sortable: false },
+    { field: 'kut', label: 'Kudi / កុដិ', sortable: false },
     { field: 'email', label: 'Email Address', sortable: false },
     { field: 'phone', label: 'Phone Number', sortable: false },
     { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false },

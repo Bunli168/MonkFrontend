@@ -65,6 +65,10 @@
                 </span>
             </template>
 
+            <template #kut="{ data }">
+                <span class="fw-medium text-dark">{{ data?.profile?.kut?.name || data?.UserProfile?.Kut?.name || data?.UserProfile?.kut?.name || '-' }}</span>
+            </template>
+
             <template #email="{ data }">
                 <span>{{ data?.email }}</span>
             </template>
@@ -126,6 +130,7 @@ const selectedUser = ref(null);
 const colDefs = ref([
     { field: 'username', label: 'Full Name', sortable: false },
     { field: 'role', label: 'Role / ឋានៈ', sortable: false },
+    { field: 'kut', label: 'Kudi / កុដិ', sortable: false },
     { field: 'email', label: 'Email Address', sortable: false },
     { field: 'phone', label: 'Phone Number', sortable: false },
     { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false },
@@ -179,15 +184,18 @@ const exportToCSV = async () => {
         const response = await api.get('/users', { params });
         const records = response.data?.data || response.data || [];
 
-        const headers = ['ល.រ (No.)', 'ឈ្មោះ (Name)', 'អ៊ីមែល (Email)', 'លេខទូរស័ព្ទ (Phone)', 'វត្តកំណើត (Wat Origin)'];
+        const headers = ['ល.រ (No.)', 'ឈ្មោះ (Name)', 'ឋានៈ (Role)', 'កុដិ (Kudi)', 'អ៊ីមែល (Email)', 'លេខទូរស័ព្ទ (Phone)', 'វត្តកំណើត (Wat Origin)'];
         const rows = records.map((mekudi, index) => {
             const profile = mekudi.UserProfile || mekudi.profile || {};
             const fullName = `${mekudi.lastName || ''} ${mekudi.firstName || ''}`.trim();
+            const kudi = profile.Kut?.name || profile.kut?.name || '-';
             const phone = profile.phone_number || profile.phone || '-';
             const wat = profile.from_wat || '-';
             return [
                 index + 1,
                 fullName,
+                'មេកុដិ',
+                kudi,
                 mekudi.email,
                 phone,
                 wat
