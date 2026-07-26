@@ -33,6 +33,7 @@ onMounted(() => {
 
     const savedTheme = savedAppearance.theme || localStorage.getItem('app-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
 
     const savedColor = savedAppearance.primaryColor || localStorage.getItem('primary-color');
     if (savedColor) {

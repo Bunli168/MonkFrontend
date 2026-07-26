@@ -270,6 +270,14 @@ watch(() => props.rows, async (newRows) => {
 .base-table-container {
     overflow-x: auto;
     width: 100%;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+:deep(.p-datatable-wrapper) {
+    overflow-x: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 :deep(.p-datatable-thead) {

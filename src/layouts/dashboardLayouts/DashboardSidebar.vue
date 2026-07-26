@@ -357,6 +357,7 @@ const theme = ref(savedTheme);
 function setTheme(val) {
     theme.value = val;
     document.documentElement.setAttribute('data-theme', val);
+    document.documentElement.setAttribute('data-bs-theme', val);
 
     let savedAppearance = {};
     try {

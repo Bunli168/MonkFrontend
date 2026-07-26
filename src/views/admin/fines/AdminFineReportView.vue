@@ -14,32 +14,79 @@
         </div>
 
         <div :class="isComponent ? '' : 'container-fluid px-3 px-md-4'">
-            <!-- Beautiful Big Metric Card for Total Amount -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card border-0 rounded-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, var(--success-color, #198754) 0%, color-mix(in srgb, var(--success-color, #198754) 70%, black) 100%);">
-                        <div class="card-body p-4 d-flex align-items-center justify-content-between position-relative">
-                            <!-- Background Icon -->
-                            <i class="fas fa-coins position-absolute" style="font-size: 10rem; right: -20px; bottom: -30px; opacity: 0.1; color: white;"></i>
-                            
-                            <div class="position-relative" style="z-index: 1;">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; backdrop-filter: blur(4px);">
-                                        <i class="fas fa-hand-holding-usd fs-5 text-white"></i>
-                                    </div>
-                                    <h6 class="text-white text-opacity-75 text-uppercase fw-bold mb-0" style="letter-spacing: 1px;">Total Fines Collected</h6>
-                                </div>
-                                <h1 class="display-4 fw-bold text-white mb-0" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${{ totalPaidAmount.toFixed(2) }}</h1>
+            <!-- Modern Premium 3-Column Analytics Grid -->
+            <div class="row g-3 mb-4">
+                <!-- Total Collected -->
+                <div class="col-12 col-md-4">
+                    <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Total Collected</span>
+                            <div class="icon-box bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fas fa-hand-holding-usd fs-5"></i>
                             </div>
+                        </div>
+                        <h2 class="fw-bold mb-1 d-flex align-items-baseline gap-1" style="color: var(--text-heading-color);">
+                            <span class="text-success fs-4">$</span>{{ totalPaidAmount.toFixed(2) }}
+                        </h2>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small fw-medium">
+                                <i class="fas fa-check-circle me-1"></i>Revenue
+                            </span>
+                            <span class="text-muted small">All recorded fines</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Transactions -->
+                <div class="col-12 col-md-4">
+                    <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Transactions</span>
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fas fa-file-invoice-dollar fs-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="fw-bold mb-1" style="color: var(--text-heading-color);">
+                            {{ filteredPayments.length }}
+                        </h2>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 small fw-medium">
+                                <i class="fas fa-receipt me-1"></i>Records
+                            </span>
+                            <span class="text-muted small">Completed payments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cleared Absents -->
+                <div class="col-12 col-md-4">
+                    <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Cleared Absents</span>
+                            <div class="icon-box bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fas fa-user-shield fs-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="fw-bold mb-1" style="color: var(--text-heading-color);">
+                            {{ totalClearedAbsents }}
+                        </h2>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2 py-1 small fw-medium">
+                                <i class="fas fa-user-check me-1"></i>Restored
+                            </span>
+                            <span class="text-muted small">Absent days cleared</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-3 d-flex flex-wrap align-items-center gap-3">
-                <div class="position-relative flex-grow-1">
-                    <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
-                    <input type="text" class="form-control rounded-pill ps-5 bg-light border-0 py-2 shadow-sm" placeholder="Search payer or collector..." v-model="searchQuery">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mb-4">
+                <div class="position-relative flex-grow-1" style="max-width: 400px;">
+                    <i class="fas fa-search position-absolute text-muted" style="left: 16px; top: 50%; transform: translateY(-50%);"></i>
+                    <input type="text" class="form-control rounded-pill ps-5 py-2 border shadow-sm" placeholder="Search payer or collector..." v-model="searchQuery">
+                    <button v-if="searchQuery" @click="searchQuery = ''" class="btn btn-sm position-absolute border-0 text-muted" style="right: 12px; top: 50%; transform: translateY(-50%);">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
 
@@ -51,10 +98,15 @@
                         <p class="mt-2 text-muted">Loading report...</p>
                     </div>
 
-                    <div v-else-if="filteredPayments.length === 0" class="text-center py-5 text-muted">
-                        <i class="fas fa-file-invoice mb-3" style="font-size: 3rem;"></i>
-                        <h5>No Payments Found</h5>
-                        <p>There are no recorded payments matching your search.</p>
+                    <div v-else-if="filteredPayments.length === 0" class="text-center py-5 my-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-secondary bg-opacity-10 text-secondary mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-file-invoice-dollar fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">No Payments Found</h5>
+                        <p class="text-muted small mb-3">There are no recorded fine payments matching your current filter.</p>
+                        <button v-if="searchQuery" @click="searchQuery = ''" class="btn btn-sm btn-outline-primary rounded-pill px-4">
+                            <i class="fas fa-times me-1"></i>Clear Search
+                        </button>
                     </div>
 
                     <div v-else>
@@ -147,6 +199,10 @@ const totalPaidAmount = computed(() => {
     return filteredPayments.value.reduce((sum, p) => sum + p.amount, 0);
 });
 
+const totalClearedAbsents = computed(() => {
+    return filteredPayments.value.reduce((sum, p) => sum + (p.cleared_absents || 0), 0);
+});
+
 const fetchData = async () => {
     isLoading.value = true;
     try {
@@ -186,6 +242,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.stat-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    border: 1px solid var(--border-clr);
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="dark"] .stat-card:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35) !important;
+}
 .table-hover tbody tr:hover {
     background-color: var(--bs-light);
 }

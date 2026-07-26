@@ -25,7 +25,7 @@
 
         <div v-else>
             <div class="row g-3 mb-3">
-                <div class="col-sm-6 mb-sm-0">
+                <div class="col-sm-6 mb-3 mb-sm-0">
                     <BaseInput type="text" placeholder="John" label="First Name" v-model="firstName" :maxlength="30" :error="errors.firstName" required />
                 </div>
                 <div class="col-sm-6">

@@ -13,6 +13,8 @@
     --card-bg-color: #EEF8F9;
     --dashboard-bg-color: #f4f7f6;
     --surface-ground: #f1f5f9;
+    --surface-card: #ffffff;
+    --border-color: rgba(15, 23, 42, 0.08);
 
     --hero-grad-start: #ace1e9;
     --hero-grad-mid1: #a4e0e8;
@@ -89,6 +91,8 @@
     --card-bg-color: #1e293b;
     --dashboard-bg-color: #0f172a;
     --surface-ground: #1e293b;
+    --surface-card: var(--card-bg-color);
+    --border-color: var(--border-clr);
 
     /* Dark Mode Hero Gradient (Deep Teal to warm dark sand) */
     --hero-grad-start: #0b2a33;
@@ -153,4 +157,133 @@
 
 [data-theme="dark"] .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Complete Dark Mode Overrides for Bootstrap and PrimeVue Utilities */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-footer,
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .offcanvas,
+[data-theme="dark"] .table-light,
+[data-theme="dark"] .table-light th,
+[data-theme="dark"] .table-light td {
+    background-color: var(--card-bg-color) !important;
+    color: var(--text-heading-color) !important;
+    border-color: var(--border-clr) !important;
+}
+
+[data-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-base);
+    --bs-table-border-color: var(--border-clr);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+    --bs-table-hover-color: var(--text-heading-color);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-striped-color: var(--text-heading-color);
+    color: var(--text-base) !important;
+    border-color: var(--border-clr) !important;
+}
+
+[data-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    color: inherit !important;
+    border-color: var(--border-clr) !important;
+}
+
+[data-theme="dark"] .table thead th,
+[data-theme="dark"] .table thead td {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-heading-color) !important;
+    border-color: var(--border-clr) !important;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .table tbody tr:hover td,
+[data-theme="dark"] .table tbody tr:hover th {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-heading-color) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg-color) !important;
+    color: var(--text-base) !important;
+    border-color: var(--border-clr) !important;
+}
+
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-header h1,
+[data-theme="dark"] .card-header h2,
+[data-theme="dark"] .card-header h3,
+[data-theme="dark"] .card-header h4,
+[data-theme="dark"] .card-header h5,
+[data-theme="dark"] .card-header h6 {
+    color: var(--text-heading-color) !important;
+}
+
+[data-theme="dark"] .badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-top,
+[data-theme="dark"] .border-bottom,
+[data-theme="dark"] .border-start,
+[data-theme="dark"] .border-end {
+    border-color: var(--border-clr) !important;
+}
+
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .text-black,
+[data-theme="dark"] .text-heading {
+    color: var(--text-heading-color) !important;
+}
+
+[data-theme="dark"] .shadow-sm,
+[data-theme="dark"] .shadow,
+[data-theme="dark"] .shadow-lg {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background-color: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+    background-color: #1e293b !important;
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem var(--primary-color-soft) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #64748b !important;
+}
+
+[data-theme="dark"] .form-check-input {
+    background-color: #334155;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }

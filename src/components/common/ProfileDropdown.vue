@@ -98,6 +98,7 @@ const toggleTheme = () => {
     const newTheme = theme.value === 'light' ? 'dark' : 'light';
     theme.value = newTheme;
     document.documentElement.setAttribute('data-theme', newTheme);
+    document.documentElement.setAttribute('data-bs-theme', newTheme);
     const appAppearance = JSON.parse(localStorage.getItem('app-Appearance')) || {};
     appAppearance.theme = newTheme;
     localStorage.setItem('app-Appearance', JSON.stringify(appAppearance));

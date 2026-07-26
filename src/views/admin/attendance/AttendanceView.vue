@@ -1,11 +1,11 @@
 <template>
     <div class="attendance-container d-flex flex-column gap-3">
-        <div class="card p-3 mb-1 border-0 shadow-sm d-flex flex-row justify-content-between align-items-center" style="background-color: var(--surface-card);">
+        <div class="card p-3 mb-1 border-0 shadow-sm d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-2" style="background-color: var(--surface-card);">
             <div>
                 <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">Attendance & Reports</h5>
             </div>
             <!-- Season Dropdown -->
-            <select v-model="selectedSeasonId" @change="onSeasonChange" class="form-select" style="max-width: 200px;" v-if="seasons.length > 0">
+            <select v-model="selectedSeasonId" @change="onSeasonChange" class="form-select w-100 w-sm-auto" style="max-width: 250px;" v-if="seasons.length > 0">
                 <option v-for="season in seasons" :key="season.id" :value="season.id">
                     {{ season.name }}
                 </option>

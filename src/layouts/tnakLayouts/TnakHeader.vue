@@ -14,7 +14,7 @@
                 </div>
 
                 <!-- Toggle Button (Mobile Only) -->
-                <button @click.stop="showNavLinks = !showNavLinks" class="btn btn-sm d-md-none border-0 p-1 toggle-btn ms-3 position-relative overflow-hidden" style="color: var(--text-color);">
+                <button @click.stop="showNavLinks = !showNavLinks" class="btn btn-sm d-xl-none border-0 p-1 toggle-btn ms-3 position-relative overflow-hidden" style="color: var(--text-color);">
                     <div class="avatar-default d-flex align-items-center justify-content-center w-100 h-100" :class="{ 'is-hidden': showNavLinks }">
                         <Menu :size="24" />
                     </div>
@@ -258,7 +258,7 @@ onUnmounted(() => {
 
 
 
-@media (max-width: 767px) {
+@media (max-width: 1199.98px) {
     .nav-links {
         position: absolute;
         top: calc(100% + 4px);
@@ -280,7 +280,8 @@ onUnmounted(() => {
     }
     
     .nav-links.mobile-open {
-        max-height: var(--mobile-nav-max-height, 300px);
+        max-height: var(--mobile-nav-max-height, 80vh);
+        overflow-y: auto;
         opacity: 1;
         pointer-events: auto;
         padding: 0.5rem;

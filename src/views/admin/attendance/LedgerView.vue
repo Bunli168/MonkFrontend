@@ -25,27 +25,65 @@
       </div>
     </div>
 
-    <!-- Stats Summary -->
-    <div class="row g-3 mb-3">
-      <div class="col-md-4">
-        <div class="card p-3 border-0 shadow-sm bg-danger text-white">
-          <h6 class="mb-1"><i class="fas fa-exclamation-circle me-1"></i> Fined (Red)</h6>
-          <h3 class="mb-0 fw-bold">{{ redCount }}</h3>
-          <small class="opacity-75">monks with active fines</small>
+    <!-- Stats Summary Grid -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Fined (Red)</span>
+            <div class="icon-box bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+              <i class="fas fa-exclamation-circle fs-5"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-1" style="color: var(--text-heading-color);">
+            {{ redCount }}
+          </h2>
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1 small fw-medium">
+              <i class="fas fa-bell me-1"></i>Action Req.
+            </span>
+            <span class="text-muted small">Monks with active fines</span>
+          </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card p-3 border-0 shadow-sm bg-warning text-dark">
-          <h6 class="mb-1"><i class="fas fa-exclamation-triangle me-1"></i> Warning (Yellow)</h6>
-          <h3 class="mb-0 fw-bold">{{ yellowCount }}</h3>
-          <small class="opacity-50">approaching fine threshold</small>
+
+      <div class="col-12 col-md-4">
+        <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Warning (Yellow)</span>
+            <div class="icon-box bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+              <i class="fas fa-exclamation-triangle fs-5"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-1" style="color: var(--text-heading-color);">
+            {{ yellowCount }}
+          </h2>
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 py-1 small fw-medium">
+              <i class="fas fa-clock me-1"></i>Warning
+            </span>
+            <span class="text-muted small">Approaching fine limit</span>
+          </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card p-3 border-0 shadow-sm" style="background: linear-gradient(135deg, #198754, #20c997); color: white;">
-          <h6 class="mb-1"><i class="fas fa-dollar-sign me-1"></i> Total Fines Owed</h6>
-          <h3 class="mb-0 fw-bold">${{ totalFinesOwed }}</h3>
-          <small class="opacity-75">across all fined monks</small>
+
+      <div class="col-12 col-md-4">
+        <div class="card stat-card h-100 p-3 p-xl-4 rounded-4 shadow-sm border-0 position-relative overflow-hidden" style="background-color: var(--surface-card);">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Total Fines Owed</span>
+            <div class="icon-box bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+              <i class="fas fa-dollar-sign fs-5"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-1 d-flex align-items-baseline gap-1" style="color: var(--text-heading-color);">
+            <span class="text-success fs-4">$</span>{{ totalFinesOwed }}
+          </h2>
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small fw-medium">
+              <i class="fas fa-coins me-1"></i>Outstanding
+            </span>
+            <span class="text-muted small">Across all fined monks</span>
+          </div>
         </div>
       </div>
     </div>
@@ -244,6 +282,17 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.stat-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  border: 1px solid var(--border-clr);
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="dark"] .stat-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35) !important;
+}
 .ledger-container {
   scrollbar-color: color-mix(in srgb, var(--primary-color) 40%, transparent) transparent;
 }

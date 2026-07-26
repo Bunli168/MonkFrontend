@@ -105,6 +105,8 @@
     flex-direction: column;
     gap: 4px;
     min-width: 260px;
+    max-height: 80vh;
+    overflow-y: auto;
     z-index: 2000;
     transform-origin: top right;
     pointer-events: auto;
@@ -131,7 +133,7 @@
     background-color: var(--body-bg-color);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991.98px) {
     .header-wrapper {
         padding: 12px 0;
     }

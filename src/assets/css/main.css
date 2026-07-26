@@ -437,3 +437,35 @@ section {
     background-color: var(--border-clr, #e2e8f0);
     width: 100%;
 }
+
+/* Global Responsive Adjustments */
+table {
+    width: 100%;
+    max-width: 100%;
+}
+
+.table-responsive,
+.table-wrapper,
+.p-datatable-wrapper,
+.card-body,
+.overflow-x-auto {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .container, .container-fluid, .container-sm, .container-md, .container-lg, .container-xl {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    .card {
+        border-radius: var(--border-inner-radius, 12px) !important;
+    }
+    
+    /* Prevents auto-zoom on iOS Safari when tapping input fields */
+    .btn, .form-control, .form-select, input, select, textarea {
+        font-size: 16px !important;
+    }
+}

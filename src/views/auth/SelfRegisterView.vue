@@ -1,26 +1,29 @@
 <template>
 <div>
-  <div class="py-4 container-fluid px-md-4">
+  <div class="py-4 container-fluid px-2 px-sm-3 px-md-4" style="overflow-x: hidden;">
     <div>
       <!-- Header Area -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-        <div class="flex-grow-1">
-          <h3 class="fw-bold mb-1 text-nowrap">Attendance & Seating / វត្តមាន និង កៅអី</h3>
-          <p class="text-muted mb-0 subtitle text-nowrap">Manage your seating registration and absence permissions.</p>
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center mb-4 gap-3">
+        <div class="flex-grow-1" style="min-width: 0;">
+          <h3 class="fw-bold mb-1 d-flex flex-wrap align-items-baseline gap-1 gap-sm-2" style="color: var(--text-heading-color); word-break: break-word;">
+            <span>Attendance & Seating</span>
+            <span class="text-primary fs-5 fs-sm-4">/ វត្តមាន និង កៅអី</span>
+          </h3>
+          <p class="text-muted mb-0 subtitle small" style="word-break: break-word;">Manage your seating registration and absence permissions.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2 justify-content-md-end flex-shrink-0">
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
           <!-- Button Register Seat -->
-          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center gap-2">
-            <Armchair :size="16" class="flex-shrink-0" />
-            <span class="text-truncate" style="max-width: 250px;">
+          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill">
+            <Armchair :size="18" class="flex-shrink-0 text-primary" />
+            <span class="text-truncate fw-medium" style="max-width: 250px;">
               {{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}
             </span>
           </BaseButton>
           
           <!-- Button Leave Request -->
-          <BaseButton type="button" @click="showLeaveModal = true" variant="primary" class="d-flex align-items-center gap-2">
-            <CalendarRange :size="16" class="flex-shrink-0" />
-            <span>Leave Request / ស្នើសុំច្បាប់</span>
+          <BaseButton type="button" @click="showLeaveModal = true" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm">
+            <CalendarRange :size="18" class="flex-shrink-0" />
+            <span class="fw-medium">Leave Request / ស្នើសុំច្បាប់</span>
           </BaseButton>
         </div>
       </div>
@@ -28,19 +31,19 @@
 
 
       <!-- Tabs System for Absences and Leave Requests -->
-      <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2 border-0 shadow-sm" style="background-color: var(--surface-card);">
-        <div>
+      <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2 p-sm-3 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: var(--surface-card); width: 100%; max-width: 100%;">
+        <div class="border-bottom pb-2" style="overflow-x: auto;">
           <TabList>
-            <Tab value="absences">
-              <div class="d-flex align-items-center gap-2">
-                <AlertCircle style="color: var(--danger-color);" :size="16" />
-                Absent & Permission / អវត្តមាន និង ច្បាប់
+            <Tab value="absences" class="py-2 px-3">
+              <div class="d-flex align-items-center gap-2 fw-medium text-nowrap">
+                <AlertCircle style="color: var(--danger-color);" :size="16" class="flex-shrink-0" />
+                <span>Absent & Permission / អវត្តមាន និង ច្បាប់</span>
               </div>
             </Tab>
-            <Tab value="leave-requests">
-              <div class="d-flex align-items-center gap-2">
-                <CalendarRange style="color: var(--primary-color);" :size="16" />
-                Leave Request History / ប្រវត្តិនៃការសុំច្បាប់
+            <Tab value="leave-requests" class="py-2 px-3">
+              <div class="d-flex align-items-center gap-2 fw-medium text-nowrap">
+                <CalendarRange style="color: var(--primary-color);" :size="16" class="flex-shrink-0" />
+                <span>Leave Request History / ប្រវត្តិនៃការសុំច្បាប់</span>
               </div>
             </Tab>
           </TabList>
@@ -226,7 +229,14 @@ const rows = ref([]);
 const myRequests = ref([]);
 const dailyAttendances = ref([]);
 
-const today = new Date().toISOString().split('T')[0];
+const getLocalToday = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const today = getLocalToday();
 
 const form = ref({
   seating_row_id: '',
@@ -491,13 +501,23 @@ const submitRegistration = async () => {
   }
 };
 
+const formatToYMD = (val) => {
+  if (!val) return '';
+  if (typeof val === 'string' && val.includes('-')) return val.split('T')[0];
+  const d = new Date(val);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const submitLeaveRequest = async () => {
   isSubmittingLeave.value = true;
   try {
     const payload = {
       ...leaveForm.value,
-      start_date: new Date(leaveForm.value.start_date).toISOString().split('T')[0],
-      end_date: new Date(leaveForm.value.end_date).toISOString().split('T')[0]
+      start_date: formatToYMD(leaveForm.value.start_date),
+      end_date: formatToYMD(leaveForm.value.end_date)
     };
 
     if (isEditing.value && editId.value) {

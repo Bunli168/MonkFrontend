@@ -12,6 +12,8 @@
             :required="required"
             :showIcon="showIcon"
             :inline="inline"
+            appendTo="body"
+            :readonlyInput="readonlyInput"
             iconDisplay="input"
             :dateFormat="timeOnly ? null : 'yy-mm-dd'"
             :timeOnly="timeOnly"
@@ -104,60 +106,59 @@ const props = defineProps({
     maxDate: {
         type: [Date, String, null],
         default: null
+    },
+    readonlyInput: {
+        type: Boolean,
+        default: true
     }
 });
 
 const emit = defineEmits(['update:modelValue', 'blur', 'focus']);
 
-const internalMinDate = computed(() => {
-    if (typeof props.minDate === 'string' && props.minDate) {
-        if (props.timeOnly && props.minDate.includes(':')) {
-            const d = new Date();
-            const parts = props.minDate.split(':');
-            d.setHours(parseInt(parts[0] || 0), parseInt(parts[1] || 0), parseInt(parts[2] || 0), 0);
-            return d;
-        }
-        return new Date(props.minDate);
+const parseLocalDate = (dateVal) => {
+    if (!dateVal || typeof dateVal !== 'string') return dateVal;
+    if (props.timeOnly && dateVal.includes(':') && !dateVal.includes('-')) {
+        const d = new Date();
+        const parts = dateVal.split(':');
+        d.setHours(parseInt(parts[0] || 0), parseInt(parts[1] || 0), parseInt(parts[2] || 0), 0);
+        return d;
     }
-    return props.minDate;
+    // If dateVal is in format YYYY-MM-DD
+    if (dateVal.includes('-')) {
+        const parts = dateVal.split('T')[0].split('-');
+        if (parts.length === 3) {
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            return new Date(year, month, day, 0, 0, 0, 0);
+        }
+    }
+    return new Date(dateVal);
+};
+
+const internalMinDate = computed(() => {
+    return parseLocalDate(props.minDate);
 });
 
 const internalMaxDate = computed(() => {
-    if (typeof props.maxDate === 'string' && props.maxDate) {
-        if (props.timeOnly && props.maxDate.includes(':')) {
-            const d = new Date();
-            const parts = props.maxDate.split(':');
-            d.setHours(parseInt(parts[0] || 0), parseInt(parts[1] || 0), parseInt(parts[2] || 0), 0);
-            return d;
-        }
-        return new Date(props.maxDate);
-    }
-    return props.maxDate;
+    return parseLocalDate(props.maxDate);
 });
 
 const internalValue = computed({
     get: () => {
         if (props.selectionMode === 'multiple' && Array.isArray(props.modelValue)) {
-            return props.modelValue.map(d => new Date(d));
+            return props.modelValue.map(d => parseLocalDate(d));
         }
-        if (typeof props.modelValue === 'string' && props.modelValue) {
-            if (props.timeOnly && props.modelValue.includes(':') && !props.modelValue.includes('-')) {
-                const d = new Date();
-                const parts = props.modelValue.split(':');
-                d.setHours(parseInt(parts[0] || 0), parseInt(parts[1] || 0), parseInt(parts[2] || 0), 0);
-                return d;
-            }
-            return new Date(props.modelValue);
-        }
-        return props.modelValue;
+        return parseLocalDate(props.modelValue);
     },
     set: (val) => {
         if (props.selectionMode === 'multiple' && Array.isArray(val)) {
             const arr = val.map(v => {
                 if (v instanceof Date && !isNaN(v)) {
-                    const offset = v.getTimezoneOffset();
-                    const adjustedDate = new Date(v.getTime() - (offset * 60 * 1000));
-                    return adjustedDate.toISOString().split('T')[0];
+                    const year = v.getFullYear();
+                    const month = String(v.getMonth() + 1).padStart(2, '0');
+                    const day = String(v.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
                 }
                 return v;
             });
@@ -172,9 +173,10 @@ const internalValue = computed({
             } else if (props.showTime) {
                 emit('update:modelValue', val.toISOString());
             } else {
-                const offset = val.getTimezoneOffset();
-                const adjustedDate = new Date(val.getTime() - (offset * 60 * 1000));
-                emit('update:modelValue', adjustedDate.toISOString().split('T')[0]);
+                const year = val.getFullYear();
+                const month = String(val.getMonth() + 1).padStart(2, '0');
+                const day = String(val.getDate()).padStart(2, '0');
+                emit('update:modelValue', `${year}-${month}-${day}`);
             }
         } else {
             emit('update:modelValue', val);
