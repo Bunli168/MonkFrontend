@@ -201,18 +201,18 @@ const bentoColumns = [
     [
         {
             icon: Presentation,
-            title: 'Classroom Management',
-            description: 'Organize and manage classrooms efficiently. Track attendance and assignments.'
+            title: 'Kudi Management',
+            description: 'Manage room and bed in kudi efficiently. Track room assignment and occupancy.'
         },
         {
             icon: BarChart3,
-            title: 'Academic Reporting',
-            description: 'Generate, manage, and distribute student performance reports securely.'
+            title: 'Daily Attendance',
+            description: 'Track daily attendance of students and monks. Generate attendance reports securely.'
         },
         {
             icon: Users,
-            title: 'Community Surveys',
-            description: 'Gather feedback effortlessly to understand your students and staff.'
+            title: 'Leave Management',
+            description: 'Track absences and leaves of students and monks. Generate leave reports securely.'
         }
     ],
     // Column 2: Large Mockup Cards
@@ -236,7 +236,7 @@ const bentoColumns = [
         {
             icon: Fingerprint,
             title: 'Role-Based Security',
-            description: 'Ensure data privacy with tailored permissions for teachers, admins, and students.'
+            description: 'Ensure data privacy with tailored permissions for Kudi chef,Leader, and members.'
         },
         {
             icon: Settings2,

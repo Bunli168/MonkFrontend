@@ -6,47 +6,13 @@
             <div class="marquee-divider" ref="marqueeRef">
                 <div class="marquee-track" ref="marqueeTrackRef">
                     <span class="marquee-item" v-for="i in 15" :key="i">
-                        SELECTED WORKS <span class="star">✦</span> INNOVATIVE DESIGN <span class="star">✦</span>
+                        NEAKAVORN PAGODA <span class="star">✦</span>  BUILDING A BETTER FUTURE <span class="star">✦</span>
                     </span>
                 </div>
             </div>
         </div>
 
-        <div class="container" style="margin-top: 4rem;">
-            <div class="section-title mb-5">
-                <h2>What we have done...</h2>
-            </div>
-
-            <!-- Portfolio List Layout -->
-            <div class="portfolio-list" ref="portfolioListRef">
-                <!-- Header -->
-                <div class="portfolio-row header-row">
-                    <div class="col-name">Project Name</div>
-                    <div class="col-client">Client</div>
-                    <div class="col-year">Year</div>
-                    <div class="col-category">Services</div>
-                    <div class="col-action"></div>
-                </div>
-
-                <!-- Project Rows -->
-                <div class="portfolio-row project-row" v-for="(project, index) in projects" :key="index"
-                    @mouseenter="(e) => setProject(project, e)" @mouseleave="clearProject">
-                    <div class="col-name">
-                        <div class="project-avatar">
-                            {{ project.name.charAt(0) }}
-                        </div>
-                        <span class="project-title">{{ project.name }}</span>
-                        <span v-if="project.isNew" class="badge-new">NEW</span>
-                    </div>
-                    <div class="col-client">{{ project.client }}</div>
-                    <div class="col-year">{{ project.year }}</div>
-                    <div class="col-category">{{ project.category }}</div>
-                    <div class="col-action">
-                    </div>
-                </div>
-            </div>
-        </div>
-
+      
         <!-- Floating Cursor Image Preview -->
         <div class="cursor-image-preview" ref="cursorPreviewRef">
             <img v-if="activeProject" :src="activeProject.image" alt="Portfolio Preview" loading="lazy" />
@@ -61,45 +27,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-import tnakDigitalMockup from '@/assets/images/mockups/TnakDigital.png';
-import eFeedbackMockup from '@/assets/images/mockups/E_Feedback.png';
-import blogPostMockup from '@/assets/images/mockups/BlogPost.jpg';
-import chouyRokMockup from '@/assets/images/mockups/ChouyRok.png';
 
-const projects = [
-    {
-        name: "MONK MANAGEMENT SYSTEM",
-        client: "ANT",
-        year: "2026",
-        category: "Web Full Stack",
-        image: tnakDigitalMockup,
-        isNew: true
-    },
-    {
-        name: "E-FEEDBACK",
-        client: "ANT",
-        year: "2026",
-        category: "Web Frontend",
-        image: eFeedbackMockup,
-        isNew: false
-    },
-    {
-        name: "BLOG POST",
-        client: "ANT",
-        year: "2025",
-        category: "Web Frontend",
-        image: blogPostMockup,
-        isNew: false
-    },
-    {
-        name: "CHOUY ROK",
-        client: "ANT",
-        year: "2025",
-        category: "Web Frontend",
-        image: chouyRokMockup,
-        isNew: false
-    }
-];
+
+
 
 const marqueeTriggerRef = ref(null);
 const marqueeRef = ref(null);

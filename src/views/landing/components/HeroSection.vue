@@ -235,12 +235,13 @@
         <div class="hero-wrapper" ref="wrapperRef">
             <div class="hero-text" ref="heroTextRef">
                 <h1 ref="heroH1Ref">
-                    <span>Empowering Schools</span><br>
-                    With Seamless Digital Solutions
+                    <span>Online </span><br>
+                    Monk & Novice <br>
+                    Management System
                 </h1>
                 <p class="text-subheading" ref="heroSubRef">
-                    Streamline your pagoda's workflow with Monk Management System. From real-time student tracking to internal surveys and
-                    comprehensive reporting, everything you need in one secure platform.
+                    A comprehensive digital platform designed to support the administration and daily management of monastic life.
+                    Facilitating seamless communication, education, and record-keeping for monks, students, and pagoda staff.
                 </p>
             </div>
 

@@ -210,12 +210,12 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response = await api.put('/auth/change-password', payload);
             toastStore.showToast(response?.data?.message || 'ប្តូរពាក្យសម្ងាត់ជោគជ័យ!', 'success');
-            // After changing password, all other sessions are invalidated on the server.
-            // Force a logout here so the user must re-authenticate with the new password.
-            setTimeout(() => {
-                clearAuth();
-                window.location.href = '/login';
-            }, 1500);
+            
+            // Set new tokens to stay logged in on the current device
+            if (response?.data?.data?.tokens?.accessToken) {
+                setTokens({ access: response.data.data.tokens.accessToken });
+            }
+            
             return true;
         } catch (error) {
             handleApiError(error, toastStore);

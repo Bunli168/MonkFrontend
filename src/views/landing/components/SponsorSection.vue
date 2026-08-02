@@ -1,49 +1,34 @@
 <template>
-    <section class="sponsor-section">
+    <section class="sponsor-section" ref="sectionRef">
         <div class="container">
             <div class="section-title mb-3">
-                <h2>Supported By</h2>
+                <h2>ប្រវត្តិសង្ខេបនៃវត្តនាគវ័ន</h2>
             </div>
 
             <div class="sponsor-paragraph-container">
-                <p class="sponsor-text" ref="sponsorTextRef">
-                    We extend our deepest gratitude to the organizations that provided scholarships and supported our
-                    development team in bringing this project to life. We want to give a special thanks to the Ministry
-                    of Post and Telecommunications (MPTC) for their unwavering support, the CBRD Fund for providing the
-                    crucial scholarships that made this possible, and ANT Training for their exceptional guidance and
-                    technical mentorship.
+                <p class="sponsor-text">
+                    <b>វត្តនាគវ័ន</b> គឺជាវត្តអារាមព្រះពុទ្ធសាសនាដ៏ចាស់ទុំ និងមានឈ្មោះបោះសំឡេងមួយក្នុងចំណោមវត្តអារាមសំខាន់ៗក្នុងរាជធានីភ្នំពេញ ដែលមានប្រវត្តិប្រទាក់ក្រឡាគ្នាយ៉ាងជិតស្និទ្ធជាមួយនឹងការអប់រំ និងការជ្រកកោនរបស់សិស្ស-និស្សិតមកពីតាមបណ្តាខេត្ត។
                 </p>
             </div>
-
-            <div class="sponsor-grid mt-3">
-                <div class="row row-cols-1 row-cols-md-3 g-4 align-items-center justify-content-center">
-
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/MPTC.png" alt="MPTC Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">MPTC</h5>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/CBRD Fund.png" alt="CBRD Fund Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">CBRD Fund</h5>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/ANT.png" alt="ANT Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">ANT</h5>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="section-title mb-3 mt-3">
+                <h5 class="text-bold fw-bold">អត្ថន័យនៃឈ្មោះ «នាគវ័ន»</h5>
             </div>
+
+            <div class="sponsor-paragraph-container">
+                <p class="sponsor-text">
+                    ដើមកំណើតពាក្យ៖ ពាក្យ «នាគ» សំដៅលើស្ដេចនាគ ឬសត្វនាគតាមជំនឿបែបពុទ្ធនិយម និងហិណ្ឌូនីយម រីឯពាក្យ «វ័ន» (ក្លាយមកពីពាក្យបាលី/សំស្ក្រឹត «វន») ប្រែថា ព្រៃ។
+                    អត្ថន័យរួម៖ «នាគវ័ន» មានន័យចំថា «ព្រៃនាគ» ឬ «ព្រៃនៃសត្វនាគ»។
+                 </p>
+            </div>
+             <div class="section-title mb-3 mt-3">
+                <h5 class="text-bold fw-bold">ទីតាំងភូមិសាស្ត្រ</h5>
+            </div>
+             <div class="sponsor-paragraph-container">
+                <p class="sponsor-text">
+                    វត្តនាគវ័ន ស្ថិតនៅក្នុងសង្កាត់បឹងកក់ទី២ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ (នៅជិតតំបន់បឹងកក់ និងផ្លូវកម្ពុជាក្រោម)។ ដោយសារទីតាំងស្ថិតនៅជិតសាកលវិទ្យាល័យ និងមជ្ឈមណ្ឌលសិក្សាធំៗ វត្តនេះបានដើរតួនាទីយ៉ាងសំខាន់ក្នុងជីវភាពរស់នៅរបស់និស្សិតជាច្រើនទសវត្សរ៍មកនេះ។
+                  </p>
+             </div>
+          
         </div>
     </section>
 </template>
@@ -55,68 +40,74 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const sponsorTextRef = ref(null);
-let sponsorTL = null;
+const sectionRef = ref(null);
+let sponsorTLs = [];
 let hoverHandlers = [];
 
 onMounted(async () => {
     await nextTick();
-    const el = sponsorTextRef.value;
-    if (!el) return;
+    if (!sectionRef.value) return;
 
-    const original = el.innerText.trim();
+    const elements = sectionRef.value.querySelectorAll('.sponsor-text');
+    if (!elements.length) return;
 
-    const words = original.split(/\s+/).map(w => {
-        const safe = w.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return `<span class="sponsor-word">${safe}</span>`;
-    }).join(' ');
+    elements.forEach(el => {
+        const original = el.innerText.trim();
 
-    el.innerHTML = words;
+        const words = original.split(/\s+/).map(w => {
+            const safe = w.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return `<span class="sponsor-word">${safe}</span>`;
+        }).join(' ');
 
-    const wordNodes = el.querySelectorAll('.sponsor-word');
-    gsap.set(wordNodes, { y: 20, opacity: 0, display: 'inline-block' });
+        el.innerHTML = words;
 
-    // Add hover animations (cold effect) on each word
-    hoverHandlers = [];
-    wordNodes.forEach((node) => {
-        const enter = () => {
-            gsap.killTweensOf(node);
-            gsap.to(node, { y: -8, scale: 1.06, color: 'var(--primary-color)', duration: 0.22, ease: 'power2.out' });
-        };
-        const leave = () => {
-            gsap.killTweensOf(node);
-            gsap.to(node, { y: 0, scale: 1, color: getComputedStyle(el).color || '', duration: 0.28, ease: 'power2.out' });
-        };
-        node.addEventListener('mouseenter', enter);
-        node.addEventListener('mouseleave', leave);
-        hoverHandlers.push({ node, enter, leave });
-    });
+        const wordNodes = el.querySelectorAll('.sponsor-word');
+        gsap.set(wordNodes, { y: 20, opacity: 0, display: 'inline-block' });
 
-    sponsorTL = gsap.timeline({
-        scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            end: 'bottom 60%',
-            toggleActions: 'play none none reverse',
-            markers: false,
-        }
-    });
+        // Add hover animations (cold effect) on each word
+        wordNodes.forEach((node) => {
+            const enter = () => {
+                gsap.killTweensOf(node);
+                gsap.to(node, { y: -8, scale: 1.06, color: 'var(--primary-color)', duration: 0.22, ease: 'power2.out' });
+            };
+            const leave = () => {
+                gsap.killTweensOf(node);
+                gsap.to(node, { y: 0, scale: 1, color: getComputedStyle(el).color || '', duration: 0.28, ease: 'power2.out' });
+            };
+            node.addEventListener('mouseenter', enter);
+            node.addEventListener('mouseleave', leave);
+            hoverHandlers.push({ node, enter, leave });
+        });
 
-    sponsorTL.to(wordNodes, {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        ease: 'power2.out',
-        stagger: { each: 0.02 }
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 95%',
+                end: 'bottom 60%',
+                toggleActions: 'play none none reverse',
+                markers: false,
+            }
+        });
+
+        tl.to(wordNodes, {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out',
+            stagger: { each: 0.02 }
+        });
+
+        sponsorTLs.push(tl);
     });
 });
 
 onUnmounted(() => {
-    if (sponsorTL) {
-        try { sponsorTL.scrollTrigger && sponsorTL.scrollTrigger.kill(); } catch (e) { }
-        try { sponsorTL.kill(); } catch (e) { }
-        sponsorTL = null;
-    }
+    sponsorTLs.forEach(tl => {
+        try { tl.scrollTrigger && tl.scrollTrigger.kill(); } catch (e) { }
+        try { tl.kill(); } catch (e) { }
+    });
+    sponsorTLs = [];
+    
     // remove hover listeners
     try {
         hoverHandlers.forEach(({ node, enter, leave }) => {

@@ -10,24 +10,14 @@
                             Profile
                         </div>
                     </Tab>
-                    <Tab value="password">
-                        <div class="d-flex align-items-center gap-2">
-                            <KeyRound style="color: var(--danger-color);" :size="16" />
-                            Change Password
-                        </div>
-                    </Tab>
+
                     <Tab value="appearance">
                         <div class="d-flex align-items-center gap-2">
                             <SunMoon style="color: var(--success-color);" :size="16" />
                             Appearance
                         </div>
                     </Tab>
-                    <Tab value="pwa">
-                        <div class="d-flex align-items-center gap-2">
-                            <Smartphone style="color: var(--warning-color);" :size="16" />
-                            Install App (PWA)
-                        </div>
-                    </Tab>
+
                 </TabList>
             </div>
             <TabPanels class="p-0 bg-transparent">
@@ -66,16 +56,6 @@
                         </div>
                     </div>
                 </TabPanel>
-                <TabPanel value="password">
-                    <div class="row">
-                        <div class="col-lg-7 col-md-12">
-                            <div class="card p-3 gap-3"
-                                style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
-                                <ChangePasswordForm />
-                            </div>
-                        </div>
-                    </div>
-                </TabPanel>
                 <TabPanel value="appearance">
                     <div class="row">
                         <div class="col-lg-6 col-md-12">
@@ -83,11 +63,7 @@
                                 <AppearanceForm />
                             </div>
                         </div>
-                    </div>
-                </TabPanel>
-                <TabPanel value="pwa">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-12">
+                        <div class="col-lg-6 col-md-12">
                             <div class="card p-4 gap-3" style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <div class="d-flex align-items-center gap-3 border-bottom pb-3">
                                     <div class="p-3 bg-warning bg-opacity-10 rounded-circle text-warning d-flex align-items-center justify-content-center">
@@ -146,7 +122,6 @@ import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 import ProfileForm from '@/components/forms/profile/ProfileForm.vue';
 import AppearanceForm from '@/components/forms/profile/AppearanceForm.vue';
 import AccountSettingForm from '@/components/forms/profile/AccountSettingForm.vue';
-import ChangePasswordForm from '@/components/forms/profile/ChangePasswordForm.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/users/user';
 import { useToastStore } from '@/stores/toast';
@@ -181,7 +156,7 @@ const route = useRoute();
 const router = useRouter();
 
 const activeTab = ref('profile');
-const VALID_TABS = ['profile', 'password', 'appearance', 'pwa', 'account', 'security'];
+const VALID_TABS = ['profile', 'appearance', 'account', 'security'];
 
 onMounted(() => {
     window.addEventListener('beforeinstallprompt', handleInstallPrompt);
