@@ -9,101 +9,54 @@
         <div class="main-divider"></div>
 
         <div>
-            <!-- Ultra-Premium Telegram Bot 2FA Card -->
-            <div class="telegram-security-card mb-4">
-                <div class="telegram-card-glow"></div>
-                <div class="telegram-card-body">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="telegram-icon-wrapper">
-                                <Send :size="24" class="telegram-icon-svg" />
-                                <span v-if="authStore.user?.telegram_chat_id" class="status-indicator active" title="Active"></span>
-                                <span v-else class="status-indicator inactive" title="Inactive"></span>
-                            </div>
-                            <div class="telegram-info">
-                                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                                    <h6 class="telegram-title mb-0">Telegram Instant OTP (2FA)</h6>
-                                    <span v-if="authStore.user?.telegram_chat_id" class="telegram-badge connected">
-                                        <span class="pulse-dot active"></span> បានភ្ជាប់រួចរាល់ (Connected)
-                                    </span>
-                                    <span v-else class="telegram-badge disconnected">
-                                        <span class="pulse-dot warning"></span> មិនទាន់ភ្ជាប់ (Action Required)
-                                    </span>
-                                </div>
-                                <p class="telegram-desc mb-0">
-                                    {{ authStore.user?.telegram_chat_id 
-                                        ? 'កូដសម្ងាត់ Login OTP និងសារជូនដំណឹងប្រព័ន្ធនឹងផ្ញើចូលគណនី Telegram របស់អ្នកភ្លាមៗ! ⚡'
-                                        : 'សូមភ្ជាប់គណនីជាមួយ Telegram Bot ដើម្បីទទួលបានកូដ Login OTP យ៉ាងរហ័ស និងមានសុវត្ថិភាពខ្ពស់បំផុត!' 
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="telegram-actions">
-                            <a v-if="!authStore.user?.telegram_chat_id" :href="`https://t.me/${telegramUsername}`" target="_blank" class="btn-link-telegram">
-                                <span class="btn-glow"></span>
-                                <Send :size="16" />
-                                <span>🔗 ភ្ជាប់គណនីឥឡូវនេះ</span>
-                            </a>
-                            <button v-else type="button" class="btn-unlink-telegram" @click="handleUnlinkTelegram" :disabled="isUnlinking">
-                                <Trash2 :size="15" />
-                                <span>{{ isUnlinking ? 'កំពុងផ្តាច់...' : 'ផ្តាច់គណនី (Unlink)' }}</span>
-                            </button>
-                        </div>
+            <!-- Compact Telegram Bot 2FA Row (OTP) -->
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-4 border-bottom">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="telegram-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(var(--primary-color-rgb), 0.1); border-radius: 10px;">
+                        <Send :size="20" style="color: var(--primary-color);" />
                     </div>
-
-                    <!-- Modern Workflow Steps (When Not Connected) -->
-                    <div v-if="!authStore.user?.telegram_chat_id" class="telegram-steps-container mt-4 pt-3">
-                        <div class="steps-header mb-3">
-                            <span class="steps-title">📖 របៀបភ្ជាប់គណនីងាយៗក្នុង ៣ ជំហាន ៖</span>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <div class="step-card">
-                                    <span class="step-num">01</span>
-                                    <div class="step-text">
-                                        <strong>ចុចលើប៊ូតុងភ្ជាប់</strong>
-                                        <span>ចុចលើប៊ូតុង "ភ្ជាប់គណនីឥឡូវនេះ" ដើម្បីបើកចូល Telegram Bot។</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="step-card">
-                                    <span class="step-num">02</span>
-                                    <div class="step-text">
-                                        <strong>ចុចពាក្យ Start</strong>
-                                        <span>ចុចប៊ូតុង Start ឬ ផ្ញើលេខទូរស័ព្ទ/អ៊ីមែលរបស់អ្នកទៅកាន់ Bot។</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="step-card">
-                                    <span class="step-num">03</span>
-                                    <div class="step-text">
-                                        <strong>ភ្ជាប់ដោយស្វ័យប្រវត្តិ!</strong>
-                                        <span>ប្រព័ន្ធនឹងផ្ទៀងផ្ទាត់ និងចងភ្ជាប់គណនីរបស់អ្នកភ្លាមៗ!</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Connected Security Banner (When Connected) -->
-                    <div v-else class="telegram-security-banner mt-3 pt-3">
-                        <div class="security-banner-content">
-                            <ShieldCheck :size="18" class="text-success" />
-                            <span><strong>ការការពារកម្រិតខ្ពស់ ៖</strong> រាល់ពេលចូលប្រើប្រព័ន្ធ ប្រព័ន្ធនឹងទាមទារកូដផ្ញើចូល Telegram នេះជានិច្ច។</span>
-                        </div>
+                    <div>
+                        <label class="form-label mb-0 fw-medium d-block">Telegram Instant OTP (2FA)</label>
+                        <span class="text-muted small">
+                            <span v-if="authStore.user?.otp_telegram_chat_id" class="text-success"><ShieldCheck :size="12" class="me-1"/>បានភ្ជាប់រួចរាល់</span>
+                            <span v-else class="text-warning">មិនទាន់ភ្ជាប់ (Action Required)</span>
+                        </span>
                     </div>
                 </div>
+                
+                <div>
+                    <button v-if="!authStore.user?.otp_telegram_chat_id" type="button" @click="handleLinkOtpTelegram" class="btn btn-sm d-flex align-items-center justify-content-center" style="background-color: var(--primary-color); color: white; min-width: 100px;" :disabled="isLinkingOtp">
+                        <span v-if="isLinkingOtp" class="spinner-border spinner-border-sm me-2"></span>
+                        <Send v-else :size="14" class="me-1" /> {{ isLinkingOtp ? 'កំពុងភ្ជាប់...' : 'ភ្ជាប់គណនី' }}
+                    </button>
+                    <button v-else type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" @click="handleUnlinkOtpTelegram" :disabled="isUnlinkingOtp" style="min-width: 100px;">
+                        <Trash2 :size="14" class="me-1" /> {{ isUnlinkingOtp ? 'កំពុងផ្តាច់...' : 'ផ្តាច់គណនី' }}
+                    </button>
+                </div>
             </div>
-
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <label class="form-label mb-0 fw-medium d-block">Two-Factor Auth (TOTP)</label>
                     <span class="text-muted small">Add an extra layer of security.</span>
                 </div>
                 <BaseToggle v-model="isTotpEnabled" @change="handleTotpToggle" />
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mt-4 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="telegram-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1); border-radius: 10px;">
+                        <Download :size="20" style="color: #10B981;" />
+                    </div>
+                    <div>
+                        <label class="form-label mb-0 fw-medium d-block">Install App (PWA)</label>
+                        <span class="text-muted small">ដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក ដើម្បីងាយស្រួលប្រើប្រាស់។</span>
+                    </div>
+                </div>
+                <div>
+                    <BaseButton @click="triggerInstall" variant="primary" class="d-flex align-items-center gap-2">
+                        <Download :size="16" /> ដំឡើង (Install)
+                    </BaseButton>
+                </div>
             </div>
 
             <!-- TOTP Password Input -->
@@ -189,13 +142,15 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { ShieldCheck, Send, Trash2 } from '@lucide/vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ShieldCheck, Send, Trash2, Download } from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
-const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'chm_kiwi';
+const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'Monk_permission_bot';
+const otpTelegramUsername = import.meta.env.VITE_TELEGRAM_OTP_SUPPORT_USERNAME || 'optsecuritybot';
 const isUnlinking = ref(false);
+const isUnlinkingOtp = ref(false);
 
 const handleUnlinkTelegram = async () => {
     isUnlinking.value = true;
@@ -203,6 +158,30 @@ const handleUnlinkTelegram = async () => {
         await authStore.unlinkTelegram();
     } finally {
         isUnlinking.value = false;
+    }
+};
+
+const isLinkingOtp = ref(false);
+const handleLinkOtpTelegram = async () => {
+    isLinkingOtp.value = true;
+    try {
+        const token = await authStore.generateTelegramLinkToken();
+        if (token) {
+            window.open(`https://t.me/${otpTelegramUsername}?start=${token}`, '_blank');
+        } else {
+            alert('បរាជ័យក្នុងការបង្កើតតំណភ្ជាប់ សូមព្យាយាមម្តងទៀត។');
+        }
+    } finally {
+        isLinkingOtp.value = false;
+    }
+};
+
+const handleUnlinkOtpTelegram = async () => {
+    isUnlinkingOtp.value = true;
+    try {
+        await authStore.unlinkOtpTelegram();
+    } finally {
+        isUnlinkingOtp.value = false;
     }
 };
 
@@ -215,8 +194,32 @@ const qrCodeUrl = ref('');
 const secretKey = ref('');
 const verificationCode = ref('');
 
+// ═══ PWA Installation Logic ═══
+const deferredPrompt = ref(null);
+const handleInstallPrompt = (e) => {
+    e.preventDefault();
+    deferredPrompt.value = e;
+};
+
+const triggerInstall = async () => {
+    if (deferredPrompt.value) {
+        deferredPrompt.value.prompt();
+        const { outcome } = await deferredPrompt.value.userChoice;
+        if (outcome === 'accepted') {
+            deferredPrompt.value = null;
+        }
+    } else {
+        alert('សូមអនុវត្តតាមការណែនាំខាងក្រោម ដើម្បីដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក!');
+    }
+};
+
 onMounted(() => {
+    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
     isTotpEnabled.value = !!authStore.user?.isTotpEnabled;
+});
+
+onUnmounted(() => {
+    window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
 });
 
 watch(() => authStore.user?.isTotpEnabled, (newVal) => {

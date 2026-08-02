@@ -81,9 +81,15 @@
             </template>
 
             <template #action="{ data }">
-                <span class="text-muted small">No Detail</span>
+                <BaseButton variant="outline-primary" size="sm" @click="viewBiography(data)">
+                    View Biography
+                </BaseButton>
             </template>
         </BaseTable>
+
+        <BaseModal v-model="showSurveyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
+            <PagodaStudentBiographyView :user-id="selectedUserId" @close="closeBiography" hide-header :is-read-only="true" />
+        </BaseModal>
 
 
     </div>
@@ -97,6 +103,8 @@ import BaseTable from '@/components/base/BaseTable.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import PagodaStudentBiographyView from '@/views/pagoda/PagodaStudentBiographyView.vue';
 
 import { useAuthStore } from '@/stores/auth';
 
@@ -114,6 +122,16 @@ const kuts = ref([]);
 
 const selectedUserId = ref(null);
 const showSurveyModal = ref(false);
+
+const viewBiography = (user) => {
+    selectedUserId.value = user.id;
+    showSurveyModal.value = true;
+};
+
+const closeBiography = () => {
+    showSurveyModal.value = false;
+    selectedUserId.value = null;
+};
 
 const fetchKuts = async () => {
     try {

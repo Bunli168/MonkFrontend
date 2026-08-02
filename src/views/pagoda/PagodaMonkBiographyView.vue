@@ -10,22 +10,22 @@
             </div>
 
             <!-- Summary View (Read Only) - Modern Dashboard Style -->
-            <div v-if="!isEditing" class="mx-auto w-100 p-4" style="background-color: rgba(220, 225, 229, 0.4); border-radius: 12px; max-width: 1000px;">
+            <div v-if="!isEditing" class="mx-auto w-100 p-4 biography-container" style="border-radius: 12px; max-width: 1000px;">
                 
                 <!-- Header with Avatar and Name -->
                 <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-secondary" style="width: 75px; height: 75px; background-color: #e2e6ea; font-size: 2rem; flex-shrink: 0;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-secondary" style="width: 75px; height: 75px; background-color: var(--bg-secondary); font-size: 2rem; flex-shrink: 0;">
                         <img v-if="viewedUserAvatar || (!props.userId && authStore.user?.profile?.avatarUrl)" 
                              :src="$authImg(viewedUserAvatar || authStore.user?.profile?.avatarUrl)" 
                              class="w-100 h-100 rounded-circle object-fit-cover">
                         <span v-else>{{ form.surname_name ? form.surname_name.charAt(0).toUpperCase() : 'M' }}</span>
                     </div>
                     <div class="flex-grow-1">
-                        <h4 class="mb-1 fw-bold" style="color: #2b3035;">{{ form.surname_name || 'N/A' }}</h4>
+                        <h4 class="mb-1 fw-bold" style="color: var(--text-heading-color);">{{ form.surname_name || 'N/A' }}</h4>
                         <div class="text-secondary" style="font-size: 0.95rem;">Ordained Name: <span class="text-primary">{{ form.ordained_name || '-' }}</span></div>
                     </div>
                     <div class="d-flex gap-2">
-                        <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: #495057;">
+                        <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: var(--text-heading-color); border-color: var(--border-color);">
                             Edit / កែសម្រួល
                         </BaseButton>
                     </div>
@@ -35,46 +35,46 @@
                 <div class="row g-4">
                     <!-- Personal Identity -->
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Personal Identity / អត្តសញ្ញាណបុគ្គល</h6>
-                                <div class="mb-2 text-secondary">Nationality: <span class="text-dark">{{ form.nationality || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Date of Birth: <span class="text-dark">{{ formatDate(form.date_of_birth) || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Phone Number: <span class="text-dark">{{ form.phone_number || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Nationality: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.nationality || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Date of Birth: <span class="fw-medium" style="color: var(--text-heading-color);">{{ formatDate(form.date_of_birth) || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Phone Number: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.phone_number || 'N/A' }}</span></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Place of Birth -->
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Place of Birth / ទីកន្លែងកំណើត</h6>
-                                <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(pobLoc.provinces, form.pob_province_id, 'province') || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(pobLoc.districts, form.pob_district_id, 'district') || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(pobLoc.communes, form.pob_commune_id, 'commune') || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Village: <span class="text-dark">{{ getLocationName(pobLoc.villages, form.pob_village_id, 'village') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Province: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(pobLoc.provinces, form.pob_province_id, 'province') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">District: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(pobLoc.districts, form.pob_district_id, 'district') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Commune: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(pobLoc.communes, form.pob_commune_id, 'commune') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Village: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(pobLoc.villages, form.pob_village_id, 'village') || 'N/A' }}</span></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Ordination Details -->
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Ordination Details / ព័ត៌មាន{{ isSamanera ? 'បព្វជ្ជា' : 'ឧបសម្បទា' }}</h6>
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <div class="mb-2 text-secondary">Preceptor Name: <span class="text-dark">{{ form.preceptor_name || 'N/A' }}</span></div>
-                                        <div v-if="!isSamanera" class="mb-2 text-secondary">First Assistant: <span class="text-dark">{{ form.first_assistant_name || 'N/A' }}</span></div>
-                                        <div v-if="!isSamanera" class="mb-2 text-secondary">Second Assistant: <span class="text-dark">{{ form.second_assistant_name || 'N/A' }}</span></div>
-                                        <div class="mb-2 text-secondary">Ordained Date: <span class="text-dark">{{ formatDate(form.ordained_date) || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Preceptor Name: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.preceptor_name || 'N/A' }}</span></div>
+                                        <div v-if="!isSamanera" class="mb-2 text-secondary">First Assistant: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.first_assistant_name || 'N/A' }}</span></div>
+                                        <div v-if="!isSamanera" class="mb-2 text-secondary">Second Assistant: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.second_assistant_name || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Ordained Date: <span class="fw-medium" style="color: var(--text-heading-color);">{{ formatDate(form.ordained_date) || 'N/A' }}</span></div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="mb-2 text-secondary">Wat / Pagoda: <span class="text-dark">{{ form.ordination_wat || 'N/A' }}</span></div>
-                                        <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(ordLoc.provinces, form.ordination_province_id, 'province') || 'N/A' }}</span></div>
-                                        <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(ordLoc.districts, form.ordination_district_id, 'district') || 'N/A' }}</span></div>
-                                        <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(ordLoc.communes, form.ordination_commune_id, 'commune') || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Wat / Pagoda: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.ordination_wat || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Province: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(ordLoc.provinces, form.ordination_province_id, 'province') || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">District: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(ordLoc.districts, form.ordination_district_id, 'district') || 'N/A' }}</span></div>
+                                        <div class="mb-2 text-secondary">Commune: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(ordLoc.communes, form.ordination_commune_id, 'commune') || 'N/A' }}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -83,13 +83,13 @@
 
                     <!-- Current Address -->
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm border-0" style="background-color: rgba(220, 225, 229, 0.6); border-radius: 8px;">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Current Address / អាសយដ្ឋានបច្ចុប្បន្ន</h6>
-                                <div class="mb-2 text-secondary">Wat / Pagoda: <span class="text-dark">{{ form.current_wat || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Province: <span class="text-dark">{{ getLocationName(currLoc.provinces, form.current_province_id, 'province') || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">District: <span class="text-dark">{{ getLocationName(currLoc.districts, form.current_district_id, 'district') || 'N/A' }}</span></div>
-                                <div class="mb-2 text-secondary">Commune: <span class="text-dark">{{ getLocationName(currLoc.communes, form.current_commune_id, 'commune') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Wat / Pagoda: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.current_wat || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Province: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(currLoc.provinces, form.current_province_id, 'province') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">District: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(currLoc.districts, form.current_district_id, 'district') || 'N/A' }}</span></div>
+                                <div class="mb-2 text-secondary">Commune: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(currLoc.communes, form.current_commune_id, 'commune') || 'N/A' }}</span></div>
                             </div>
                         </div>
                     </div>

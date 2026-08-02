@@ -13,7 +13,9 @@
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="user-profile-avatar d-flex align-items-center justify-content-center text-muted rounded-circle overflow-hidden border"
                         style="width: 80px; height: 80px; background-color: rgba(0,0,0,0.03);">
-                        <img v-if="authStore.user?.profile?.avatarUrl" :src="$authImg(authStore.user.profile.avatarUrl)" class="w-100 h-100 object-fit-cover">
+                        <img v-if="viewedUserAvatar || (!props.userId && authStore.user?.profile?.avatarUrl)" 
+                             :src="$authImg(viewedUserAvatar || authStore.user?.profile?.avatarUrl)" 
+                             class="w-100 h-100 object-fit-cover">
                         <span v-else class="fs-2 fw-bold text-muted">{{ form.surname_name ? form.surname_name.charAt(0) : 'S' }}</span>
                     </div>
                     <div>
@@ -288,6 +290,18 @@ const props = defineProps({
     title: {
         type: String,
         default: 'Student Profile Summary / ព័ត៌មានសិស្ស (ប្រវត្តិរូបសង្ខេប)'
+    },
+    userId: {
+        type: [String, Number],
+        default: null
+    },
+    hideHeader: {
+        type: Boolean,
+        default: false
+    },
+    isReadOnly: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -312,6 +326,7 @@ const isEditing   = ref(false);
 const hasSurvey   = ref(false);
 const currentStep = ref(1);
 const avatarFile  = ref(null);
+const viewedUserAvatar = ref(null);
 
 const steps = [
     { name: 'Personal Identity' },
@@ -363,7 +378,8 @@ const fetchSurvey = async () => {
     try {
         let res;
         try {
-            res = await api.get('/student-surveys/me');
+            const endpoint = props.userId ? `/student-surveys/${props.userId}` : `/student-surveys/me`;
+            res = await api.get(endpoint);
         } catch (apiError) {
             if (apiError.response?.status !== 404) throw apiError;
         }
@@ -393,61 +409,71 @@ const fetchSurvey = async () => {
         }
 
         // For own profile, fetch fresh from /users/me to guarantee profile data is loaded
-        try {
-            await authStore.fetchProfile();
-        } catch (e) {
-            console.error("Failed to fetch profile in biography view:", e);
+        let ownProfile = null;
+        if (!props.userId) {
+            try {
+                await authStore.fetchProfile();
+                ownProfile = authStore.user?.profile || null;
+            } catch (e) {
+                console.error("Failed to fetch profile in biography view:", e);
+            }
         }
 
         // Auto-fill from user profile if fields are empty
-        const user = authStore.user;
-        if (user) {
-            const p = user.profile || user.UserProfile;
-            if (p) {
-                // Personal Identity
-                if (!form.value.surname_name) {
-                    form.value.surname_name = `${p.last_name_kh || ''} ${p.first_name_kh || ''}`.trim();
-                }
-                if (!form.value.date_of_birth && p.date_of_birth) form.value.date_of_birth = p.date_of_birth;
-                if (!form.value.date_of_birth && p.dateOfBirth) form.value.date_of_birth = p.dateOfBirth;
-                if (!form.value.phone_number && (p.phone_number || p.phone)) form.value.phone_number = p.phone_number || p.phone;
-                if (!form.value.id_card_number && p.chhaya_number) form.value.id_card_number = p.chhaya_number;
-                
-                // Education
-                if (!form.value.edu_school && p.university_name) form.value.edu_school = p.university_name;
-                if (!form.value.edu_grade && p.university_year) form.value.edu_grade = `Year ${p.university_year}`;
-                
-                // Place of Birth from Addresses
-                if (user.Addresses && user.Addresses.length > 0) {
-                    const birthAddress = user.Addresses.find(a => a.address_type === 'birth_place');
-                    if (birthAddress) {
-                        if (!form.value.pob_province && birthAddress.province) form.value.pob_province = birthAddress.province;
-                        if (!form.value.pob_district && birthAddress.district) form.value.pob_district = birthAddress.district;
-                        if (!form.value.pob_commune && birthAddress.commune) form.value.pob_commune = birthAddress.commune;
-                        if (!form.value.pob_village && birthAddress.village) form.value.pob_village = birthAddress.village;
-                        
-                        if (!form.value.pob_province_id && birthAddress.province_id) {
-                            form.value.pob_province_id = birthAddress.province_id;
-                            await pobLoc.fetchDistricts(birthAddress.province_id);
-                        }
-                        if (!form.value.pob_district_id && birthAddress.district_id) {
-                            form.value.pob_district_id = birthAddress.district_id;
-                            await pobLoc.fetchCommunes(birthAddress.district_id);
-                        }
-                        if (!form.value.pob_commune_id && birthAddress.commune_id) {
-                            form.value.pob_commune_id = birthAddress.commune_id;
-                            await pobLoc.fetchVillages(birthAddress.commune_id);
-                        }
-                        if (!form.value.pob_village_id && birthAddress.village_id) form.value.pob_village_id = birthAddress.village_id;
+        let user = null;
+        let p = null;
+        if (!props.userId) {
+            user = authStore.user;
+            p = user?.profile || user?.UserProfile;
+        } else {
+            const userStore = useUserStore();
+            await userStore.fetchUser(props.userId);
+            user = userStore.user;
+            p = user?.profile || user?.UserProfile;
+        }
+
+        if (user && p) {
+            viewedUserAvatar.value = p.avatar_url || p.avatarUrl || null;
+            // Personal Identity
+            if (!form.value.surname_name) {
+                form.value.surname_name = `${p.last_name_kh || ''} ${p.first_name_kh || ''}`.trim();
+            }
+            if (!form.value.date_of_birth && p.date_of_birth) form.value.date_of_birth = p.date_of_birth;
+            if (!form.value.date_of_birth && p.dateOfBirth) form.value.date_of_birth = p.dateOfBirth;
+            if (!form.value.phone_number && (p.phone_number || p.phone)) form.value.phone_number = p.phone_number || p.phone;
+            if (!form.value.id_card_number && p.chhaya_number) form.value.id_card_number = p.chhaya_number;
+            
+            // Education
+            if (!form.value.edu_school && p.university_name) form.value.edu_school = p.university_name;
+            if (!form.value.edu_grade && p.university_year) form.value.edu_grade = `Year ${p.university_year}`;
+            
+            // Place of Birth from Addresses
+            if (!form.value.pob_province_id) {
+                const birthAddress = Array.isArray(p.Addresses) 
+                    ? p.Addresses.find(a => a.type === 'BIRTH') 
+                    : null;
+                if (birthAddress) {
+                    if (birthAddress.province_id) {
+                        form.value.pob_province_id = birthAddress.province_id;
+                        await pobLoc.fetchDistricts(birthAddress.province_id);
                     }
+                    if (!form.value.pob_district_id && birthAddress.district_id) {
+                        form.value.pob_district_id = birthAddress.district_id;
+                        await pobLoc.fetchCommunes(birthAddress.district_id);
+                    }
+                    if (!form.value.pob_commune_id && birthAddress.commune_id) {
+                        form.value.pob_commune_id = birthAddress.commune_id;
+                        await pobLoc.fetchVillages(birthAddress.commune_id);
+                    }
+                    if (!form.value.pob_village_id && birthAddress.village_id) form.value.pob_village_id = birthAddress.village_id;
                 }
             }
-            if (!form.value.nationality) form.value.nationality = 'KHMER';
-            
-            // Kudi Number (auto-fetched from profile - always populate regardless of survey data)
-            const kudiNumber = (p && p.kut_id) || (p && (p.chhaya_number || p.kudi_number || p.student_id || p.id_number)) || user.id || user.userId;
-            form.value.kudi_number = kudiNumber ? String(kudiNumber) : '';
         }
+        if (!form.value.nationality) form.value.nationality = 'KHMER';
+        
+        // Kudi Number (auto-fetched from profile - always populate regardless of survey data)
+        const kudiNumber = (p && p.kut_id) || (p && (p.chhaya_number || p.kudi_number || p.student_id || p.id_number)) || user?.id || user?.userId;
+        form.value.kudi_number = kudiNumber ? String(kudiNumber) : '';
     } catch (error) {
         console.error('Failed to load student survey:', error);
         isEditing.value = false;

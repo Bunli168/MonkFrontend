@@ -22,12 +22,7 @@
                             Appearance
                         </div>
                     </Tab>
-                    <Tab value="pwa">
-                        <div class="d-flex align-items-center gap-2">
-                            <Smartphone style="color: var(--warning-color);" :size="16" />
-                            Install App (PWA)
-                        </div>
-                    </Tab>
+
                 </TabList>
             </div>
             <TabPanels class="p-0 bg-transparent">
@@ -58,7 +53,7 @@
                             </div>
                         </div>
                         
-                        <div class="col-lg-6 col-md-12">
+                        <div class="col-lg-6 col-md-12 d-flex flex-column gap-3">
                             <div class="card p-3 gap-3"
                                 style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <AccountSettingForm />
@@ -85,55 +80,6 @@
                         </div>
                     </div>
                 </TabPanel>
-                <TabPanel value="pwa">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-12">
-                            <div class="card p-4 gap-3" style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
-                                <div class="d-flex align-items-center gap-3 border-bottom pb-3">
-                                    <div class="p-3 bg-warning bg-opacity-10 rounded-circle text-warning d-flex align-items-center justify-content-center">
-                                        <Smartphone :size="32" />
-                                    </div>
-                                    <div>
-                                        <h5 class="fw-bold mb-1">ប្រព័ន្ធគ្រប់គ្រងវត្តអារាម (Pagoda Management App)</h5>
-                                        <p class="text-muted small mb-0">ដំឡើងកម្មវិធីចូលក្នុងទូរស័ព្ទ ឬកុំព្យូទ័រ ដើម្បីងាយស្រួលប្រើប្រាស់ និងលឿនជាងមុន</p>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-end pt-2">
-                                    <button @click="triggerInstall" class="btn btn-warning d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm fw-bold">
-                                        <Smartphone :size="18" />
-                                        <span>📲 ដំឡើងកម្មវិធីឥឡូវនេះ (Install Now)</span>
-                                    </button>
-                                </div>
-
-                                <div class="mt-2">
-                                    <h6 class="fw-bold mb-3">📲 របៀបដំឡើងកម្មវិធី៖</h6>
-                                    
-                                    <div class="mb-3 p-3 bg-light rounded border">
-                                        <h6 class="fw-bold mb-2 text-primary d-flex align-items-center gap-2">
-                                            <span>🍏 សម្រាប់ទូរស័ព្ទ iPhone / iPad (Safari)</span>
-                                        </h6>
-                                        <ol class="mb-0 ps-3 small text-muted">
-                                            <li class="mb-1">ចុចលើប៊ូតុង <b>Share (ចែករំលែក) 📤</b> នៅបាតកណ្តាលខាងក្រោមនៃអេក្រង់។</li>
-                                            <li class="mb-1">អូសចុះក្រោម រួចជ្រើសរើសយកពាក្យ <b>"Add to Home Screen" ➕</b>។</li>
-                                            <li>ចុចពាក្យ <b>Add</b> នៅជ្រុងលើខាងស្តាំ ជាការស្រេច!</li>
-                                        </ol>
-                                    </div>
-
-                                    <div class="mb-3 p-3 bg-light rounded border">
-                                        <h6 class="fw-bold mb-2 text-success d-flex align-items-center gap-2">
-                                            <span>🤖 សម្រាប់ទូរស័ព្ទ Android / Chrome (PC)</span>
-                                        </h6>
-                                        <ol class="mb-0 ps-3 small text-muted">
-                                            <li class="mb-1">ចុចសញ្ញាចុច ៣ <b>(⋮)</b> នៅជ្រុងលើខាងស្តាំក្នុង Browser។</li>
-                                            <li>ជ្រើសរើសយកពាក្យ <b>"Install app" / "Add to Home screen"</b>។</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </TabPanel>
             </TabPanels>
         </Tabs>
     </div>
@@ -150,7 +96,7 @@ import ChangePasswordForm from '@/components/forms/profile/ChangePasswordForm.vu
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/users/user';
 import { useToastStore } from '@/stores/toast';
-import { Save, UserRoundPen, UserRoundCog, SunMoon, ShieldCheck, KeyRound, Smartphone } from '@lucide/vue';
+import { Save, UserRoundPen, UserRoundCog, SunMoon, ShieldCheck, KeyRound, Smartphone, Download, Info } from '@lucide/vue';
 
 const authStore = useAuthStore();
 const userStore = useUserStore();
@@ -159,23 +105,6 @@ const isSaving = ref(false);
 const isEditMode = ref(false);
 const profileFormRef = ref(null);
 
-const deferredPrompt = ref(null);
-const handleInstallPrompt = (e) => {
-    e.preventDefault();
-    deferredPrompt.value = e;
-};
-
-const triggerInstall = async () => {
-    if (deferredPrompt.value) {
-        deferredPrompt.value.prompt();
-        const { outcome } = await deferredPrompt.value.userChoice;
-        if (outcome === 'accepted') {
-            deferredPrompt.value = null;
-        }
-    } else {
-        alert('សូមអនុវត្តតាមការណែនាំខាងក្រោម ដើម្បីដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក!');
-    }
-};
 
 const route = useRoute();
 const router = useRouter();
@@ -184,7 +113,6 @@ const activeTab = ref('profile');
 const VALID_TABS = ['profile', 'password', 'appearance', 'pwa', 'account', 'security'];
 
 onMounted(() => {
-    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
     let targetTab = route.query.tab;
     if (targetTab === 'account' || targetTab === 'security') targetTab = 'profile';
     if (targetTab && VALID_TABS.includes(targetTab)) {
@@ -197,7 +125,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
 });
 
 watch(activeTab, (newTab) => {

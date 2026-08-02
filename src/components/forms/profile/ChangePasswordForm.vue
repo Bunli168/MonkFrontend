@@ -49,7 +49,7 @@
                 </div>
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-2 border-top">
                     <span class="text-muted small d-flex align-items-center gap-1">
-                        ⚠️ <span class="text-danger fw-medium">ចំណាំ៖</span> Session ទាំងអស់នឹងត្រូវបញ្ចប់ភ្លាមៗក្រោយពេលប្តូររួច
+                        ⚠️ <span class="text-danger fw-medium">ចំណាំ៖</span> Session លើឧបករណ៍ផ្សេងទៀតនឹងត្រូវបញ្ចប់ (Logout) ដោយស្វ័យប្រវត្តិ។
                     </span>
                     <BaseButton
                         @click="handleChangePassword"
