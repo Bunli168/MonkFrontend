@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
     });
     const isSuperAdmin = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['SUPERADMIN'].includes(uRole);
+        return ['SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isTeacher = computed(() => {
         const uRole = userRole.value?.toUpperCase();
@@ -41,24 +41,29 @@ export const useAuthStore = defineStore('auth', () => {
     });
     const isStudent = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['MONK', 'STUDENT', 'BHIKKHU', 'ATTENDANCETAKER'].includes(uRole);
+        return ['MONK', 'STUDENT', 'BHIKKHU', 'ATTENDANCETAKER', 'ATTENDANCE_TAKER'].includes(uRole);
     });
     const isMonk = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['MONK', 'BHIKKHU', 'MEKUDI', 'ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(uRole);
+        return ['MONK', 'BHIKKHU', 'MEKUDI', 'ATTENDANCETAKER', 'ATTENDANCE_TAKER', 'ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isBhikkhu = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['BHIKKHU', 'ADMIN', 'SUPERADMIN'].includes(uRole);
+        return ['BHIKKHU', 'ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isAttendanceTaker = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['ATTENDANCETAKER'].includes(uRole);
+        return ['ATTENDANCETAKER', 'ATTENDANCE_TAKER'].includes(uRole);
     });
 
     const hasRole = (roles) => {
         const uRole = userRole.value?.toUpperCase();
-        const uppercaseRoles = roles.map(r => r.toUpperCase());
+        const uppercaseRoles = roles.map(r => {
+            const up = r.toUpperCase();
+            if (up === 'SUPERADMIN') return ['SUPERADMIN', 'SUPER_ADMIN'];
+            if (up === 'ATTENDANCETAKER') return ['ATTENDANCETAKER', 'ATTENDANCE_TAKER'];
+            return [up];
+        }).flat();
         return uppercaseRoles.includes(uRole);
     };
 
