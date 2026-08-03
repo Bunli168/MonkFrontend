@@ -2,48 +2,20 @@
     <section class="sponsor-section">
         <div class="container">
             <div class="section-title mb-3">
-                <h2>Supported By</h2>
+                <h2>ប្រវត្តិសង្ខេបនៃវត្តនាគវ័ន</h2>
             </div>
 
             <div class="sponsor-paragraph-container">
                 <p class="sponsor-text" ref="sponsorTextRef">
-                    We extend our deepest gratitude to the organizations that provided scholarships and supported our
-                    development team in bringing this project to life. We want to give a special thanks to the Ministry
-                    of Post and Telecommunications (MPTC) for their unwavering support, the CBRD Fund for providing the
-                    crucial scholarships that made this possible, and ANT Training for their exceptional guidance and
-                    technical mentorship.
+                    វត្តនាគវ័នគឺជាវត្តអារាមព្រះពុទ្ធសាសនាដ៏ចាស់ទុំ និងមានឈ្មោះបោះសំឡេងមួយក្នុងចំណោមវត្តអារាមសំខាន់ៗក្នុងរាជធានីភ្នំពេញ ដែលមានប្រវត្តិប្រទាក់ក្រឡាគ្នាយ៉ាងជិតស្និទ្ធជាមួយនឹងការអប់រំ និងការជ្រកកោនរបស់សិស្ស-និស្សិតមកពីតាមបណ្តាខេត្ត។ <br><br>
+
+                    វត្តនាគវ័ន ស្ថិតនៅក្នុងសង្កាត់បឹងកក់ទី២ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ (នៅជិតតំបន់បឹងកក់ និងផ្លូវកម្ពុជាក្រោម)។ ដោយសារទីតាំងស្ថិតនៅជិតសាកលវិទ្យាល័យ និងមជ្ឈមណ្ឌលសិក្សាធំៗ វត្តនេះបានដើរតួនាទីយ៉ាងសំខាន់ក្នុងជីវភាពរស់នៅរបស់និស្សិតជាច្រើនទសវត្សរ៍មកនេះ។ <br><br>
+                    
+                    ជម្រកសម្រាប់សិស្ស-និស្សិតក្រីក្រ៖ វត្តនាគវ័នត្រូវបានគេស្គាល់យ៉ាងច្បាស់ថាជា «ផ្ទះទីពីរ» របស់សិស្ស-និស្សិតប្រុសៗដែលចាកចេញពីស្រុកកំណើតមកបន្តការសិក្សាថ្នាក់ឧត្តមសិក្សានៅភ្នំពេញ។ ព្រះសង្ឃ និងចៅអធិការវត្តគ្រប់ជំនាន់បានផ្តល់កុដិស្នាក់នៅ អាហារ និងការប្រដៅធម៌អាថ៌ដល់និស្សិតរាប់ពាន់នាក់។
                 </p>
             </div>
 
-            <div class="sponsor-grid mt-3">
-                <div class="row row-cols-1 row-cols-md-3 g-4 align-items-center justify-content-center">
 
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/MPTC.png" alt="MPTC Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">MPTC</h5>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/CBRD Fund.png" alt="CBRD Fund Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">CBRD Fund</h5>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="sponsor-card text-center p-4">
-                            <img src="@/assets/images/sponsors/ANT.png" alt="ANT Logo"
-                                class="img-fluid mb-3 sponsor-logo" loading="lazy" />
-                            <h5 class="fw-bold text-heading-color mb-1 d-none">ANT</h5>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
         </div>
     </section>
 </template>
@@ -64,14 +36,36 @@ onMounted(async () => {
     const el = sponsorTextRef.value;
     if (!el) return;
 
-    const original = el.innerText.trim();
+    const segmenter = new Intl.Segmenter('km', { granularity: 'word' });
 
-    const words = original.split(/\s+/).map(w => {
-        const safe = w.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return `<span class="sponsor-word">${safe}</span>`;
-    }).join(' ');
+    const walk = (node) => {
+        const children = Array.from(node.childNodes);
+        children.forEach(child => {
+            if (child.nodeType === 3) {
+                const text = child.nodeValue;
+                if (!text.trim()) return;
 
-    el.innerHTML = words;
+                const fragment = document.createDocumentFragment();
+                const segments = segmenter.segment(text);
+                
+                Array.from(segments).forEach(s => {
+                    if (!s.segment.trim()) {
+                        fragment.appendChild(document.createTextNode(s.segment));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'sponsor-word';
+                        span.textContent = s.segment;
+                        fragment.appendChild(span);
+                    }
+                });
+                node.replaceChild(fragment, child);
+            } else if (child.nodeType === 1) {
+                walk(child);
+            }
+        });
+    };
+
+    walk(el);
 
     const wordNodes = el.querySelectorAll('.sponsor-word');
     gsap.set(wordNodes, { y: 20, opacity: 0, display: 'inline-block' });

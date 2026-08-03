@@ -10,16 +10,11 @@
                             Take Attendance
                         </div>
                     </Tab>
-                    <Tab value="member-absences">
-                        <div class="d-flex align-items-center gap-2">
-                            <FileText style="color: var(--warning-color);" :size="16" />
-                            View
-                        </div>
-                    </Tab>
                     <Tab value="request-permission">
                         <div class="d-flex align-items-center gap-2">
                             <ClipboardList style="color: var(--primary-color);" :size="16" />
                             Member Request Permission
+                            <span v-if="pendingCount > 0" class="badge bg-danger rounded-pill">{{ pendingCount }}</span>
                         </div>
                     </Tab>
                     <Tab value="my-leave-request">
@@ -40,11 +35,8 @@
                 <TabPanel value="take-attendance" v-if="authStore.isAttendanceTaker">
                     <TakerTakeAttendanceView v-if="activeTab === 'take-attendance'" />
                 </TabPanel>
-                <TabPanel value="member-absences">
-                    <TakerAbsentPermissionView v-if="activeTab === 'member-absences'" />
-                </TabPanel>
                 <TabPanel value="request-permission">
-                    <MemberRequestPermissionView v-if="activeTab === 'request-permission'" />
+                    <MemberRequestPermissionView v-if="activeTab === 'request-permission'" :pending-count="pendingCount" @refresh-pending-count="fetchPendingCount" />
                 </TabPanel>
                 <TabPanel value="my-leave-request">
                     <PagodaLeaveRequestView v-if="activeTab === 'my-leave-request'" />
@@ -60,10 +52,10 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import api from '@/api/api';
 import { useAuthStore } from '@/stores/auth';
 import { ClipboardList, FileText, Settings } from '@lucide/vue';
 import TakerTakeAttendanceView from './TakerTakeAttendanceView.vue';
-import TakerAbsentPermissionView from './TakerAbsentPermissionView.vue';
 import MemberRequestPermissionView from './MemberRequestPermissionView.vue';
 import PagodaLeaveRequestView from '@/views/pagoda/PagodaLeaveRequestView.vue';
 import SeatingRowSettings from '@/views/admin/settings/SeatingRowSettings.vue';
@@ -73,9 +65,23 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const activeTab = ref('member-absences');
+const activeTab = ref('request-permission');
+const pendingCount = ref(0);
+
+const fetchPendingCount = async () => {
+    if (!authStore.isAdmin && !authStore.isAttendanceTaker) return;
+    try {
+        const response = await api.get('/leave-requests', {
+            params: { status: 'pending' }
+        });
+        pendingCount.value = response.data?.length || 0;
+    } catch (error) {
+        console.error('Failed to load pending count:', error);
+    }
+};
 
 onMounted(() => {
+    fetchPendingCount();
     if (authStore.isAttendanceTaker) {
         activeTab.value = 'take-attendance';
     } else if (false) {

@@ -33,9 +33,13 @@ export const useUserStore = defineStore('user', () => {
         { id: 3, name: 'MONK' }
     ];
 
-    const fetchRoleStats = async (forceRefresh = false) => {
+    const fetchRoleStats = async (forceRefresh = false, isActive = null) => {
         try {
-            const response = await api.get('/users/stats/roles');
+            const params = {};
+            if (isActive !== null && isActive !== undefined && isActive !== '') {
+                params.isActive = isActive;
+            }
+            const response = await api.get('/users/stats/roles', { params });
             const data = response.data?.data || response.data;
             if (data) {
                 roleStats.value = {

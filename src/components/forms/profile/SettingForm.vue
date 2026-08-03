@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column gap-3">
-    <div>
+    <div v-if="false">
       <h5 class="mb-3">Telegram Integration</h5>
       <div class="card bg-transparent" style=" border-radius: calc(var(--border-radius) - 1rem);">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -166,6 +166,7 @@ const userStore = useUserStore();
 const toastStore = useToastStore();
 
 const isTeacher = computed(() => authStore.user?.role?.id === 2);
+const isUser = computed(() => authStore.user?.role?.name?.toUpperCase() === 'USER');
 
 const settings = ref({
   receiveReportAlerts: false,

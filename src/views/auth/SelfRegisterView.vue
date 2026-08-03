@@ -21,14 +21,36 @@
           </BaseButton>
           
           <!-- Button Leave Request -->
-          <BaseButton type="button" @click="showLeaveModal = true" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm">
+          <BaseButton type="button" @click="handleLeaveRequestClick" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm">
             <CalendarRange :size="18" class="flex-shrink-0" />
             <span class="fw-medium">Leave Request / ស្នើសុំច្បាប់</span>
           </BaseButton>
         </div>
       </div>
 
+      <!-- Summary Cards -->
+      <div v-if="summary" class="d-flex flex-wrap gap-2 mb-3">
+        <!-- Permission Count -->
+        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-primary-rgb), 0.3) !important;">
+          <CalendarRange class="text-primary" :size="18" />
+          <span class="small fw-medium text-muted">Permission:</span>
+          <span class="fw-bold text-dark">{{ summary.permission || 0 }} <small class="text-muted fw-normal">days</small></span>
+        </div>
+        
+        <!-- Absent Count -->
+        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-danger-rgb), 0.3) !important;">
+          <AlertCircle class="text-danger" :size="18" />
+          <span class="small fw-medium text-muted">Absent:</span>
+          <span class="fw-bold text-dark">{{ summary.absent || 0 }} <small class="text-muted fw-normal">days</small></span>
+        </div>
 
+        <!-- Fine Amount -->
+        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-warning-rgb), 0.3) !important; background-color: #fffdf5 !important;">
+          <Coins style="color: #b8860b;" :size="18" />
+          <span class="small fw-medium text-muted">Fine:</span>
+          <span class="fw-bold text-dark"><small class="text-muted fw-normal">$</small>{{ Number(summary.fine || 0).toLocaleString() }}</span>
+        </div>
+      </div>
 
       <!-- Tabs System for Absences and Leave Requests -->
       <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2 p-sm-3 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: var(--surface-card); width: 100%; max-width: 100%;">
@@ -85,6 +107,14 @@
               <template #date_range="{ data: row }">
                 <span>{{ formatDate(row.start_date) }} <ArrowRight class="text-muted mx-1" :size="14" /> {{ formatDate(row.end_date) }}</span>
               </template>
+              <template #attachment="{ data: row }">
+                <div class="d-flex justify-content-start align-items-center">
+                  <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
+                    <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                  </a>
+                  <span v-else class="text-muted fst-italic">-</span>
+                </div>
+              </template>
               <template #status="{ data: row }">
                 <BaseBadge v-if="row.status" :status="getBadgeStatusColor(row.status)" :label="formatStatus(row.status)" />
               </template>
@@ -103,6 +133,13 @@
       </Tabs>
     </div>
   </div>
+
+  <!-- Image Viewer Modal -->
+  <BaseModal v-model="isImageModalOpen" title="Attachment View" size="lg">
+    <div class="text-center p-0">
+      <img v-if="currentImageModalUrl" :src="currentImageModalUrl" class="img-fluid rounded shadow" style="max-height: 70vh;" alt="Attachment View" />
+    </div>
+  </BaseModal>
 
   <!-- Dialog Seating Registration -->
   <BaseModal v-model="showRegisterModal" title="Seating Registration / ចុះឈ្មោះកៅអី" size="md">
@@ -170,6 +207,39 @@
         <label class="form-label fw-medium mt-2">Reason for Leave</label>
         <textarea class="form-control" v-model="leaveForm.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
       </div>
+      <div class="col-12">
+        <label class="form-label fw-medium mt-2 mb-3">Attachment (Optional)</label>
+        
+        <!-- Upload Drop Zone -->
+        <div 
+          class="border rounded bg-light cursor-pointer text-center py-3 mb-3"
+          style="border-style: dashed !important; border-width: 2px !important; border-color: #dee2e6 !important; transition: all 0.2s;"
+          @click="fileInput.click()"
+          onmouseover="this.classList.add('bg-secondary', 'bg-opacity-10')"
+          onmouseout="this.classList.remove('bg-secondary', 'bg-opacity-10')"
+        >
+          <input type="file" class="d-none" ref="fileInput" @change="handleFileChange" accept="image/*" />
+          
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-1 border rounded bg-white shadow-sm mb-2 text-dark fw-medium" style="font-size: 0.85rem;">
+            <UploadCloud size="16" /> Upload
+          </div>
+          <div class="text-muted mb-1" style="font-size: 0.8rem;">Choose image or drag & drop it here.</div>
+          <div class="text-muted opacity-75" style="font-size: 0.75rem;">JPG, JPEG, PNG. Max 5 MB.</div>
+        </div>
+
+        <!-- Thumbnails Row -->
+        <div class="d-flex gap-3 flex-wrap">
+          <div v-if="leaveForm.imagePreview" class="position-relative shadow-sm rounded overflow-hidden flex-shrink-0" style="width: 110px; height: 140px; border: 1px solid #dee2e6;">
+            <img :src="leaveForm.imagePreview" class="w-100 h-100" style="object-fit: cover; cursor: zoom-in;" alt="Preview" @click="openImageModal(leaveForm.imagePreview)" />
+            <!-- Remove Button -->
+            <div class="position-absolute top-0 end-0 p-1">
+              <button type="button" class="btn btn-sm btn-danger rounded-circle shadow-sm" style="padding: 0.15rem 0.35rem; background-color: rgba(220, 53, 69, 0.85); border: none;" @click.stop="leaveForm.image = null; leaveForm.imagePreview = null; if($refs.fileInput) $refs.fileInput.value = '';" title="Remove">
+                <i class="bi bi-x" style="font-size: 1rem; line-height: 1;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="col-12 d-flex justify-content-end gap-2 mt-4">
         <button type="button" class="btn btn-light border" @click="showLeaveModal = false">Cancel</button>
         <BaseButton type="submit" variant="primary" :isLoading="isSubmittingLeave" class="btn-premium px-4">
@@ -197,13 +267,14 @@ import api from '@/api/api';
 import { socket } from '@/utils/socket';
 import { useAuthStore } from '@/stores/auth';
 import { useToastStore } from '@/stores/toast';
-import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList, ArrowRight, FileEdit, Trash2 } from '@lucide/vue';
+import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList, ArrowRight, FileEdit, Trash2, Coins, UploadCloud, Maximize2 } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import * as bootstrap from 'bootstrap';
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 
 const authStore = useAuthStore();
@@ -215,6 +286,7 @@ const isSubmitting = ref(false);
 const isSubmittingLeave = ref(false);
 const isLoading = ref(false);
 const isAttendancesLoading = ref(false);
+const fileInput = ref(null);
 
 const isEditing = ref(false);
 const editId = ref(null);
@@ -228,6 +300,10 @@ const summary = ref(null);
 const rows = ref([]);
 const myRequests = ref([]);
 const dailyAttendances = ref([]);
+
+// Image Viewer State
+const isImageModalOpen = ref(false);
+const currentImageModalUrl = ref('');
 
 const getLocalToday = () => {
   const d = new Date();
@@ -246,8 +322,21 @@ const form = ref({
 const leaveForm = ref({
   start_date: '',
   end_date: '',
-  reason: ''
+  reason: '',
+  image: null,
+  imagePreview: null
 });
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    leaveForm.value.image = file;
+    leaveForm.value.imagePreview = URL.createObjectURL(file);
+  } else {
+    leaveForm.value.image = null;
+    leaveForm.value.imagePreview = null;
+  }
+};
 
 const selectedRowCapacity = ref(0);
 const takenSeats = ref([]);
@@ -256,6 +345,15 @@ const hasRegisteredSeat = computed(() => {
   return !!(authStore.user?.profile?.seating_row_id || authStore.user?.profile?.seating_row?.id) && 
          !!authStore.user?.profile?.seat_number;
 });
+
+const handleLeaveRequestClick = () => {
+  if (!hasRegisteredSeat.value) {
+    toast.showToast('Please register your row and seat number before submitting a leave request.', 'error');
+    showRegisterModal.value = true;
+    return;
+  }
+  showLeaveModal.value = true;
+};
 
 const attendanceColDefs = computed(() => {
   return [
@@ -270,6 +368,7 @@ const colDefs = computed(() => {
   return [
     { field: 'date_range', header: 'Date Range', sortable: false },
     { field: 'reason', header: 'Reason', sortable: false },
+    { field: 'attachment', header: 'Attachment', sortable: false },
     { field: 'status', header: 'Status', sortable: true },
     { field: 'approved_by', header: 'Reviewed By', sortable: false },
     { field: 'actions', header: 'Actions', sortable: false, class: 'text-end' }
@@ -353,7 +452,7 @@ watch(showLeaveModal, (val) => {
   if (!val) {
     isEditing.value = false;
     editId.value = null;
-    leaveForm.value = { start_date: '', end_date: '', reason: '' };
+    leaveForm.value = { start_date: '', end_date: '', reason: '', image: null, imagePreview: null };
   }
 });
 
@@ -514,17 +613,23 @@ const formatToYMD = (val) => {
 const submitLeaveRequest = async () => {
   isSubmittingLeave.value = true;
   try {
-    const payload = {
-      ...leaveForm.value,
-      start_date: formatToYMD(leaveForm.value.start_date),
-      end_date: formatToYMD(leaveForm.value.end_date)
-    };
+    const formData = new FormData();
+    formData.append('start_date', formatToYMD(leaveForm.value.start_date));
+    formData.append('end_date', formatToYMD(leaveForm.value.end_date));
+    formData.append('reason', leaveForm.value.reason);
+    if (leaveForm.value.image) {
+      formData.append('image', leaveForm.value.image);
+    }
 
     if (isEditing.value && editId.value) {
-      await api.put(`/leave-requests/${editId.value}`, payload);
+      await api.put(`/leave-requests/${editId.value}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       toast.showToast('Leave request updated successfully', 'success');
     } else {
-      await api.post('/leave-requests', payload);
+      await api.post('/leave-requests', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       toast.showToast('Leave request submitted successfully', 'success');
     }
     
@@ -543,6 +648,18 @@ const handleLeaveUpdated = () => {
   fetchRequests();
   fetchDailyAttendances();
   loadSummary();
+};
+
+const openImageModal = (url) => {
+  currentImageModalUrl.value = url;
+  isImageModalOpen.value = true;
+};
+
+const closeImageModal = () => {
+  isImageModalOpen.value = false;
+  setTimeout(() => {
+    currentImageModalUrl.value = '';
+  }, 300);
 };
 
 onMounted(async () => {
@@ -625,5 +742,34 @@ onUnmounted(() => {
 
 .btn-premium:hover {
   background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+}
+
+/* PrimeVue Active Tab Styling (Pill Style like Navbar) */
+:deep(.p-tablist-tab-list) {
+  border-bottom: none !important;
+}
+
+:deep(.p-tablist-tab-list .p-tab),
+:deep(.p-tab) {
+  border: none !important;
+  border-radius: 8px !important;
+  color: var(--text-muted) !important;
+  background-color: transparent !important;
+  padding: 0.6rem 1rem !important;
+  margin-right: 0.5rem !important;
+  transition: all 0.2s ease;
+}
+
+:deep(.p-tablist-tab-list .p-tab:hover),
+:deep(.p-tab:hover) {
+  background-color: var(--surface-hover) !important;
+}
+
+:deep(.p-tablist-tab-list .p-tab[aria-selected="true"]),
+:deep(.p-tab.p-tab-active),
+:deep(.p-tab-active) {
+  background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
 }
 </style>

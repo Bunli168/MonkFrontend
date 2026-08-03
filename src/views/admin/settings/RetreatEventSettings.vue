@@ -9,39 +9,31 @@
                 </BaseButton>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="py-3 px-4">Season Name</th>
-                                <th class="py-3 px-4">Start Date</th>
-                                <th class="py-3 px-4">End Date</th>
-                                <th class="py-3 px-4">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-if="eventsList.length === 0">
-                                <td colspan="4" class="text-center py-4 text-muted">No history found</td>
-                            </tr>
-                            <tr v-for="evt in eventsList" :key="evt.id">
-                                <td class="py-3 px-4 fw-medium">{{ evt.name }}</td>
-                                <td class="py-3 px-4">{{ evt.start_date || '-' }}</td>
-                                <td class="py-3 px-4">{{ evt.end_date || '-' }}</td>
-                                <td class="py-3 px-4">
-                                    <span v-if="evt.is_active && !evt.is_closed" class="badge bg-success-subtle text-success">
-                                        Active & Open
-                                    </span>
-                                    <span v-else-if="evt.is_active && evt.is_closed" class="badge bg-secondary-subtle text-secondary">
-                                        Closed
-                                    </span>
-                                    <span v-else class="badge bg-light text-muted border">
-                                        Archived
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <BaseTable 
+                    :columns="[
+                        { field: 'name', header: 'Season Name' },
+                        { field: 'start_date', header: 'Start Date' },
+                        { field: 'end_date', header: 'End Date' },
+                        { field: 'status', header: 'Status' }
+                    ]"
+                    :rows="paginatedEvents"
+                    :total-records="eventsList.length"
+                    v-model:page="currentPage"
+                    v-model:per-page="itemsPerPage"
+                    :loading="false"
+                >
+                    <template #start_date="{ data }">
+                        {{ data.start_date || '-' }}
+                    </template>
+                    <template #end_date="{ data }">
+                        {{ data.end_date || '-' }}
+                    </template>
+                    <template #status="{ data }">
+                        <span :class="getStatusBadgeClass(data)">
+                            {{ getStatusText(data) }}
+                        </span>
+                    </template>
+                </BaseTable>
             </div>
         </div>
 
@@ -78,8 +70,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '@/api/api';
+import BaseButton from '@/components/base/BaseButton.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseTable from '@/components/base/BaseTable.vue';
 import { useToastStore } from '@/stores/toast';
 import { useSystemStore } from '@/stores/system';
 
@@ -95,6 +91,42 @@ const formData = ref({
 });
 
 const eventsList = ref([]);
+
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
+
+const totalPages = computed(() => {
+    return Math.ceil(eventsList.value.length / itemsPerPage.value);
+});
+
+const paginatedEvents = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return eventsList.value.slice(start, end);
+});
+
+const isExpired = (endDate) => {
+    if (!endDate) return false;
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    return new Date() > end;
+};
+
+const getStatusText = (evt) => {
+    if (evt.is_active) {
+        if (evt.is_closed || isExpired(evt.end_date)) return 'Closed';
+        return 'Active & Open';
+    }
+    return 'Archived';
+};
+
+const getStatusBadgeClass = (evt) => {
+    if (evt.is_active) {
+        if (evt.is_closed || isExpired(evt.end_date)) return 'badge bg-secondary-subtle text-secondary';
+        return 'badge bg-success-subtle text-success';
+    }
+    return 'badge bg-light text-muted border';
+};
 
 const fetchEventsList = async () => {
     try {

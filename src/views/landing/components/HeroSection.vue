@@ -235,8 +235,8 @@
         <div class="hero-wrapper" ref="wrapperRef">
             <div class="hero-text" ref="heroTextRef">
                 <h1 ref="heroH1Ref">
-                    <span>Empowering Schools</span><br>
-                    With Seamless Digital Solutions
+                    <span>Empowering Monks and Novices</span><br>
+                    With Seamless of Management 
                 </h1>
                 <p class="text-subheading" ref="heroSubRef">
                     Streamline your pagoda's workflow with Monk Management System. From real-time student tracking to internal surveys and

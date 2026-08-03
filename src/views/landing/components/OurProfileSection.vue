@@ -7,6 +7,7 @@
                     We are a passionate group of developers dedicated to building innovative digital solutions.
                     Together, we crafted the ANT Portal to transform the educational experience through intuitive design
                     and robust engineering.
+                  
                 </p>
             </div>
 
@@ -41,7 +42,10 @@ import Bunli from '@/assets/images/member/Bunli.JPG';
 gsap.registerPlugin(ScrollTrigger);
 
 const members = [
-    { id: 1, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' }
+    { id: 1, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 2, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 3, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 4, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
 ]
 
 const sectionRef = ref(null);

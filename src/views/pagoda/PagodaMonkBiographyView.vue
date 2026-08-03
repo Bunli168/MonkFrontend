@@ -337,7 +337,7 @@ const defaultForm = () => ({
     ordained_name: '', ordained_date: null,
     
     ordination_wat: '', ordination_province_id: null, ordination_district_id: null, ordination_commune_id: null,
-    current_wat: '', current_province_id: null, current_district_id: null, current_commune_id: null,
+    current_wat: 'វត្តនាគវ័ន', current_province_id: null, current_district_id: null, current_commune_id: null,
     phone_number: '',
     
     edu_level: '', edu_school: '', edu_specialty: '', edu_grade: '',

@@ -12,7 +12,7 @@
             <!-- Compact Telegram Bot 2FA Row (OTP) -->
             <div class="d-flex align-items-center justify-content-between mb-4 pb-4 border-bottom">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="telegram-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(var(--primary-color-rgb), 0.1); border-radius: 10px;">
+                    <div class="setting-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(var(--primary-color-rgb), 0.1); border-radius: 10px;">
                         <Send :size="20" style="color: var(--primary-color);" />
                     </div>
                     <div>
@@ -44,7 +44,7 @@
 
             <div class="d-flex align-items-center justify-content-between mt-4 pt-4 border-top">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="telegram-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1); border-radius: 10px;">
+                    <div class="setting-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1); border-radius: 10px;">
                         <Download :size="20" style="color: #10B981;" />
                     </div>
                     <div>

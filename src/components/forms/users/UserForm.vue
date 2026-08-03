@@ -17,10 +17,6 @@
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
-            <div class="mb-3" v-if="seatingRowsOptions.length > 0">
-                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
-                    label="Seating Row" placeholder="Select Seating Row" />
-            </div>
         </div>
 
         <div v-else>
@@ -40,10 +36,6 @@
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
-            <div class="mb-3" v-if="seatingRowsOptions.length > 0">
-                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
-                    label="Seating Row" placeholder="Select Seating Row" />
-            </div>
         </div>
     </form>
 </template>
@@ -62,7 +54,10 @@ const userStore = useUserStore();
 const kuts = ref([]);
 const seatingRows = ref([]);
 const kutsOptions = computed(() => kuts.value.map(k => ({ label: k.name, value: k.id })));
-const seatingRowsOptions = computed(() => seatingRows.value.map(row => ({ label: row.name || `Row ${row.id}`, value: row.id })));
+const seatingRowsOptions = computed(() => {
+    const options = [{ label: 'No Seating Row', value: null }];
+    return options.concat(seatingRows.value.map(row => ({ label: row.name || `Row ${row.id}`, value: row.id })));
+});
 
 const { value: kut_id } = useField('kut_id');
 

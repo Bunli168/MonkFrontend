@@ -54,12 +54,19 @@
                 <BaseBadge v-if="row.status" :status="getBadgeStatusColor(row.status)" :label="formatStatus(row.status)" />
                 <span v-else>—</span>
             </template>
+
+            <template #attachment="{ data: row }">
+                <a v-if="row.image_url" :href="`http://localhost:3006${row.image_url}`" target="_blank" class="text-primary text-decoration-none">
+                    <i class="bi bi-paperclip"></i> View
+                </a>
+                <span v-else class="text-muted fst-italic">-</span>
+            </template>
             
             <template #actions="{ data: row }">
                 <BaseActionMenu v-if="['pending', 'pending_mekudi', 'pending_superadmin'].includes(row.status) && getActionItems(row).length > 0" :items="getActionItems(row)" />
                 <span v-else class="text-muted small">
                     <template v-if="row.status === 'pending_superadmin'">
-                        <template v-if="false">Awaiting Final Approval</template>
+                        <template v-if="authStore.isSuperAdmin">Awaiting Final Approval</template>
                         <template v-else>Pending Super Admin</template>
                     </template>
                     <template v-else-if="row.status === 'approved' || row.status === 'rejected'">
@@ -116,7 +123,7 @@ const props = defineProps({
 
 const authStore = useAuthStore();
 const filterOptions = computed(() => {
-    const pendingValue = false ? 'pending_superadmin' : 'pending';
+    const pendingValue = authStore.isSuperAdmin ? 'pending_superadmin' : 'pending';
     return [
         { label: 'All Requests', value: '' },
         { label: 'Approved', value: 'approved' },
@@ -130,6 +137,7 @@ const colDefs = computed(() => {
         { field: 'monk', header: 'Monk', sortable: false },
         { field: 'date_range', header: 'Date Range', sortable: false },
         { field: 'reason', header: 'Reason', sortable: false },
+        { field: 'attachment', header: 'Attachment', sortable: false },
         { field: 'status', header: 'Status', sortable: true },
         { field: 'actions', header: 'Actions', sortable: false, class: 'text-end' }
     ];
@@ -164,7 +172,7 @@ const formatStatus = (status) => {
     if (!status) return '';
     if (status === 'pending_mekudi' || status === 'pending') return 'Pending';
     if (status === 'pending_superadmin') {
-        if (false) return 'Pending';
+        if (authStore.isSuperAdmin) return 'Pending';
         return 'Pending Super Admin';
     }
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -172,7 +180,7 @@ const formatStatus = (status) => {
 
 const getBadgeStatusColor = (status) => {
     if (!status) return '';
-    if (status === 'pending_superadmin' && !false) {
+    if (status === 'pending_superadmin' && !authStore.isSuperAdmin) {
         return 'PENDING';
     }
     if (status === 'pending_mekudi' || status === 'pending') return 'PENDING';
@@ -206,7 +214,7 @@ const getActionItems = (row) => {
     const isAwaitingAdmin = row.status === 'pending' || row.status === 'pending_mekudi';
 
     if (isAwaitingSuperAdmin) {
-        if (!false) return [];
+        if (!authStore.isSuperAdmin) return [];
         return [
             {
                 label: 'Approve Final',

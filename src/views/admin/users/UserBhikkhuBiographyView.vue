@@ -7,7 +7,7 @@
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
                 <BaseButton variant="outline-success" class="d-flex align-items-center gap-2" @click="exportToCSV" :isLoading="isExporting">
-                    <FileDown :size="16" />
+                    <FileUp :size="16" />
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
                 <div class="kudi-select" style="min-width: 180px;">
@@ -97,7 +97,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { Search, User, FileDown } from '@lucide/vue';
+import { Search, User, FileUp } from '@lucide/vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import api from '@/api/api';
 import BaseTable from '@/components/base/BaseTable.vue';

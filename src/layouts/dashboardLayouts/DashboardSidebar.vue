@@ -284,7 +284,7 @@
             </div>
 
             <div class="footer-col">
-                <a :href="`https://t.me/Monk_permission_bot?start=${authStore.user?.phone || ''}`" target="_blank" class="theme-btn mb-2" v-tooltip.right="'Link Telegram'" style="text-decoration: none; color: #0088cc;">
+                <a :href="`https://t.me/${telegramUsername}?start=${authStore.user?.phone || ''}`" target="_blank" class="theme-btn mb-2" v-tooltip.right="'Link Telegram'" style="text-decoration: none; color: #0088cc;">
                     <Send :size="18" :stroke-width="2" />
                 </a>
 
@@ -345,6 +345,8 @@ import { useSidebarStore } from '@/stores/sidebar';
 const authStore = useAuthStore();
 
 const sidebar = useSidebarStore();
+const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'Monk_permission_bot';
+
 let savedAppearance = {};
 try {
     const stored = localStorage.getItem('app-Appearance');

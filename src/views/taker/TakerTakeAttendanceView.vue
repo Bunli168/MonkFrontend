@@ -17,7 +17,7 @@
                 <div class="row-pills-container d-flex flex-nowrap gap-2 pb-2 px-2" style="overflow-x: auto;">
                     <button v-for="(row, idx) in seatingRows" :key="idx" 
                         @click="selectRow(row)"
-                        class="btn rounded-pill px-3 border flex-shrink-0 d-flex align-items-center btn-sm"
+                        class="btn px-3 border flex-shrink-0 d-flex align-items-center btn-sm"
                         :class="activeRow?.id === row.id ? 'btn-primary' : 'btn-light'"
                     >
                         <span>Row {{ row.row_num }}</span>
@@ -118,7 +118,7 @@
                         <div v-show="!isRowConfirmed" class="d-none d-sm-block"></div>
                         <BaseButton 
                             :variant="isRowConfirmed ? 'outline-primary' : 'primary'" 
-                            class="w-100 w-sm-auto"
+                            class="px-5"
                             @click="confirmAttendance" 
                             :isLoading="isSaving"
                         >
@@ -233,6 +233,15 @@ watch(() => activeRowMonks.value, (newMonks) => {
 
 watch(() => selectedAbsentMonks.value, (newSelection) => {
     if (isSyncingSelection) return;
+
+    const permissionMonksInSelection = newSelection.filter(s => s.attendance?.status === 'permission');
+    if (permissionMonksInSelection.length > 0) {
+        isSyncingSelection = true;
+        selectedAbsentMonks.value = newSelection.filter(s => s.attendance?.status !== 'permission');
+        setTimeout(() => isSyncingSelection = false, 0);
+        return; // The watch will re-trigger with the clean selection
+    }
+
     activeRowMonks.value.forEach(monk => {
         // Do not override if the monk has an approved leave
         if (monk.attendance?.status === 'permission') return;

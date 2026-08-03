@@ -101,6 +101,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     const login = async (payload) => {
         try {
+            // Clear any stale tokens from previous incomplete logins
+            localStorage.removeItem('changePasswordToken');
+            localStorage.removeItem('otpSessionToken');
+            localStorage.removeItem('mfaType');
+
             if (!payload.email || !payload.password) throw new Error('Email and Password are required!')
             const response = await api.post('/auth/login', payload);
             const data = response.data?.data || response.data;

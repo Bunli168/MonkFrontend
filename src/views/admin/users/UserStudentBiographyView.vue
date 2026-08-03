@@ -7,7 +7,7 @@
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
                 <BaseButton variant="outline-success" class="d-flex align-items-center gap-2" @click="exportToCSV" :isLoading="isExporting">
-                    <FileDown :size="16" />
+                    <FileUp :size="16" />
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
 
@@ -97,7 +97,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { Search, User, BookOpen, FileDown } from '@lucide/vue';
+import { Search, User, BookOpen, FileUp } from '@lucide/vue';
 import api from '@/api/api';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
@@ -216,7 +216,8 @@ const exportToCSV = async () => {
             perPage: 10000,
             roleId: 4, // Students
             search: searchQuery.value || undefined,
-            kutId: selectedKut.value || undefined
+            kutId: selectedKut.value || undefined,
+            isActive: true
         };
         const response = await api.get('/users', { params });
         const records = response.data?.data || response.data || [];

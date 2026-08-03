@@ -185,7 +185,7 @@
 <script setup>
 const emit = defineEmits(['new', 'edit', 'import', 'preview-bulk']);
 import { useUserStore } from '@/stores/users/user.js';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { formatDate } from '@/utils/dateFormat';
 import { BadgeCheck, Info, User, KeyRound, Search, FileDown, Check, X, BookOpen } from '@lucide/vue';
 import UserDetailView from './UserDetailView.vue';
@@ -534,13 +534,14 @@ const confirmStatusChange = async () => {
     const newStatus = !originalStatus;
 
     const payload = {
-        isActive: newStatus
+        is_active: newStatus
     };
 
     const result = await userStore.updateUser(data.id, payload);
 
     if (result !== false) {
         data.isActive = newStatus;
+        userStore.fetchRoleStats(true, searchAndFilter.filters.value.isActive);
     }
 
     isUpdatingStatus.value = false;
@@ -549,11 +550,15 @@ const confirmStatusChange = async () => {
 };
 
 onMounted(async () => {
-    userStore.fetchRoleStats();
+    userStore.fetchRoleStats(true, searchAndFilter.filters.value.isActive);
     await Promise.all([
         userStore.getAllUsers(),
         userStore.getUserRoles()
     ]);
+});
+
+watch(() => searchAndFilter.filters.value.isActive, (newIsActive) => {
+    userStore.fetchRoleStats(true, newIsActive);
 });
 
 const yearOptions = [

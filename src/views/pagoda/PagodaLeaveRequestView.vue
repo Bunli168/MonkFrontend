@@ -40,6 +40,10 @@
                             <label class="form-label fw-medium">Reason for Leave</label>
                             <textarea class="form-control" v-model="formData.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium mt-2">Attachment (Optional)</label>
+                            <input type="file" class="form-control" @change="handleFileChange" accept="image/*" />
+                        </div>
                         <div class="col-12 d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-light border" @click="cancelForm">Cancel</button>
                             <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" :disabled="isSubmitting">
@@ -83,6 +87,14 @@
                             <span v-else>—</span>
                         </div>
                     </template>
+                    <template #attachment="{ data: row }">
+                        <div class="d-flex justify-content-start align-items-center">
+                            <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
+                                <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                            </a>
+                            <span v-else class="text-muted fst-italic">-</span>
+                        </div>
+                    </template>
                     <template #approved_by="{ data: row }">
                         <span v-if="row.Approver && row.status !== 'pending'" class="text-muted">
                             {{ row.Approver.UserProfile?.first_name_kh }} {{ row.Approver.UserProfile?.last_name_kh }}
@@ -96,7 +108,7 @@
             </div>
         </div>
 
-        <BaseModal v-model="showConfirmModal" title="Confirm Delete" size="sm">
+        <BaseModal v-model="showConfirmModal" title="Confirm Action" size="sm">
             <p class="mb-4 text-muted fw-medium">Are you sure you want to delete this leave request?</p>
             <div class="d-flex justify-content-end gap-2">
                 <BaseButton type="button" variant="outline" @click="showConfirmModal = false">Cancel</BaseButton>
@@ -105,6 +117,22 @@
                 </BaseButton>
             </div>
         </BaseModal>
+
+        <!-- Image Viewer Modal -->
+        <Teleport to="body">
+            <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true" ref="imageModalRef">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content border-0 shadow bg-transparent">
+                        <div class="modal-header border-0 pb-0 justify-content-end">
+                            <button type="button" class="btn-close btn-close-white shadow-none bg-white rounded-circle p-2 m-2" data-bs-dismiss="modal" @click="closeImageModal"></button>
+                        </div>
+                        <div class="modal-body text-center p-0">
+                            <img v-if="currentImageModalUrl" :src="currentImageModalUrl" class="img-fluid rounded shadow" style="max-height: 80vh;" alt="Attachment View" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </div>
 </template>
 
@@ -113,12 +141,13 @@ import { ref, computed, onMounted } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
-import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import { FileEdit, Trash2 } from '@lucide/vue';
+import * as bootstrap from 'bootstrap';
 
 const toast = useToastStore();
 const showForm = ref(false);
@@ -147,13 +176,29 @@ const today = new Date().toISOString().split('T')[0];
 const formData = ref({
     start_date: '',
     end_date: '',
-    reason: ''
+    reason: '',
+    image: null
 });
+
+// Image Viewer State
+const imageModalRef = ref(null);
+let imageModalInstance = null;
+const currentImageModalUrl = ref('');
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        formData.value.image = file;
+    } else {
+        formData.value.image = null;
+    }
+};
 
 const colDefs = computed(() => {
     return [
         { field: 'date_range', header: 'Date Range', sortable: false },
         { field: 'reason', header: 'Reason', sortable: false },
+        { field: 'attachment', header: 'Attachment', sortable: false },
         { field: 'status', header: 'Status', sortable: true, class: 'text-center' },
         { field: 'approved_by', header: 'Reviewed By', sortable: false },
         { field: 'actions', header: 'Actions', sortable: false, class: 'text-end' }
@@ -234,27 +279,53 @@ const executeDelete = async () => {
     }
 };
 
+const openImageModal = (url) => {
+    currentImageModalUrl.value = url;
+    if (!imageModalInstance && imageModalRef.value) {
+        imageModalInstance = new bootstrap.Modal(imageModalRef.value);
+    }
+    imageModalInstance?.show();
+};
+
+const closeImageModal = () => {
+    imageModalInstance?.hide();
+    setTimeout(() => {
+        currentImageModalUrl.value = '';
+    }, 300);
+};
+
 const cancelForm = () => {
     showForm.value = false;
     isEditing.value = false;
     editId.value = null;
-    formData.value = { start_date: '', end_date: '', reason: '' };
+    formData.value = {
+        start_date: '',
+        end_date: '',
+        reason: '',
+        image: null
+    };
 };
 
 const submitRequest = async () => {
     isSubmitting.value = true;
     try {
-        const payload = {
-            ...formData.value,
-            start_date: new Date(formData.value.start_date).toISOString().split('T')[0],
-            end_date: new Date(formData.value.end_date).toISOString().split('T')[0]
-        };
-        
+        const payloadData = new FormData();
+        payloadData.append('start_date', new Date(formData.value.start_date).toISOString().split('T')[0]);
+        payloadData.append('end_date', new Date(formData.value.end_date).toISOString().split('T')[0]);
+        payloadData.append('reason', formData.value.reason);
+        if (formData.value.image) {
+            payloadData.append('image', formData.value.image);
+        }
+
         if (isEditing.value) {
-            await api.put(`/leave-requests/${editId.value}`, payload);
+            await api.put(`/leave-requests/${editId.value}`, payloadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             toast.showToast('Leave request updated successfully', 'success');
         } else {
-            await api.post('/leave-requests', payload);
+            await api.post('/leave-requests', payloadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             toast.showToast('Leave request submitted successfully', 'success');
         }
         

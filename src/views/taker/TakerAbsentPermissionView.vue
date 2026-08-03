@@ -1,15 +1,15 @@
 <template>
     <div class="card" style="background-color: var(--surface-ground);">
         <!-- Filters Bar -->
-        <div class="mb-2 d-flex flex-wrap justify-content-end align-items-center gap-2 w-100">
+        <div class="mb-2 d-flex flex-wrap justify-content-center align-items-center gap-2 w-100">
             <div class="input-group flex-grow-1" style="min-width: 200px; max-width: 400px;">
                 <span class="input-group-text bg-white border-end-0 text-muted">
-                    <i class="fas fa-search"></i>
+                    <Search size="18" />
                 </span>
-                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search by name, kudi, phone..." v-model="searchQuery">
+                <input type="text" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name, kudi, phone..." v-model="searchQuery" style="outline: none; box-shadow: none;">
             </div>
             <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0" style="min-width: 120px;" @click="fetchData">
-                <i class="fas fa-sync-alt" :class="{ 'fa-spin': isLoading }"></i>
+                <RefreshCcw size="16" :class="{ 'fa-spin': isLoading }" />
                 Refresh
             </button>
         </div>
@@ -60,6 +60,15 @@
                             (Paid: ${{ row.totalPaid }})
                         </div>
                     </template>
+
+                    <template #image="{ data: row }">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <a v-if="row.leaveImages && row.leaveImages.length > 0" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.leaveImages[0]}`)" class="d-block" title="Click to view full image">
+                                <img :src="`http://localhost:3006${row.leaveImages[0]}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                            </a>
+                            <span v-else class="text-muted">-</span>
+                        </div>
+                    </template>
                     
                     <template #actions="{ data: row }">
                         <BaseActionMenu :items="getActionItems(row)" />
@@ -69,12 +78,13 @@
         </div>
         
         <!-- Detail Modal -->
+        <Teleport to="body">
         <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true" ref="detailModalRef">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-0 shadow">
                     <div class="modal-header border-bottom-0 pb-0">
                         <h5 class="modal-title fw-bold">Attendance Details - {{ selectedMonk?.name }}</h5>
-                        <button type="button" class="btn-close" @click="closeModal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" @click="closeModal"></button>
                     </div>
                     <div class="modal-body">
                         <div v-if="isFetchingDetails" class="text-center py-4">
@@ -93,6 +103,7 @@
                                         <th class="fw-medium">Date</th>
                                         <th class="fw-medium text-center">Status</th>
                                         <th class="fw-medium">Notes</th>
+                                        <th class="fw-medium text-center">Attachment</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,17 +117,42 @@
                                         <td class="small text-muted" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" :title="record.notes">
                                             {{ record.notes || '-' }}
                                         </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center align-items-center">
+                                                <a v-if="record.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${record.image_url}`)" class="d-block" title="Click to view full image">
+                                                    <img :src="`http://localhost:3006${record.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                                                </a>
+                                                <span v-else class="text-muted fst-italic">-</span>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="modal-footer border-top-0 pt-0">
-                        <button type="button" class="btn btn-light" @click="closeModal">Close</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" @click="closeModal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
+        </Teleport>
+
+        <!-- Image Viewer Modal -->
+        <Teleport to="body">
+        <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true" ref="imageModalRef">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow bg-transparent">
+                    <div class="modal-header border-0 pb-0 justify-content-end">
+                        <button type="button" class="btn-close btn-close-white shadow-none bg-white rounded-circle p-2 m-2" data-bs-dismiss="modal" @click="closeImageModal"></button>
+                    </div>
+                    <div class="modal-body text-center p-0">
+                        <img v-if="currentImageModalUrl" :src="currentImageModalUrl" class="img-fluid rounded shadow" style="max-height: 80vh;" alt="Attachment View" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        </Teleport>
     </div>
 </template>
 
@@ -126,7 +162,7 @@ import api from '@/api/api';
 import { useAuthStore } from '@/stores/auth';
 import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
-import { Eye, Banknote } from '@lucide/vue';
+import { Eye, Banknote, Image, Search, RefreshCcw } from '@lucide/vue';
 import * as bootstrap from 'bootstrap';
 
 const authStore = useAuthStore();
@@ -142,6 +178,11 @@ const selectedMonk = ref(null);
 const monkDetails = ref([]);
 const isFetchingDetails = ref(false);
 
+// Image Viewer State
+const imageModalRef = ref(null);
+let imageModalInstance = null;
+const currentImageModalUrl = ref('');
+
 const colDefs = computed(() => {
     const cols = [
         { field: 'name', header: 'Monk Name', sortable: true },
@@ -152,9 +193,10 @@ const colDefs = computed(() => {
         { field: 'phone', header: 'Phone', sortable: false },
         { field: 'absent', header: 'Absent', sortable: true, class: 'text-center' },
         { field: 'permission', header: 'Permission', sortable: true, class: 'text-center' },
+        { field: 'image', header: 'Attachment', sortable: false, class: 'text-center' },
         { field: 'fine', header: 'Net Fine', sortable: true, class: 'text-center' }
     ];
-    if ( authStore.isAttendanceTaker) {
+    if ( authStore.isAttendanceTaker || authStore.isAdmin || authStore.isSuperAdmin) {
         cols.push({ field: 'actions', header: 'Actions', sortable: false, class: 'text-end' });
     }
     return cols;
@@ -170,7 +212,7 @@ const getActionItems = (row) => {
         }
     ];
     
-    if (row.fine > 0) {
+    if (row.fine > 0 && authStore.isSuperAdmin) {
         items.push({
             label: 'Pay Fine',
             icon: Banknote,
@@ -269,6 +311,19 @@ const viewDetails = async (monk) => {
 
 const closeModal = () => {
     detailModalInstance?.hide();
+};
+
+// Image Viewer Modal Functions
+const openImageModal = (url) => {
+    currentImageModalUrl.value = url;
+    if (!imageModalInstance && imageModalRef.value) {
+        imageModalInstance = new bootstrap.Modal(imageModalRef.value);
+    }
+    imageModalInstance?.show();
+};
+
+const closeImageModal = () => {
+    imageModalInstance?.hide();
 };
 
 const fetchData = async () => {
