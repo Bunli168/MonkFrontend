@@ -1,18 +1,5 @@
 <template>
     <div class="card" style="background-color: var(--surface-ground);">
-        <!-- Filters Bar -->
-        <div class="mb-2 d-flex flex-wrap justify-content-center align-items-center gap-2 w-100">
-            <div class="input-group flex-grow-1" style="min-width: 200px; max-width: 400px;">
-                <span class="input-group-text bg-white border-end-0 text-muted">
-                    <Search size="18" />
-                </span>
-                <input type="text" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name, kudi, phone..." v-model="searchQuery" style="outline: none; box-shadow: none;">
-            </div>
-            <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0" style="min-width: 120px;" @click="fetchData">
-                <RefreshCcw size="16" :class="{ 'fa-spin': isLoading }" />
-                Refresh
-            </button>
-        </div>
 
         <div class="card border-0 shadow-sm">
             <div class="card-body p-0">
@@ -27,7 +14,8 @@
                 >
                     <template #name="{ data: row }">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                            <img v-if="row.avatar_url" :src="`http://localhost:3006${row.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm" style="width: 35px; height: 35px;" />
+                            <div v-else class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
                                 {{ row.name ? row.name.charAt(0) : 'U' }}
                             </div>
                             <span class="fw-medium">{{ row.name }}</span>
@@ -167,9 +155,16 @@ import * as bootstrap from 'bootstrap';
 
 const authStore = useAuthStore();
 const toast = useToastStore();
+
+const props = defineProps({
+    searchQuery: {
+        type: String,
+        default: ''
+    }
+});
+
 const allMonks = ref([]);
 const isLoading = ref(false);
-const searchQuery = ref('');
 
 // Details Modal State
 const detailModalRef = ref(null);
@@ -228,8 +223,8 @@ const getActionItems = (row) => {
 const filteredMonks = computed(() => {
     let filtered = allMonks.value.filter(m => m.absent > 0 || m.permission > 0 || m.pendingLeaves > 0);
     
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase();
+    if (props.searchQuery) {
+        const query = props.searchQuery.toLowerCase();
         filtered = filtered.filter(m => 
             (m.name && m.name.toLowerCase().includes(query)) ||
             (m.kudiNumber && String(m.kudiNumber).toLowerCase().includes(query)) ||
@@ -367,6 +362,11 @@ const fetchData = async () => {
 onMounted(() => {
     fetchData();
 });
+
+defineExpose({
+    fetchData
+});
+
 </script>
 
 <style scoped>

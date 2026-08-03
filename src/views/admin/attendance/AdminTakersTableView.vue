@@ -8,17 +8,17 @@
             
             <div class="d-flex align-items-center gap-2 ms-auto" style="width: 100%; max-width: 500px;">
                 <div class="position-relative flex-grow-1">
-                    <i class="fas fa-search position-absolute text-muted" style="left: 1.2rem; top: 50%; transform: translateY(-50%);"></i>
+                    <Search size="16" class="position-absolute text-muted" style="left: 1rem; top: 50%; transform: translateY(-50%);" />
                     <input 
                         v-model="searchQuery" 
                         type="text" 
-                        class="form-control rounded-pill bg-white border-0 shadow-sm py-2" 
-                        style="padding-left: 2.8rem;"
+                        class="form-control rounded border-0 shadow-sm py-2" 
+                        style="padding-left: 2.5rem;"
                         placeholder="Search by name, email, or phone..." 
                     />
                 </div>
-                <BaseButton @click="showCreateModal = true" variant="primary" class="fw-bold shadow-sm rounded-pill text-nowrap px-4 py-2">
-                    <i class="fas fa-plus me-1"></i> Add Taker
+                <BaseButton @click="showCreateModal = true" variant="primary" class="fw-bold shadow-sm rounded text-nowrap px-4 py-2 d-flex align-items-center">
+                    <Plus size="16" class="me-1" /> Add Taker
                 </BaseButton>
             </div>
         </div>
@@ -128,6 +128,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { Search, Plus } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';

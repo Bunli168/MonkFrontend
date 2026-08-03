@@ -4,7 +4,7 @@
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-3 rounded" style="background-color: var(--body-bg-color); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
             <div>
                 <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">
-                    Users Management / គ្រប់គ្រងអ្នកប្រើប្រាស់
+                    Users Management <span class="d-none d-md-inline">/ គ្រប់គ្រងអ្នកប្រើប្រាស់</span>
                 </h5>
             </div>
         </div>
@@ -15,43 +15,43 @@
                 <Tab value="all-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <UserRoundCheck style="color: var(--success-color);" :size="16" />
-                        All Verified Users
+                        <span :class="{'d-none d-md-inline': activeTab !== 'all-users'}">All Verified Users</span>
                     </div>
                 </Tab>
                 <Tab v-if="authStore.isMonk" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <ClipboardList style="color: var(--primary-color);" :size="16" />
-                        <span>{{ authStore.isSuperAdmin ? 'ប្រវត្តិរូបមេកុដិ (Mekudi Biography)' : 'ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)' }}</span>
+                        <span :class="{'d-none d-md-inline': activeTab !== 'my-biography'}">{{ authStore.isSuperAdmin ? 'ប្រវត្តិរូបមេកុដិ' : 'ប្រវត្តិរូបរបស់ខ្ញុំ' }}</span>
                     </div>
                 </Tab>
                 <Tab v-if="false" value="all-pending-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <MailWarning style="color: var(--warning-color);" :size="16" />
-                        Pending Users
+                        <span :class="{'d-none d-md-inline': activeTab !== 'all-pending-users'}">Pending Users</span>
                     </div>
                 </Tab>
                 <Tab value="biography-surveys" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <BookOpen style="color: var(--primary-color);" :size="16" />
-                        ប្រវត្តិព្រះសង្ឃ
+                        <span :class="{'d-none d-md-inline': activeTab !== 'biography-surveys'}">ប្រវត្តិព្រះសង្ឃ</span>
                     </div>
                 </Tab>
                 <Tab value="student-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <GraduationCap style="color: var(--info-color, #0ea5e9);" :size="16" />
-                        ប្រវត្តិរូបនិស្សិត
+                        <span :class="{'d-none d-md-inline': activeTab !== 'student-biography'}">ប្រវត្តិរូបនិស្សិត</span>
                     </div>
                 </Tab>
                 <Tab value="user-form" v-show="activeTab === 'user-form'">
                     <div class="d-flex align-items-center gap-2">
                         <UserPlus style="color: var(--primary-color);" :size="16" />
-                        Add New User
+                        <span :class="{'d-none d-md-inline': activeTab !== 'user-form'}">Add New User</span>
                     </div>
                 </Tab>
                 <Tab value="bulk-preview" v-show="activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <FileDown style="color: var(--primary-color);" :size="16" />
-                        Preview Import
+                        <span :class="{'d-none d-md-inline': activeTab !== 'bulk-preview'}">Preview Import</span>
                     </div>
                 </Tab>
             </TabList>

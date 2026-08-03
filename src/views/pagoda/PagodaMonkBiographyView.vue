@@ -6,11 +6,11 @@
         
         <div v-if="!isLoading" class="w-100" style="max-width: 1000px;">
             <div v-if="!hideHeader" class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
-                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title || `Monk Profile Summary / ប្រវត្តិរូបសង្ខេប (${isSamanera ? 'សាមណេរ' : 'ភិក្ខុ'})` }}</h5>
+                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title || `Monk Profile Summary ` }}<span class="d-none d-md-inline">{{ title ? '' : `/ ប្រវត្តិរូបសង្ខេប (${isSamanera ? 'សាមណេរ' : 'ភិក្ខុ'})` }}</span></h5>
             </div>
 
             <!-- Summary View (Read Only) - Modern Dashboard Style -->
-            <div v-if="!isEditing" class="mx-auto w-100 p-4 biography-container" style="border-radius: 12px; max-width: 1000px;">
+            <div v-if="!isEditing" class="card mx-auto w-100 p-3 p-md-4 biography-container" style="background-color: var(--body-bg-color); border-radius: 12px; max-width: 1000px; border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                 
                 <!-- Header with Avatar and Name -->
                 <div class="d-flex flex-wrap align-items-center mb-4 gap-3">
@@ -24,18 +24,18 @@
                         <h4 class="mb-1 fw-bold" style="color: var(--text-heading-color);">{{ form.surname_name || 'N/A' }}</h4>
                         <div class="text-secondary" style="font-size: 0.95rem;">Ordained Name: <span class="text-primary">{{ form.ordained_name || '-' }}</span></div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: var(--text-heading-color); border-color: var(--border-color);">
+                    <div class="d-flex gap-2 w-100 w-sm-auto mt-2 mt-sm-0">
+                        <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: var(--text-heading-color); border-color: var(--border-color);" class="w-100 w-sm-auto">
                             Edit / កែសម្រួល
                         </BaseButton>
                     </div>
                 </div>
 
                 <!-- 2x2 Grid of Cards -->
-                <div class="row g-4">
+                <div class="row g-3 g-md-4">
                     <!-- Personal Identity -->
-                    <div class="col-md-6">
-                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px; background-color: var(--surface-ground);">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Personal Identity / អត្តសញ្ញាណបុគ្គល</h6>
                                 <div class="mb-2 text-secondary">Nationality: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.nationality || 'N/A' }}</span></div>
@@ -46,8 +46,8 @@
                     </div>
 
                     <!-- Place of Birth -->
-                    <div class="col-md-6">
-                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px; background-color: var(--surface-ground);">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Place of Birth / ទីកន្លែងកំណើត</h6>
                                 <div class="mb-2 text-secondary">Province: <span class="fw-medium" style="color: var(--text-heading-color);">{{ getLocationName(pobLoc.provinces, form.pob_province_id, 'province') || 'N/A' }}</span></div>
@@ -59,8 +59,8 @@
                     </div>
 
                     <!-- Ordination Details -->
-                    <div class="col-md-6">
-                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px; background-color: var(--surface-ground);">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Ordination Details / ព័ត៌មាន{{ isSamanera ? 'បព្វជ្ជា' : 'ឧបសម្បទា' }}</h6>
                                 <div class="row">
@@ -82,8 +82,8 @@
                     </div>
 
                     <!-- Current Address -->
-                    <div class="col-md-6">
-                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px;">
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 border-0 biography-card" style="border-radius: 8px; background-color: var(--surface-ground);">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-3" style="color: #026bb4;">Current Address / អាសយដ្ឋានបច្ចុប្បន្ន</h6>
                                 <div class="mb-2 text-secondary">Wat / Pagoda: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.current_wat || 'N/A' }}</span></div>
@@ -97,7 +97,7 @@
 
             </div>
 
-            <div v-else :class="['mx-auto w-100', hideHeader ? '' : 'card p-4']" :style="hideHeader ? { paddingBottom: '1rem' } : { backgroundColor: 'var(--body-bg-color)', borderRadius: 'var(--border-radius)', border: '1px solid var(--border-color, rgba(0,0,0,0.06))', maxWidth: '1000px' }">
+            <div v-else :class="['mx-auto w-100', hideHeader ? '' : 'card p-3 p-md-4']" :style="hideHeader ? { paddingBottom: '1rem' } : { backgroundColor: 'var(--body-bg-color)', borderRadius: 'var(--border-radius)', border: '1px solid var(--border-color, rgba(0,0,0,0.06))', maxWidth: '1000px' }">
                 <h5 v-if="!hideHeader" class="fw-bold mb-4 text-primary">Biography Survey / ប្រវត្តិរូបសង្ខេប ({{ isSamanera ? 'សាមណេរ' : 'ភិក្ខុ' }})</h5>
                 
                 <form @submit.prevent="currentStep === 5 ? saveSurvey() : currentStep++">
@@ -132,11 +132,11 @@
                         <div class="row g-4">
                             <div class="col-12 col-md-6">
                                 <label class="form-label" style="color: var(--text-color);">Surname-Name (គោត្តនាម-នាម) - ខ្មែរ <span class="text-danger">*</span></label>
-                                <BaseInput v-model="form.surname_name" placeholder="E.g., ឈួន ស៊ីណា" :required="currentStep === 1" />
+                                <BaseInput v-model="form.surname_name" placeholder="E.g., ភី ប៊ុនលិ" :required="currentStep === 1" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label" style="color: var(--text-color);">Surname-Name (គោត្តនាម-នាម) - Latin <span class="text-danger">*</span></label>
-                                <BaseInput v-model="form.latin_name" placeholder="E.g., CHHOUN SINA" :required="currentStep === 1" />
+                                <BaseInput v-model="form.latin_name" placeholder="E.g., PHI BUNLICH" :required="currentStep === 1" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label" style="color: var(--text-color);">Nationality (សញ្ជាតិ) <span class="text-danger">*</span></label>

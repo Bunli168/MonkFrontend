@@ -7,19 +7,19 @@
                     <Tab value="profile">
                         <div class="d-flex align-items-center gap-2">
                             <UserRoundPen :size="16" />
-                            Profile
+                            <span :class="{'d-none d-md-inline': activeTab !== 'profile'}">Profile</span>
                         </div>
                     </Tab>
                     <Tab value="password">
                         <div class="d-flex align-items-center gap-2">
                             <KeyRound style="color: var(--danger-color);" :size="16" />
-                            Change Password
+                            <span :class="{'d-none d-md-inline': activeTab !== 'password'}">Change Password</span>
                         </div>
                     </Tab>
                     <Tab value="appearance">
                         <div class="d-flex align-items-center gap-2">
                             <SunMoon style="color: var(--success-color);" :size="16" />
-                            Appearance
+                            <span :class="{'d-none d-md-inline': activeTab !== 'appearance'}">Appearance</span>
                         </div>
                     </Tab>
 

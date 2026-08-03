@@ -17,20 +17,20 @@
                     <Tab value="attendance">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-calendar-check" style="color: var(--primary-color);"></i>
-                            Master Attendance
+                            <span :class="{'d-none d-md-inline': activeTab !== 'attendance'}">Master Attendance</span>
                         </div>
                     </Tab>
 
                     <Tab value="report">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-history" style="color: var(--info-color, #0dcaf0);"></i>
-                            Payment History
+                            <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
                         </div>
                     </Tab>
                     <Tab value="leave">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-envelope-open-text" style="color: var(--warning-color, #ffc107);"></i>
-                            Leave Requests
+                            <span :class="{'d-none d-md-inline': activeTab !== 'leave'}">Leave Requests</span>
                             <span
                                 v-if="leaveViewRef?.pendingCount > 0"
                                 class="badge rounded-pill ms-1"
@@ -41,7 +41,7 @@
                     <Tab value="takers">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-users-cog" style="color: var(--success-color, #198754);"></i>
-                            Attendance Takers
+                            <span :class="{'d-none d-md-inline': activeTab !== 'takers'}">Attendance Takers</span>
                         </div>
                     </Tab>
                 </TabList>

@@ -51,6 +51,16 @@
                                 <strong class="text-secondary me-2">Year:</strong> {{ user?.UserProfile?.university_year ? 'Year ' + user?.UserProfile?.university_year : (user?.profile?.university_year ? 'Year ' + user?.profile?.university_year : 'N/A') }}
                             </li>
                             <li class="list-group-item px-0 py-1 border-0">
+                                <strong class="text-secondary me-2">Seating:</strong>
+                                <span v-if="user?.UserProfile?.seating_row_id || user?.profile?.seating_row_id">
+                                    Row {{ user?.profile?.seatingRow?.row_num || user?.UserProfile?.seating_row_id || user?.profile?.seating_row_id }}
+                                    <span v-if="user?.UserProfile?.seat_number || user?.profile?.seat_number">
+                                        (Seat {{ user?.UserProfile?.seat_number || user?.profile?.seat_number }})
+                                    </span>
+                                </span>
+                                <span v-else class="text-muted">Not Assigned</span>
+                            </li>
+                            <li class="list-group-item px-0 py-1 border-0">
                                 <strong class="text-secondary d-block mb-1">Wat Origin / មកពិវត្តណា:</strong>
                                 <div class="ps-3 text-muted" style="font-size: 0.9rem;">
                                     <div><strong class="text-secondary">From Wat:</strong> {{ user?.UserProfile?.from_wat || user?.profile?.from_wat || 'N/A' }}</div>

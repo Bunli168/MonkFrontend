@@ -1,13 +1,13 @@
 <template>
     <div style="background-color: var(--surface-ground);">
-        <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
-            <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                
-                <BaseFilter v-model="activeFilter" :options="filterOptions" wrap />
+        <div class="mb-3 d-flex flex-wrap flex-lg-nowrap align-items-center justify-content-between gap-2 w-100">
+            <!-- Left Side: Filters -->
+            <div class="d-flex align-items-center w-100 w-lg-auto">
+                <BaseFilter v-model="activeFilter" :options="filterOptions" :wrap="true" />
             </div>
             
-            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
-                
+            <!-- Right Side: Search, Status, Buttons -->
+            <div class="d-flex flex-wrap flex-md-nowrap align-items-center gap-2 justify-content-end w-100 w-lg-auto">
                 <div class="search-input">
                     <BaseInput 
                         v-model="searchAndFilter.searchQuery.value" 
@@ -16,8 +16,8 @@
                         clearable
                     />
                 </div>
-
-                <div class="status-select">
+        
+                <div class="status-select flex-shrink-0">
                     <BaseSelect 
                         v-model="searchAndFilter.filters.value.isActive" 
                         :options="statusOptions"
@@ -35,8 +35,8 @@
                         </template>
                     </BaseSelect>
                 </div>
-
-                <div class="kut-select" v-if="authStore.isSuperAdmin">
+            
+                <div class="kut-select flex-shrink-0" v-if="authStore.isSuperAdmin">
                     <BaseSelect 
                         v-model="searchAndFilter.filters.value.kutId" 
                         :options="kutOptions"
@@ -44,17 +44,17 @@
                     />
                 </div>
                 
-
-
-                <input type="file" accept=".csv" ref="csvInputRef" @change="onFileSelected" style="display: none;" />
-                <BaseButton :disabled="userStore.isLoading" @click="triggerFileInput" variant="outline-primary"
-                    class="btn d-flex align-items-center gap-2 text-nowrap" v-tooltip="'Import CSV'">
-                    <FileDown class="text-success" :size="16" />
-                </BaseButton>
-                <BaseButton :disabled="userStore.isLoading" @click="$emit('new')"
-                    class="btn btn-primary text-nowrap">
-                    Add New User
-                </BaseButton>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <input type="file" accept=".csv" ref="csvInputRef" @change="onFileSelected" style="display: none;" />
+                    <BaseButton :disabled="userStore.isLoading" @click="triggerFileInput" variant="outline-primary"
+                        class="btn d-flex align-items-center justify-content-center px-3" v-tooltip="'Import CSV'">
+                        <FileDown class="text-success" :size="16" />
+                    </BaseButton>
+                    <BaseButton :disabled="userStore.isLoading" @click="$emit('new')"
+                        class="btn btn-primary text-nowrap d-flex align-items-center justify-content-center px-4">
+                        Add New User
+                    </BaseButton>
+                </div>
             </div>
         </div>
         <BaseTable :columns="colDefs" :rows="userStore.users" :loading="userStore.isLoading"
@@ -87,6 +87,16 @@
 
             <template #kut="{ data }">
                 <span>{{ data?.profile?.kut?.name || data?.profile?.kut?.number || '-' }}</span>
+            </template>
+
+            <template #rowAndSeat="{ data }">
+                <span v-if="data?.profile?.seatingRowId || data?.profile?.seating_row_id">
+                    Row {{ data?.profile?.seatingRow?.row_num || data?.profile?.seatingRowId || data?.profile?.seating_row_id }} 
+                    <span v-if="data?.profile?.seatNumber || data?.profile?.seat_number">
+                        (Seat {{ data?.profile?.seatNumber || data?.profile?.seat_number }})
+                    </span>
+                </span>
+                <span v-else class="text-muted">-</span>
             </template>
 
             <template #role="{ data }">
@@ -582,13 +592,15 @@ const colDefs = computed(() => {
     ];
     cols.push(
         { field: 'kut', header: 'Kudi' },
+        { field: 'rowAndSeat', header: 'Row/Seat' },
         { field: 'phone', header: 'Phone Number' },
         { field: 'school', header: 'School / University' },
         { field: 'year', header: 'Year' },
         { field: 'action', header: '', sortable: false }
     );
     return cols;
-});</script>
+});
+</script>
 
 <style scoped>
 .user-profile-avatar {
@@ -624,7 +636,7 @@ const colDefs = computed(() => {
         width: 180px;
     }
     .search-input {
-        width: 300px;
+        width: 350px;
     }
 }
 </style>

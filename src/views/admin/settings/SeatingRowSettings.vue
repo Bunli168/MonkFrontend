@@ -377,7 +377,7 @@ const getUsersForRow = (rowId) => {
         const profile = user.UserProfile || user.profile || {};
         const rowValue = profile.seating_row_id || profile.seatingRowId || user.seating_row_id || user.seatingRowId;
         const roleName = (user.Role?.name || user.role?.name || '').toUpperCase().replace(/\s+/g, '');
-        const isManagement = ['ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(roleName);
+        const isManagement = ['ATTENDANCETAKER', 'SUPERADMIN'].includes(roleName);
         return Number(rowValue) === Number(rowId) && !isManagement;
     });
 };
@@ -388,7 +388,7 @@ const unassignedUsers = computed(() => {
         const rowValue = profile.seating_row_id || profile.seatingRowId || user.seating_row_id || user.seatingRowId;
         const roleName = (user.Role?.name || user.role?.name || '').toUpperCase().replace(/\s+/g, '');
         
-        const isManagement = ['ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(roleName);
+        const isManagement = ['ATTENDANCETAKER', 'SUPERADMIN'].includes(roleName);
         
         return !rowValue && !isManagement;
     }).sort((a, b) => {

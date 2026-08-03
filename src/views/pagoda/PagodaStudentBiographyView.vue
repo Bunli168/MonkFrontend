@@ -9,7 +9,7 @@
             </div>
 
             <!-- Summary View (Read Only) -->
-            <div v-if="!isEditing" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+            <div v-if="!isEditing" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="user-profile-avatar d-flex align-items-center justify-content-center text-muted rounded-circle overflow-hidden border"
                         style="width: 80px; height: 80px; background-color: rgba(0,0,0,0.03);">
@@ -120,7 +120,7 @@
                     <div class="flex-grow-1 w-100">
 
                         <!-- Step 1: Personal Identity -->
-                        <div v-show="currentStep === 1" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <div v-show="currentStep === 1" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                             <div class="d-flex justify-content-between align-items-start mb-4">
                                 <h6 class="fw-bold mb-0" style="color: var(--text-heading-color);">Personal Identity / អត្តសញ្ញាណបុគ្គល</h6>
                                 <div>
@@ -130,7 +130,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Surname-Name (គោត្តនាម-នាម) <span class="text-danger">*</span></label>
-                                    <BaseInput v-model="form.surname_name" preventNumbers placeholder="E.g., CHHOUN SINA" :required="currentStep === 1" />
+                                    <BaseInput v-model="form.surname_name" preventNumbers placeholder="E.g., PHI BUNLI" :required="currentStep === 1" />
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">Nationality (សញ្ជាតិ) <span class="text-danger">*</span></label>
@@ -149,7 +149,7 @@
                         </div>
 
                         <!-- Step 2: Place of Birth -->
-                        <div v-show="currentStep === 2" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <div v-show="currentStep === 2" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                             <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Place of Birth / ទីកន្លែងកំណើត</h6>
                             
                             <div class="row g-3">
@@ -173,7 +173,7 @@
                         </div>
 
                         <!-- Step 3: Education -->
-                        <div v-show="currentStep === 3" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <div v-show="currentStep === 3" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                             <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Education / ការសិក្សា</h6>
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
@@ -208,7 +208,7 @@
                         </div>
 
                         <!-- Step 4: Parents & Family -->
-                        <div v-show="currentStep === 4" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <div v-show="currentStep === 4" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                             <h6 class="fw-bold mb-4" style="color: var(--text-heading-color);">Parents & Family / ព័ត៌មានឪពុកម្ដាយ</h6>
                             <div class="row g-3">
                                 <div class="col-12 mb-1">

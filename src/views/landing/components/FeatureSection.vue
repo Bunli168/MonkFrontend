@@ -201,13 +201,13 @@ const bentoColumns = [
     [
         {
             icon: Presentation,
-            title: 'Classroom Management',
-            description: 'Organize and manage classrooms efficiently. Track attendance and assignments.'
+            title: 'Leader Management',
+            description: 'Organize and manage members efficiently.'
         },
         {
             icon: BarChart3,
             title: 'Academic Reporting',
-            description: 'Generate, manage, and distribute student performance reports securely.'
+            description: 'Generate, manage, and distribute performance reports securely.'
         },
         {
             icon: Users,

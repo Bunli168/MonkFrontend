@@ -2,9 +2,9 @@
     <div class="d-flex flex-column gap-3">
         <div>
             <h5 class="d-flex align-items-center gap-2 mb-0">
-                <KeyRound :size="20" class="text-danger" /> ប្តូរពាក្យសម្ងាត់ (Change Password)
+                <KeyRound :size="20" class="text-danger" /> ប្តូរពាក្យសម្ងាត់ <span class="d-none d-md-inline">(Change Password)</span>
             </h5>
-            <p class="text-muted small mb-0 mt-1">ដើម្បីសុវត្ថិភាពគណនី សូមប្រើពាក្យសម្ងាត់ដែលមានភាពស្មុគស្មាញ និងមិនចែករំលែកទៅអ្នកដទៃ។</p>
+            <p class="text-muted small mb-0 mt-1 d-none d-md-block">ដើម្បីសុវត្ថិភាពគណនី សូមប្រើពាក្យសម្ងាត់ដែលមានភាពស្មុគស្មាញ និងមិនចែករំលែកទៅអ្នកដទៃ។</p>
         </div>
         <div class="main-divider"></div>
 
@@ -15,13 +15,13 @@
                     <ShieldAlert :size="20" />
                 </div>
                 <div>
-                    <h6 class="mb-1 fw-semibold">លក្ខខណ្ឌពាក្យសម្ងាត់ (Password Requirements)</h6>
-                    <p class="mb-0 text-muted small">ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៨ តួ អក្សរធំ លេខ និងសញ្ញាពិសេស។</p>
+                    <h6 class="mb-1 fw-semibold">លក្ខខណ្ឌពាក្យសម្ងាត់ <span class="d-none d-md-inline">(Password Requirements)</span></h6>
+                    <p class="mb-0 text-muted small d-none d-md-block">ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៨ តួ អក្សរធំ លេខ និងសញ្ញាពិសេស។</p>
                 </div>
             </div>
             <div class="change-pwd-body">
                 <div class="mb-3">
-                    <label class="form-label small fw-medium mb-1">ពាក្យសម្ងាត់បច្ចុប្បន្ន (Current Password)</label>
+                    <label class="form-label small fw-medium mb-1">ពាក្យសម្ងាត់បច្ចុប្បន្ន <span class="d-none d-md-inline">(Current Password)</span></label>
                     <BaseInput
                         type="password"
                         v-model="cpForm.currentPassword"
@@ -30,7 +30,7 @@
                     />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label small fw-medium mb-1">ពាក្យសម្ងាត់ថ្មី (New Password)</label>
+                    <label class="form-label small fw-medium mb-1">ពាក្យសម្ងាត់ថ្មី <span class="d-none d-md-inline">(New Password)</span></label>
                     <BaseInput
                         type="password"
                         v-model="cpForm.newPassword"
@@ -39,7 +39,7 @@
                     />
                 </div>
                 <div class="mb-4">
-                    <label class="form-label small fw-medium mb-1">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី (Confirm New Password)</label>
+                    <label class="form-label small fw-medium mb-1">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី <span class="d-none d-md-inline">(Confirm New Password)</span></label>
                     <BaseInput
                         type="password"
                         v-model="cpForm.confirmPassword"
@@ -49,7 +49,7 @@
                 </div>
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-2 border-top">
                     <span class="text-muted small d-flex align-items-center gap-1">
-                        ⚠️ <span class="text-danger fw-medium">ចំណាំ៖</span> Session លើឧបករណ៍ផ្សេងទៀតនឹងត្រូវបញ្ចប់ (Logout) ដោយស្វ័យប្រវត្តិ។
+                        ⚠️ <span class="text-danger fw-medium">ចំណាំ៖</span> Session លើឧបករណ៍ផ្សេងទៀតនឹងត្រូវបញ្ចប់ <span class="d-none d-md-inline">(Logout)</span> ដោយស្វ័យប្រវត្តិ។
                     </span>
                     <BaseButton
                         @click="handleChangePassword"

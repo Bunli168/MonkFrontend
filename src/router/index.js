@@ -153,6 +153,12 @@ const routes = [
 				meta: { title: 'Take Attendance', roles: ['ATTENDANCETAKER', 'SuperAdmin'] }
 			},
 			{
+				path: 'scan-attendance',
+				name: 'pagoda-self-scan',
+				component: () => import('@/views/pagoda/PagodaSelfScanView.vue'),
+				meta: { title: 'Scan Attendance', roles: ['MONK', 'STUDENT'] }
+			},
+			{
 				path: 'taker/absences',
 				name: 'taker-absent-permission',
 				component: () => import('@/views/taker/TakerAbsentPermissionView.vue'),
@@ -244,7 +250,7 @@ const routes = [
 				path: 'taker/management',
 				name: 'dashboard-taker-management',
 				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Member Attendance', roles: ['ATTENDANCETAKER', 'ADMIN'] }
+				meta: { title: 'Attendance', roles: ['ATTENDANCETAKER', 'ADMIN'] }
 			},
 			{
 				path: 'leave-requests',

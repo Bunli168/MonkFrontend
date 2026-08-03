@@ -5,15 +5,15 @@
       <!-- Header Area -->
       <div class="d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center mb-4 gap-3">
         <div class="flex-grow-1" style="min-width: 0;">
-          <h3 class="fw-bold mb-1 d-flex flex-wrap align-items-baseline gap-1 gap-sm-2" style="color: var(--text-heading-color); word-break: break-word;">
-            <span>Attendance & Seating</span>
-            <span class="text-primary fs-5 fs-sm-4">/ វត្តមាន និង កៅអី</span>
+          <h3 class="fw-bold mb-1 d-block d-sm-flex align-items-baseline gap-1 gap-sm-2" style="color: var(--text-heading-color); word-break: break-word;">
+            <span class="d-block">Attendance & Seating</span>
+            <span class="text-primary fs-5 fs-sm-4 d-block mt-1 mt-sm-0">/ វត្តមាន និង កៅអី</span>
           </h3>
           <p class="text-muted mb-0 subtitle small" style="word-break: break-word;">Manage your seating registration and absence permissions.</p>
         </div>
-        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end w-100 w-lg-auto mt-3 mt-lg-0">
           <!-- Button Register Seat -->
-          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill">
+          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill w-100 w-sm-auto">
             <Armchair :size="18" class="flex-shrink-0 text-primary" />
             <span class="text-truncate fw-medium" style="max-width: 250px;">
               {{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}
@@ -21,7 +21,7 @@
           </BaseButton>
           
           <!-- Button Leave Request -->
-          <BaseButton type="button" @click="handleLeaveRequestClick" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm">
+          <BaseButton type="button" @click="handleLeaveRequestClick" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm w-100 w-sm-auto">
             <CalendarRange :size="18" class="flex-shrink-0" />
             <span class="fw-medium">Leave Request / ស្នើសុំច្បាប់</span>
           </BaseButton>
@@ -29,26 +29,32 @@
       </div>
 
       <!-- Summary Cards -->
-      <div v-if="summary" class="d-flex flex-wrap gap-2 mb-3">
+      <div v-if="summary" class="row g-2 mb-3">
         <!-- Permission Count -->
-        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-primary-rgb), 0.3) !important;">
-          <CalendarRange class="text-primary" :size="18" />
-          <span class="small fw-medium text-muted">Permission:</span>
-          <span class="fw-bold text-dark">{{ summary.permission || 0 }} <small class="text-muted fw-normal">days</small></span>
+        <div class="col-12 col-md-4">
+          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-primary-rgb), 0.3) !important;">
+            <CalendarRange class="text-primary" :size="18" />
+            <span class="small fw-medium text-muted">Permission:</span>
+            <span class="fw-bold text-dark text-nowrap">{{ summary.permission || 0 }} <small class="text-muted fw-normal">days</small></span>
+          </div>
         </div>
         
         <!-- Absent Count -->
-        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-danger-rgb), 0.3) !important;">
-          <AlertCircle class="text-danger" :size="18" />
-          <span class="small fw-medium text-muted">Absent:</span>
-          <span class="fw-bold text-dark">{{ summary.absent || 0 }} <small class="text-muted fw-normal">days</small></span>
+        <div class="col-12 col-md-4">
+          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-danger-rgb), 0.3) !important;">
+            <AlertCircle class="text-danger" :size="18" />
+            <span class="small fw-medium text-muted">Absent:</span>
+            <span class="fw-bold text-dark text-nowrap">{{ summary.absent || 0 }} <small class="text-muted fw-normal">days</small></span>
+          </div>
         </div>
 
         <!-- Fine Amount -->
-        <div class="px-3 py-2 border bg-white d-flex align-items-center gap-2 shadow-sm" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-warning-rgb), 0.3) !important; background-color: #fffdf5 !important;">
-          <Coins style="color: #b8860b;" :size="18" />
-          <span class="small fw-medium text-muted">Fine:</span>
-          <span class="fw-bold text-dark"><small class="text-muted fw-normal">$</small>{{ Number(summary.fine || 0).toLocaleString() }}</span>
+        <div class="col-12 col-md-4">
+          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-warning-rgb), 0.3) !important; background-color: #fffdf5 !important;">
+            <Coins style="color: #b8860b;" :size="18" />
+            <span class="small fw-medium text-muted">Fine:</span>
+            <span class="fw-bold text-dark text-nowrap"><small class="text-muted fw-normal">$</small>{{ Number(summary.fine || 0).toLocaleString() }}</span>
+          </div>
         </div>
       </div>
 
@@ -59,13 +65,13 @@
             <Tab value="absences" class="py-2 px-3">
               <div class="d-flex align-items-center gap-2 fw-medium text-nowrap">
                 <AlertCircle style="color: var(--danger-color);" :size="16" class="flex-shrink-0" />
-                <span>Absent & Permission / អវត្តមាន និង ច្បាប់</span>
+                <span :class="{'d-none d-md-inline': activeTab !== 'absences'}">Absent & Permission / អវត្តមាន និង ច្បាប់</span>
               </div>
             </Tab>
             <Tab value="leave-requests" class="py-2 px-3">
               <div class="d-flex align-items-center gap-2 fw-medium text-nowrap">
                 <CalendarRange style="color: var(--primary-color);" :size="16" class="flex-shrink-0" />
-                <span>Leave Request History / ប្រវត្តិនៃការសុំច្បាប់</span>
+                <span :class="{'d-none d-md-inline': activeTab !== 'leave-requests'}">Leave Request History / ប្រវត្តិនៃការសុំច្បាប់</span>
               </div>
             </Tab>
           </TabList>

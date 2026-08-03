@@ -382,7 +382,7 @@ const navItems = computed(() => {
         { id: 1, label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
         { id: 2, label: 'Users', link: '/dashboard/user', icon: Users },
         { id: 4, label: 'Attendance Management', link: '/dashboard/attendance', icon: Calendar, roles: ['SuperAdmin', 'MEKUDI'] },
-        { id: 11, label: 'Member Attendance', link: '/dashboard/taker/management', icon: ClipboardList, roles: ['ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
+        { id: 11, label: 'Attendance', link: '/dashboard/taker/management', icon: ClipboardList, roles: ['ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
         // { id: 12, label: 'Leave Requests', link: '/dashboard/leave-requests', icon: FileText, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
         { id: 10, label: 'System Settings', link: '/dashboard/system-settings', icon: Settings2, roles: ['SuperAdmin'] },
         { id: 9, label: 'Settings', link: '/dashboard/settings', icon: Settings },

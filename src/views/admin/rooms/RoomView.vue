@@ -3,57 +3,57 @@
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2"
             style="background-color: var(--surface-ground);">
             <div>
-                <TabList>
+            <TabList>
                     <Tab value="room"
                         :disabled="['room-form', 'room-session-form', 'room-schedule-form'].includes(activeTab)">
                         <div class="d-flex align-items-center gap-2">
                             <School style="color: var(--success-color);" :size="16" />
-                            All Rooms
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room'}">All Rooms</span>
                         </div>
                     </Tab>
                     <Tab value="room-planner"
                         :disabled="['room-form', 'room-session-form', 'room-schedule-form'].includes(activeTab)">
                         <div class="d-flex align-items-center gap-2">
                             <CalendarDays style="color: var(--success-color);" :size="16" />
-                            Planner
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-planner'}">Planner</span>
                         </div>
                     </Tab>
                     <Tab value="room-schedule"
                         :disabled="['room-form', 'room-session-form', 'room-schedule-form'].includes(activeTab)">
                         <div class="d-flex align-items-center gap-2">
                             <CalendarCheck style="color: var(--success-color);" :size="16" />
-                            Events
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-schedule'}">Events</span>
                         </div>
                     </Tab>
                     <Tab value="room-booking-requests"
                         :disabled="['room-form', 'room-session-form', 'room-schedule-form'].includes(activeTab)">
                         <div class="d-flex align-items-center gap-2">
                             <ClipboardList style="color: var(--warning-color);" :size="16" />
-                            Booking Requests
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-booking-requests'}">Booking Requests</span>
                         </div>
                     </Tab>
                     <Tab value="room-form" v-show="activeTab === 'room-form'">
                         <div class="d-flex align-items-center gap-2">
                             <FileSignature style="color: var(--primary-color);" :size="16" />
-                            {{ editingRoom ? 'Edit Room' : 'New Room' }}
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-form'}">{{ editingRoom ? 'Edit Room' : 'New Room' }}</span>
                         </div>
                     </Tab>
                     <Tab value="room-session-form" v-show="activeTab === 'room-session-form'">
                         <div class="d-flex align-items-center gap-2">
                             <FileSignature style="color: var(--primary-color);" :size="16" />
-                            {{ editingSession ? 'Edit Session' : 'New Session' }}
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-session-form'}">{{ editingSession ? 'Edit Session' : 'New Session' }}</span>
                         </div>
                     </Tab>
                     <Tab value="room-schedule-form" v-show="activeTab === 'room-schedule-form'">
                         <div class="d-flex align-items-center gap-2">
                             <FileSignature style="color: var(--primary-color);" :size="16" />
-                            {{ editingSchedule ? 'Edit Event' : 'New Event' }}
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-schedule-form'}">{{ editingSchedule ? 'Edit Event' : 'New Event' }}</span>
                         </div>
                     </Tab>
                     <Tab value="room-detail" v-show="activeTab === 'pagoda-room-detail'">
                         <div class="d-flex align-items-center gap-2">
                             <FileSignature style="color: var(--success-color);" :size="16" />
-                            Room Details & Images
+                            <span :class="{'d-none d-md-inline': activeTab !== 'room-detail'}">Room Details & Images</span>
                         </div>
                     </Tab>
                 </TabList>

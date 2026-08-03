@@ -1,6 +1,6 @@
 <template>
 	<Dialog v-model:visible="localVisible" :maximizable="maximizable" :modal="modal" :closable="showCloseButton"
-		:appendTo="appendToResolved" :style="{ width: dialogWidth }" :contentClass="contentClass" :contentStyle="contentStyle" @hide="onHide">
+		:appendTo="appendToResolved" :style="{ width: dialogWidth }" :breakpoints="{ '991px': '75vw', '767px': '90vw', '575px': '95vw' }" :contentClass="contentClass" :contentStyle="contentStyle" @hide="onHide">
 
 		<template #header>
 			<div v-if="$slots.title || title">

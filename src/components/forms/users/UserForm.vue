@@ -17,6 +17,14 @@
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
+            <div class="mb-3" v-if="authStore.isSuperAdmin && kut_id">
+                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
+                    label="Seating Row" placeholder="Select Seating Row" :error="errors.seating_row_id" />
+            </div>
+            <div class="mb-3" v-if="authStore.isSuperAdmin && seating_row_id">
+                <BaseInput type="number" v-model="seat_number" 
+                    label="Seat Number" placeholder="e.g. 1" :error="errors.seat_number" />
+            </div>
         </div>
 
         <div v-else>
@@ -35,6 +43,14 @@
             <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
+            </div>
+            <div class="mb-3" v-if="authStore.isSuperAdmin && kut_id">
+                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
+                    label="Seating Row" placeholder="Select Seating Row" :error="errors.seating_row_id" />
+            </div>
+            <div class="mb-3" v-if="authStore.isSuperAdmin && seating_row_id">
+                <BaseInput type="number" v-model="seat_number" 
+                    label="Seat Number" placeholder="e.g. 1" :error="errors.seat_number" />
             </div>
         </div>
     </form>
@@ -171,7 +187,8 @@ const { validate, setValues, errors, resetForm } = useForm({
         pob: "",
         roleId: 3,
         kut_id: authStore.user?.profile?.kut_id || 1,
-        seating_row_id: null
+        seating_row_id: null,
+        seat_number: null
     }
 });
 
@@ -183,6 +200,7 @@ const { value: gender } = useField('gender');
 const { value: pob } = useField('pob');
 const { value: roleId } = useField('roleId');
 const { value: seating_row_id } = useField('seating_row_id');
+const { value: seat_number } = useField('seat_number');
 
 watch(creationMode, (newMode) => {
     resetForm({
@@ -195,7 +213,8 @@ watch(creationMode, (newMode) => {
             pob: "",
             roleId: newMode === 'auto' ? 3 : 3,
             kut_id: authStore.user?.profile?.kut_id || 1,
-            seating_row_id: null
+            seating_row_id: null,
+            seat_number: null
         }
     });
 });
@@ -211,7 +230,8 @@ const initForm = () => {
             pob: '',
             roleId: props.initialData?.role?.id || 3,
             kut_id: authStore.user?.profile?.kut_id || 1,
-            seating_row_id: props.initialData?.seating_row_id || null
+            seating_row_id: props.initialData?.seating_row_id || props.initialData?.profile?.seating_row_id || null,
+            seat_number: props.initialData?.seat_number || props.initialData?.profile?.seat_number || null
         });
     } else {
         creationMode.value = authStore.isSuperAdmin ? 'email' : 'auto';
@@ -228,7 +248,8 @@ const validateForm = async () => {
                 email: email.value.trim(),
                 roleId: Number(roleId.value),
                 kut_id: kut_id.value ? Number(kut_id.value) : null,
-                seating_row_id: seating_row_id.value ? Number(seating_row_id.value) : null
+                seating_row_id: seating_row_id.value ? Number(seating_row_id.value) : null,
+                seat_number: seat_number.value ? Number(seat_number.value) : null
             };
         } else {
             return {
@@ -241,7 +262,8 @@ const validateForm = async () => {
                         gender: gender.value,
                         pob: pob.value.trim(),
                         kut_id: kut_id.value ? Number(kut_id.value) : null,
-                        seating_row_id: seating_row_id.value ? Number(seating_row_id.value) : null
+                        seating_row_id: seating_row_id.value ? Number(seating_row_id.value) : null,
+                        seat_number: seat_number.value ? Number(seat_number.value) : null
                     }
                 ]
             };

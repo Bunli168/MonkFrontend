@@ -29,8 +29,8 @@ import BadgeStatSkeleton from '@/components/skeletons/BadgeStatSkeleton.vue';
 
 <style scoped>
 button {
-    border-radius: var(--border-inner-radius) !important;
-    height: var(--control-height) !important;
+    border-radius: var(--border-inner-radius);
+    height: var(--control-height);
     color: var(--text-white);
     padding-inline: 24px;
     display: flex;

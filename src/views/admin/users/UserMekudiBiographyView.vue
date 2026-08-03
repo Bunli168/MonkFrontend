@@ -3,7 +3,7 @@
         <template v-if="authStore.isSuperAdmin">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Mekudi Biography / ប្រវត្តិរូបមេកុដិ</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Mekudi Biography <span class="d-none d-md-inline">/ ប្រវត្តិរូបមេកុដិ</span></h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
@@ -69,6 +69,16 @@
                 <span class="fw-medium text-dark">{{ data?.profile?.kut?.name || data?.UserProfile?.Kut?.name || data?.UserProfile?.kut?.name || '-' }}</span>
             </template>
 
+            <template #seating="{ data }">
+                <span v-if="data?.UserProfile?.seating_row_id || data?.profile?.seating_row_id">
+                    Row {{ data?.profile?.seatingRow?.row_num || data?.UserProfile?.seating_row_id || data?.profile?.seating_row_id }}
+                    <span v-if="data?.UserProfile?.seat_number || data?.profile?.seat_number">
+                        (Seat {{ data?.UserProfile?.seat_number || data?.profile?.seat_number }})
+                    </span>
+                </span>
+                <span v-else class="text-muted">-</span>
+            </template>
+
             <template #email="{ data }">
                 <span>{{ data?.email }}</span>
             </template>
@@ -131,6 +141,7 @@ const colDefs = ref([
     { field: 'username', label: 'Full Name', sortable: false },
     { field: 'role', label: 'Role / ឋានៈ', sortable: false },
     { field: 'kut', label: 'Kudi / កុដិ', sortable: false },
+    { field: 'seating', label: 'Seating / ជួរ', sortable: false },
     { field: 'email', label: 'Email Address', sortable: false },
     { field: 'phone', label: 'Phone Number', sortable: false },
     { field: 'wat', label: 'Wat Origin / វត្តកំណើត', sortable: false },

@@ -13,12 +13,13 @@
         </div>
 
         <!-- Actual Visible Container -->
-        <div class="d-flex align-items-center gap-2" :class="{ 'flex-wrap': wrap }">
+        <div class="d-flex align-items-center gap-2" :class="wrap ? 'flex-wrap flex-lg-nowrap' : ''">
             <!-- Visible Options -->
             <BaseButton 
                 v-for="option in visibleOptions" 
                 :key="option.value"
                 type="button" 
+                class="flex-grow-1 flex-md-grow-0 text-nowrap"
                 :variant="modelValue === option.value ? (option.variant ? `badge ${option.variant} active` : 'badge primary active') : (option.variant ? `badge ${option.variant}` : 'badge')"
                 :label="option.label"
                 :badge="option.badge" 

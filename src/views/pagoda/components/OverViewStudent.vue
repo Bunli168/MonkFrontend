@@ -17,7 +17,7 @@
                                     {{ roleLabelKhmer }}
                                 </span>
                                 <span v-if="authStore.user?.profile?.kut" class="badge px-3 py-2 text-base text-uppercase" style="letter-spacing: 0.5px; font-weight: 600; border-radius: var(--border-inner-radius); background-color: var(--surface-ground);">
-                                    Kut: {{ authStore.user.profile.kut.name }}
+                                    កុដិ: {{ authStore.user.profile.kut.name }}
                                 </span>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ const roleLabelKhmer = computed(() => {
     const labels = {
         'SUPERADMIN': 'មេដឹកនាំ',
         'ADMIN': 'មេកុដិ',
-        'MONK': 'ព្រះសង្ឃ',
+        'MONK': 'សាមណេរ',
         'BHIKKHU': 'ភិក្ខុ',
         'STUDENT': 'និស្សិត',
         'MEKUDI': 'មេកុដិ',

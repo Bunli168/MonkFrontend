@@ -16,21 +16,21 @@
                         <Send :size="20" style="color: var(--primary-color);" />
                     </div>
                     <div>
-                        <label class="form-label mb-0 fw-medium d-block">Telegram Instant OTP (2FA)</label>
+                        <label class="form-label mb-0 fw-medium d-block">Telegram OTP</label>
                         <span class="text-muted small">
                             <span v-if="authStore.user?.otp_telegram_chat_id" class="text-success"><ShieldCheck :size="12" class="me-1"/>បានភ្ជាប់រួចរាល់</span>
-                            <span v-else class="text-warning">មិនទាន់ភ្ជាប់ (Action Required)</span>
                         </span>
                     </div>
                 </div>
                 
                 <div>
-                    <button v-if="!authStore.user?.otp_telegram_chat_id" type="button" @click="handleLinkOtpTelegram" class="btn btn-sm d-flex align-items-center justify-content-center" style="background-color: var(--primary-color); color: white; min-width: 100px;" :disabled="isLinkingOtp">
-                        <span v-if="isLinkingOtp" class="spinner-border spinner-border-sm me-2"></span>
-                        <Send v-else :size="14" class="me-1" /> {{ isLinkingOtp ? 'កំពុងភ្ជាប់...' : 'ភ្ជាប់គណនី' }}
+                    <button v-if="!authStore.user?.otp_telegram_chat_id" type="button" @click="handleLinkOtpTelegram" class="btn btn-sm d-flex align-items-center justify-content-center px-3" style="background-color: var(--primary-color); color: white;" :disabled="isLinkingOtp" title="ភ្ជាប់គណនី (Link Account)">
+                        <span v-if="isLinkingOtp" class="spinner-border spinner-border-sm"></span>
+                        <Link2 v-else :size="16" />
                     </button>
-                    <button v-else type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" @click="handleUnlinkOtpTelegram" :disabled="isUnlinkingOtp" style="min-width: 100px;">
-                        <Trash2 :size="14" class="me-1" /> {{ isUnlinkingOtp ? 'កំពុងផ្តាច់...' : 'ផ្តាច់គណនី' }}
+                    <button v-else type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center px-3" @click="handleUnlinkOtpTelegram" :disabled="isUnlinkingOtp">
+                        <Trash2 v-if="!isUnlinkingOtp" :size="16" />
+                        <span v-else class="spinner-border spinner-border-sm"></span>
                     </button>
                 </div>
             </div>
@@ -40,23 +40,6 @@
                     <span class="text-muted small">Add an extra layer of security.</span>
                 </div>
                 <BaseToggle v-model="isTotpEnabled" @change="handleTotpToggle" />
-            </div>
-
-            <div class="d-flex align-items-center justify-content-between mt-4 pt-4 border-top">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="setting-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1); border-radius: 10px;">
-                        <Download :size="20" style="color: #10B981;" />
-                    </div>
-                    <div>
-                        <label class="form-label mb-0 fw-medium d-block">Install App (PWA)</label>
-                        <span class="text-muted small">ដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក ដើម្បីងាយស្រួលប្រើប្រាស់។</span>
-                    </div>
-                </div>
-                <div>
-                    <BaseButton @click="triggerInstall" variant="primary" class="d-flex align-items-center gap-2">
-                        <Download :size="16" /> ដំឡើង (Install)
-                    </BaseButton>
-                </div>
             </div>
 
             <!-- TOTP Password Input -->
@@ -137,13 +120,31 @@
                     </div>
                 </div>
             </div>
+
+            <div class="d-flex align-items-center justify-content-between mt-4 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="setting-icon-wrapper" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1); border-radius: 10px;">
+                        <Download :size="20" style="color: #10B981;" />
+                    </div>
+                    <div>
+                        <label class="form-label mb-0 fw-medium d-block">Install App <span class="d-none d-md-inline">(PWA)</span></label>
+                        <span class="text-muted small d-none d-md-block">ដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក ដើម្បីងាយស្រួលប្រើប្រាស់។</span>
+                    </div>
+                </div>
+                <div>
+                    <BaseButton @click="triggerInstall" variant="primary" class="d-flex align-items-center gap-2">
+                        <Download :size="16" /> ដំឡើង <span class="d-none d-md-inline">(Install)</span>
+                    </BaseButton>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
-import { ShieldCheck, Send, Trash2, Download } from '@lucide/vue';
+import { ShieldCheck, Send, Trash2, Download, Link2 } from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();

@@ -1,112 +1,120 @@
 <template>
-    <div class="pagoda-leave-requests-view container-xl py-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-            <div>
-                <h4 class="fw-bold mb-1" style="color: var(--text-heading-color);">Leave Requests</h4>
-                <p class="text-muted mb-0">Submit and track your requests for leave or absence.</p>
+    <div class="pagoda-leave-requests-view py-4">
+        <!-- Inner Tabs for Leave Requests and Register Seat -->
+        <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 w-100">
+            <div class="d-flex align-items-center flex-wrap flex-md-nowrap gap-2">
+                <BaseFilter v-model="innerTab" :options="innerTabOptions" :wrap="true" class="w-100 w-md-auto" />
             </div>
-            <button class="btn btn-primary d-flex align-items-center gap-2" @click="showForm = true">
-                <i class="fas fa-plus"></i> New Request
-            </button>
-        </div>
-
-        <div class="card border-0 shadow-sm mb-4" v-if="showForm" style="background-color: var(--surface-card);">
-            <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">
-                    {{ isEditing ? 'Edit Leave Request' : 'New Leave Request' }}
-                </h5>
-                <button type="button" class="btn-close" @click="cancelForm"></button>
-            </div>
-            <div class="card-body">
-                <form @submit.prevent="submitRequest">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <BaseDatePicker 
-                                label="Start Date" 
-                                v-model="formData.start_date" 
-                                required 
-                                :minDate="today"
-                            />
-                        </div>
-                        <div class="col-md-6">
-                            <BaseDatePicker 
-                                label="End Date" 
-                                v-model="formData.end_date" 
-                                required 
-                                :minDate="formData.start_date || today"
-                            />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-medium">Reason for Leave</label>
-                            <textarea class="form-control" v-model="formData.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-medium mt-2">Attachment (Optional)</label>
-                            <input type="file" class="form-control" @change="handleFileChange" accept="image/*" />
-                        </div>
-                        <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-light border" @click="cancelForm">Cancel</button>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" :disabled="isSubmitting">
-                                <i class="fas fa-paper-plane" v-if="!isSubmitting"></i>
-                                <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                Submit Request
-                            </button>
-                        </div>
-                    </div>
-                </form>
+            
+            <div class="d-flex align-items-center flex-wrap flex-md-nowrap gap-2 mt-2 mt-md-0">
+                <BaseButton variant="badge" type="button" @click="showScanModal = true" class="flex-grow-1 flex-md-grow-0 text-nowrap justify-content-center">
+                    <i class="fas fa-qrcode text-primary"></i> Scan Attendance
+                </BaseButton>
+                <BaseButton v-if="innerTab === 'leave-requests'" variant="badge primary active" type="button" @click="showForm = true" class="flex-grow-1 flex-md-grow-0 text-nowrap justify-content-center">
+                    <i class="fas fa-plus text-primary"></i> New Request
+                </BaseButton>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm" style="background-color: var(--surface-card);">
-            <div class="card-header bg-transparent border-bottom py-3">
-                <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">My Requests History</h5>
-            </div>
-            <div class="card-body p-0">
-                <BaseTable 
-                    :columns="colDefs" 
-                    :rows="paginatedRequests" 
-                    :totalRecords="myRequests.length"
-                    :loading="isLoading"
-                    :show-index="true"
-                    :page="currentPage"
-                    :perPage="perPage"
-                    @update:page="currentPage = $event"
-                    @update:perPage="perPage = $event"
-                >
-                    <template #date_range="{ data: row }">
-                        <span>{{ formatDate(row.start_date) }} <i class="fas fa-arrow-right text-muted mx-1"></i> {{ formatDate(row.end_date) }}</span>
-                    </template>
-                    <template #reason="{ data: row }">
-                        <div class="text-truncate" style="max-width: 250px;" :title="row.reason">
-                            {{ row.reason || '—' }}
+        <div v-if="innerTab === 'leave-requests'">
+            <BaseModal v-model="showForm" :title="isEditing ? 'Edit Leave Request' : 'New Leave Request'" size="lg">
+                <div class="px-2">
+                    <form @submit.prevent="submitRequest">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <BaseDatePicker 
+                                    label="Start Date" 
+                                    v-model="formData.start_date" 
+                                    required 
+                                    :minDate="today"
+                                />
+                            </div>
+                            <div class="col-md-6">
+                                <BaseDatePicker 
+                                    label="End Date" 
+                                    v-model="formData.end_date" 
+                                    required 
+                                    :minDate="formData.start_date || today"
+                                />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Reason for Leave</label>
+                                <textarea class="form-control" v-model="formData.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium mt-2">Attachment (Optional)</label>
+                                <input type="file" class="form-control" @change="handleFileChange" accept="image/*" />
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                                <button type="button" class="btn btn-light border" @click="cancelForm">Cancel</button>
+                                <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" :disabled="isSubmitting">
+                                    <i class="fas fa-paper-plane" v-if="!isSubmitting"></i>
+                                    <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Submit Request
+                                </button>
+                            </div>
                         </div>
-                    </template>
-                    <template #status="{ data: row }">
-                        <div class="d-flex justify-content-center">
-                            <BaseBadge v-if="row.status" :status="row.status" :label="formatStatus(row.status)" />
-                            <span v-else>—</span>
-                        </div>
-                    </template>
-                    <template #attachment="{ data: row }">
-                        <div class="d-flex justify-content-start align-items-center">
-                            <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
-                                <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
-                            </a>
-                            <span v-else class="text-muted fst-italic">-</span>
-                        </div>
-                    </template>
-                    <template #approved_by="{ data: row }">
-                        <span v-if="row.Approver && row.status !== 'pending'" class="text-muted">
-                            {{ row.Approver.UserProfile?.first_name_kh }} {{ row.Approver.UserProfile?.last_name_kh }}
-                        </span>
-                        <span v-else class="text-muted fst-italic">N/A</span>
-                    </template>
-                    <template #actions="{ data: row }">
-                        <BaseActionMenu v-if="getActionItems(row).length > 0" :items="getActionItems(row)" />
-                    </template>
-                </BaseTable>
+                    </form>
+                </div>
+            </BaseModal>
+
+            <div class="card border-0 shadow-sm" style="background-color: var(--surface-card);">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">My Requests History</h5>
+                </div>
+                <div class="card-body p-0">
+                    <BaseTable 
+                        :columns="colDefs" 
+                        :rows="paginatedRequests" 
+                        :totalRecords="myRequests.length"
+                        :loading="isLoading"
+                        :show-index="true"
+                        :page="currentPage"
+                        :perPage="perPage"
+                        @update:page="currentPage = $event"
+                        @update:perPage="perPage = $event"
+                    >
+                        <template #date_range="{ data: row }">
+                            <span>{{ formatDate(row.start_date) }} <i class="fas fa-arrow-right text-muted mx-1"></i> {{ formatDate(row.end_date) }}</span>
+                        </template>
+                        <template #reason="{ data: row }">
+                            <div class="text-truncate" style="max-width: 250px;" :title="row.reason">
+                                {{ row.reason || '—' }}
+                            </div>
+                        </template>
+                        <template #status="{ data: row }">
+                            <div class="d-flex justify-content-center">
+                                <BaseBadge v-if="row.status" :status="row.status" :label="formatStatus(row.status)" />
+                                <span v-else>—</span>
+                            </div>
+                        </template>
+                        <template #attachment="{ data: row }">
+                            <div class="d-flex justify-content-start align-items-center">
+                                <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
+                                    <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                                </a>
+                                <span v-else class="text-muted fst-italic">-</span>
+                            </div>
+                        </template>
+                        <template #approved_by="{ data: row }">
+                            <span v-if="row.Approver && row.status !== 'pending'" class="text-muted">
+                                {{ row.Approver.UserProfile?.first_name_kh }} {{ row.Approver.UserProfile?.last_name_kh }}
+                            </span>
+                            <span v-else class="text-muted fst-italic">N/A</span>
+                        </template>
+                        <template #actions="{ data: row }">
+                            <BaseActionMenu v-if="getActionItems(row).length > 0" :items="getActionItems(row)" />
+                        </template>
+                    </BaseTable>
+                </div>
             </div>
         </div>
+
+        <PagodaRegisterSeatView v-if="innerTab === 'register-seat'" />
+
+        <BaseModal v-model="showScanModal" title="Scan Attendance" size="lg">
+            <PagodaSelfScanView @close="showScanModal = false" />
+        </BaseModal>
 
         <BaseModal v-model="showConfirmModal" title="Confirm Action" size="sm">
             <p class="mb-4 text-muted fw-medium">Are you sure you want to delete this leave request?</p>
@@ -141,6 +149,9 @@ import { ref, computed, onMounted } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
+import BaseFilter from '@/components/base/BaseFilter.vue';
+import PagodaRegisterSeatView from './PagodaRegisterSeatView.vue';
+import PagodaSelfScanView from './PagodaSelfScanView.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
@@ -151,6 +162,13 @@ import * as bootstrap from 'bootstrap';
 
 const toast = useToastStore();
 const showForm = ref(false);
+const showScanModal = ref(false);
+
+const innerTab = ref('leave-requests');
+const innerTabOptions = computed(() => [
+    { label: 'Leave Requests', value: 'leave-requests' },
+    { label: 'Register Seat', value: 'register-seat' }
+]);
 const isSubmitting = ref(false);
 const isLoading = ref(false);
 const myRequests = ref([]);

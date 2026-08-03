@@ -2,9 +2,22 @@
     <div>
         <div class="card border-0" style="background-color: var(--surface-ground);">
             <!-- Filters Bar -->
-            <div class="mb-3 d-flex justify-content-between align-items-center w-100">
-                <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 0;">
+            <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center w-100 gap-2">
+                <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1 w-100" style="min-width: 0;">
                     <BaseFilter v-model="statusFilter" :options="filterOptions" :wrap="true" />
+                    <!-- Search input for TakerAbsentPermissionView -->
+                    <div v-if="statusFilter === 'view'" class="d-flex gap-2 ms-auto justify-content-end" style="max-width: 500px; flex-grow: 1;">
+                        <div class="input-group flex-grow-1" style="min-width: 200px; max-width: 400px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <Search size="18" />
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name, kudi, phone..." v-model="searchQuery" style="outline: none; box-shadow: none;">
+                        </div>
+                        <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0" style="min-width: 120px;" @click="handleRefresh">
+                            <RefreshCcw size="16" :class="{ 'fa-spin': isRefreshing }" />
+                            Refresh
+                        </button>
+                    </div>
                 </div>
                 <BaseButton v-if="!authStore.isAdmin && !authStore.isAttendanceTaker" @click="showModal = true" variant="primary">
                     <i class="fas fa-plus me-1"></i> New Request
@@ -13,7 +26,7 @@
 
             <!-- Table -->
             <div v-if="statusFilter === 'view'">
-                <TakerAbsentPermissionView />
+                <TakerAbsentPermissionView ref="takerAbsentRef" :searchQuery="searchQuery" />
             </div>
             
             <BaseTable 
@@ -31,7 +44,8 @@
             >
                 <template #monk="{ data: row }">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="avatar-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden"
+                        <img v-if="row.User?.UserProfile?.avatar_url" :src="`http://localhost:3006${row.User.UserProfile.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 32px; height: 32px;" />
+                        <div v-else class="avatar-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden"
                             style="width: 32px; height: 32px; background: color-mix(in srgb, var(--primary-color) 15%, transparent);">
                             <User :size="14" style="color: var(--primary-color);" />
                         </div>
@@ -146,7 +160,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
-import { CheckCircle, XCircle, User } from '@lucide/vue';
+import { CheckCircle, XCircle, User, Search, RefreshCcw } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseFilter from '@/components/base/BaseFilter.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
@@ -159,6 +173,19 @@ const toast = useToastStore();
 const authStore = useAuthStore();
 const isLoading = ref(false);
 const requests = ref([]);
+
+// Search state for TakerAbsentPermissionView
+const searchQuery = ref('');
+const isRefreshing = ref(false);
+const takerAbsentRef = ref(null);
+
+const handleRefresh = async () => {
+    isRefreshing.value = true;
+    if (takerAbsentRef.value) {
+        await takerAbsentRef.value.fetchData();
+    }
+    isRefreshing.value = false;
+};
 
 const props = defineProps({
     pendingCount: {

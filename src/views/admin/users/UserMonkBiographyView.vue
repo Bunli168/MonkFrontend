@@ -2,7 +2,7 @@
     <div style="background-color: var(--surface-ground);">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biographies / ប្រវត្តិព្រះសង្ឃ</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biographies <span class="d-none d-md-inline">/ ប្រវត្តិព្រះសង្ឃ</span></h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
