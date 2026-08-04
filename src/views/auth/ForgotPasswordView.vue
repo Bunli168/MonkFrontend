@@ -240,6 +240,71 @@
     color: var(--primary-color) !important;
     transform: translateX(-4px);
 }
+
+/* Segmented Control using CSS Variables for theming */
+.custom-segmented-control {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-clr);
+    position: relative;
+    padding: 6px;
+}
+.segmented-btn {
+    border: none;
+    background: transparent;
+    color: var(--sidebar-text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    box-shadow: none;
+}
+.segmented-btn:hover:not(.active) {
+    color: var(--text-heading-color);
+    background: color-mix(in srgb, var(--text-base) 5%, transparent);
+}
+.segmented-btn.active {
+    background: var(--bg-primary);
+    color: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon-circle-teal {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--primary-color-soft);
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.note-box {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border: 1px dashed var(--border-clr);
+}
+
+.success-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #10b981;
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.15);
+}
+
+.btn-primary-custom {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    transition: all 0.2s;
+}
+.btn-primary-custom:hover {
+    filter: brightness(0.9);
+    box-shadow: 0 4px 12px rgba(0, 109, 128, 0.2);
+    color: white;
+}
 </style>
 
 <template>
@@ -313,7 +378,7 @@
             <div class="forgot-password-form p-5 p-lg-4 animate-slide-up delay-1">
                 <div class="forgot-password-form-inner text-center">
                     <div class="d-flex justify-content-start w-100">
-                        <router-link :to="{ name: 'login' }" class="text-decoration-none d-flex align-items-center gap-2 mb-3 text-muted back-btn" style="width: max-content;">
+                        <router-link :to="{ name: 'login' }" class="text-decoration-none d-flex align-items-center gap-2 mb-4 text-muted back-btn" style="width: max-content;">
                             <ArrowLeft :size="16" />
                             <span>Back to Login</span>
                         </router-link>
@@ -321,7 +386,7 @@
 
                     <Logo class="brand-icon mx-auto mb-3" />
                     
-                    <h1 class="h3 mb-3 font-weight-bold" style="color: var(--text-heading-color); font-family: 'Poppins', 'Kantumruy Pro', sans-serif;">
+                    <h1 class="h3 mb-4 font-weight-bold" style="color: var(--text-heading-color); font-family: 'Poppins', 'Kantumruy Pro', sans-serif;">
                         កំណត់លេខសម្ងាត់ឡើងវិញ
                     </h1>
 
@@ -339,24 +404,24 @@
                         </button>
                     </div>
                     
-                    <!-- TAB 1: Monk & Student Instruction Card -->
+                    <!-- TAB 1: Monk & Student Instruction -->
                     <div v-if="activeTab === 'monk'" class="animate-slide-up">
-                        <div class="instruction-card p-4 text-start mb-2">
+                        <div class="text-start mb-2">
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <div class="icon-circle-teal d-flex align-items-center justify-content-center">
                                     <UserCheck :size="22" />
                                 </div>
                                 <div>
-                                    <h3 class="m-0 font-weight-bold" style="font-size: 1.05rem; color: #0f172a;">ទាក់ទងមេកុដិ ឬ Admin</h3>
+                                    <h3 class="m-0 font-weight-bold" style="font-size: 1.05rem; color: var(--text-heading-color);">ទាក់ទងមេកុដិ ឬ Admin</h3>
                                     <span class="text-muted" style="font-size: 0.82rem;">សម្រាប់គណនីក្នុងប្រព័ន្ធវត្តអារាម</span>
                                 </div>
                             </div>
-                            <p class="mb-4" style="font-size: 0.96rem; line-height: 1.75; color: #334155;">
+                            <p class="mb-4 text-muted" style="font-size: 0.96rem; line-height: 1.75;">
                                 ប្រសិនបើលោកអ្នកភ្លេចលេខសម្ងាត់ សូមមេត្តាទាក់ទងមកកាន់ <strong style="color: var(--primary-color);">មេកុដិ ឬ Admin</strong> របស់អ្នកដើម្បីធ្វើការកំណត់លេខសម្ងាត់ថ្មីក្នុងប្រព័ន្ធ!
                             </p>
                             <div class="note-box p-3">
-                                <p class="m-0" style="font-size: 0.85rem; line-height: 1.65; color: #475569;">
-                                    <strong style="color: #1e293b;">💡 ចំណាំ (Note)៖</strong> ដើម្បីសុវត្ថិភាព និងការគ្រប់គ្រងទិន្នន័យក្នុងប្រព័ន្ធវត្តអារាម ការកំណត់លេខសម្ងាត់ថ្មីសម្រាប់គណនីព្រះសង្ឃ ភិក្ខុ និងនិស្សិត ត្រូវធ្វើឡើងតាមរយៈមេកុដិ ឬអ្នកគ្រប់គ្រងប្រព័ន្ធផ្ទាល់ប៉ុណ្ណោះ។
+                                <p class="m-0 text-muted" style="font-size: 0.85rem; line-height: 1.65;">
+                                    <strong style="color: var(--text-heading-color);">💡 ចំណាំ (Note)៖</strong> ដើម្បីសុវត្ថិភាព និងការគ្រប់គ្រងទិន្នន័យក្នុងប្រព័ន្ធវត្តអារាម ការកំណត់លេខសម្ងាត់ថ្មីសម្រាប់គណនីព្រះសង្ឃ ភិក្ខុ និងនិស្សិត ត្រូវធ្វើឡើងតាមរយៈមេកុដិ ឬអ្នកគ្រប់គ្រងប្រព័ន្ធផ្ទាល់ប៉ុណ្ណោះ។
                                 </p>
                             </div>
                         </div>
@@ -365,12 +430,12 @@
                     <!-- TAB 2: Email Reset Form -->
                     <div v-else class="animate-slide-up text-start">
                         <!-- Forbidden / Telegram Redirection -->
-                        <div v-if="showTelegramContact" class="instruction-card p-4 text-center">
-                            <h2 class="h5 mb-3 font-weight-bold" style="color: #0f172a;">គណនីមានសុវត្ថិភាពខ្ពស់ (2FA)</h2>
+                        <div v-if="showTelegramContact" class="text-center">
+                            <h2 class="h5 mb-3 font-weight-bold" style="color: var(--text-heading-color);">គណនីមានសុវត្ថិភាពខ្ពស់ (2FA)</h2>
                             <p class="text-muted mb-4" style="line-height: 1.6; font-size: 0.95rem;">
                                 គណនីរបស់អ្នកបានបើកមុខងារការពារ ២ ជាន់។ សូមទាក់ទង Admin តាម Telegram ដើម្បីប្តូរលេខសម្ងាត់។
                             </p>
-                            <BaseButton @click="openTelegramLink" class="w-100 mb-3 justify-content-center d-flex align-items-center gap-2 py-2" variant="primary">
+                            <BaseButton @click="openTelegramLink" class="w-100 mb-3 justify-content-center d-flex align-items-center gap-2" variant="primary">
                                 <MessageCircle :size="18" />
                                 Contact Support via Telegram
                             </BaseButton>
@@ -379,37 +444,37 @@
                             </button>
                         </div>
 
-                        <!-- Success state (Stripe / Apple confirmation card) -->
-                        <div v-else-if="isSuccess" class="success-card text-center p-4 p-md-5 animate-slide-up">
+                        <!-- Success state -->
+                        <div v-else-if="isSuccess" class="text-center animate-slide-up">
                             <div class="success-icon-wrapper mx-auto mb-4 d-flex align-items-center justify-content-center">
                                 <CheckCircle2 :size="38" />
                             </div>
-                            <h3 class="h4 font-weight-bold mb-2" style="color: #0f172a;">ពិនិត្យអ៊ីមែលរបស់អ្នក</h3>
-                            <p class="text-muted mb-4 mx-auto" style="font-size: 0.94rem; line-height: 1.7; max-width: 330px; color: #475569;">
+                            <h3 class="h4 font-weight-bold mb-2" style="color: var(--text-heading-color);">ពិនិត្យអ៊ីមែលរបស់អ្នក</h3>
+                            <p class="text-muted mb-4 mx-auto" style="font-size: 0.94rem; line-height: 1.7; max-width: 330px;">
                                 យើងបានផ្ញើតំណភ្ជាប់សុវត្ថិភាពដើម្បីកំណត់លេខសម្ងាត់ថ្មីទៅកាន់ប្រអប់សំបុត្រ (Inbox) របស់អ្នកហើយ។
                             </p>
                             <div class="note-box p-3 mb-4 text-start">
                                 <p class="m-0 text-muted" style="font-size: 0.84rem; line-height: 1.6;">
-                                    <strong style="color: #334155;">💡 មិនឃើញអ៊ីមែលទេ?</strong> សូមពិនិត្យមើលក្នុងថត Spam ឬ Junk Folder របស់អ្នក។
+                                    <strong style="color: var(--text-heading-color);">💡 មិនឃើញអ៊ីមែលទេ?</strong> សូមពិនិត្យមើលក្នុងថត Spam ឬ Junk Folder របស់អ្នក។
                                 </p>
                             </div>
                             <div class="d-flex flex-column gap-2">
-                                <router-link :to="{ name: 'login' }" class="btn btn-primary-custom w-100 py-3 font-weight-bold d-flex align-items-center justify-content-center gap-2 text-decoration-none" style="border-radius: 10px; font-size: 0.95rem;">
+                                <router-link :to="{ name: 'login' }" class="btn btn-primary-custom w-100 font-weight-bold d-flex align-items-center justify-content-center gap-2 text-decoration-none" style="padding: 0.5rem 1rem;">
                                     <span>ត្រឡប់ទៅចូលប្រព័ន្ធ (Back to Login)</span>
                                 </router-link>
-                                <button type="button" @click="isSuccess = false; email = ''" class="btn btn-link text-muted py-2 w-100 text-decoration-none" style="font-size: 0.88rem;">
+                                <button type="button" @click="isSuccess = false; email = ''" class="btn btn-link text-muted w-100 text-decoration-none" style="padding: 0.5rem 1rem;">
                                     មិនទទួលបានអ៊ីមែល? <strong style="color: var(--primary-color);">ផ្ញើម្តងទៀត</strong>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Form state -->
-                        <div v-else class="instruction-card p-4">
+                        <div v-else>
                             <form @submit.prevent="onSubmit" novalidate>
                                 <div class="mb-3">
                                     <BaseInput required type="email" label="អ៊ីមែលផ្ទាល់ខ្លួន (Email Address)" v-model="email" :error="errors.email" placeholder="admin@example.com" />
                                 </div>
-                                <BaseButton :isLoading="isLoading" type="submit" class="w-100 justify-content-center py-3 mt-3" style="font-size: 0.95rem; font-weight: 600; border-radius: 10px;">
+                                <BaseButton :isLoading="isLoading" type="submit" class="w-100 justify-content-center mt-2">
                                     {{ isLoading ? 'កំពុងផ្ញើ...' : 'ផ្ញើតំណប្តូរលេខសម្ងាត់ (Send Reset Link)' }}
                                 </BaseButton>
                             </form>
@@ -422,7 +487,7 @@
 </template>
 
 <script setup>
-import { UserCheck, KeyRound, MessageCircle, ArrowLeft, Mail, CheckCircle2 } from '@lucide/vue';
+import { UserCheck, KeyRound, MessageCircle, ArrowLeft, CheckCircle2 } from '@lucide/vue';
 import Logo from '@/components/Logo.vue';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
@@ -459,80 +524,3 @@ const onSubmit = handleSubmit(async (values) => {
     }
 });
 </script>
-
-<style scoped>
-.custom-segmented-control {
-    background-color: #f1f5f9;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    position: relative;
-    padding: 4px;
-}
-.segmented-btn {
-    border: none;
-    background: transparent;
-    color: #64748b;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.25s ease;
-    cursor: pointer;
-    box-shadow: none;
-}
-.segmented-btn:hover:not(.active) {
-    color: #334155;
-    background: rgba(255, 255, 255, 0.5);
-}
-.segmented-btn.active {
-    background: #ffffff;
-    color: var(--primary-color, #006d80);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.instruction-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-.icon-circle-teal {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(0, 109, 128, 0.1);
-    color: var(--primary-color, #006d80);
-    flex-shrink: 0;
-}
-.note-box {
-    background: #f8fafc;
-    border-radius: 10px;
-    border: 1px dashed #cbd5e1;
-}
-
-.success-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-}
-.success-icon-wrapper {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-    color: #16a34a;
-    box-shadow: 0 8px 16px rgba(22, 163, 74, 0.12);
-}
-
-.btn-primary-custom {
-    background: var(--primary-color, #006d80);
-    border: none;
-    color: white;
-    transition: all 0.2s;
-}
-.btn-primary-custom:hover {
-    background: #005666;
-    box-shadow: 0 4px 12px rgba(0, 109, 128, 0.2);
-    color: white;
-}
-</style>

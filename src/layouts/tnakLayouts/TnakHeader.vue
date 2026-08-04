@@ -131,7 +131,7 @@ const headerPaths = computed(() => {
     }
 
     // Admin & SuperAdmin get a link back to the main dashboard
-    if (authStore.isAdmin) {
+    if (authStore.isAdmin || authStore.isSuperAdmin) {
         paths.push({ label: 'Dashboard', path: 'dashboard', icon: LayoutDashboard });
     }
     

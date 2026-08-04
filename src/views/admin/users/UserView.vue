@@ -21,15 +21,10 @@
                 <Tab v-if="authStore.isMonk" value="my-biography" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <ClipboardList style="color: var(--primary-color);" :size="16" />
-                        <span :class="{'d-none d-md-inline': activeTab !== 'my-biography'}">{{ authStore.isSuperAdmin ? 'ប្រវត្តិរូបមេកុដិ (Mekudi Biography)' : 'ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)' }}</span>
+                        <span :class="{'d-none d-md-inline': activeTab !== 'my-biography'}">{{ authStore.isSuperAdmin ? 'ប្រវត្តិរូបមេកុដិ' : 'ប្រវត្តិរូបរបស់ខ្ញុំ (My Biography)' }}</span>
                     </div>
                 </Tab>
-                <Tab v-if="false" value="all-pending-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
-                    <div class="d-flex align-items-center gap-2">
-                        <MailWarning style="color: var(--warning-color);" :size="16" />
-                        <span :class="{'d-none d-md-inline': activeTab !== 'all-pending-users'}">Pending Users</span>
-                    </div>
-                </Tab>
+
                 <Tab value="biography-surveys" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
                     <div class="d-flex align-items-center gap-2">
                         <BookOpen style="color: var(--primary-color);" :size="16" />
@@ -40,6 +35,12 @@
                     <div class="d-flex align-items-center gap-2">
                         <GraduationCap style="color: var(--info-color, #0ea5e9);" :size="16" />
                         <span :class="{'d-none d-md-inline': activeTab !== 'student-biography'}">ប្រវត្តិរូបនិស្សិត</span>
+                    </div>
+                </Tab>
+                <Tab v-if="authStore.isSuperAdmin" value="all-pending-users" :disabled="activeTab === 'user-form' || activeTab === 'bulk-preview'">
+                    <div class="d-flex align-items-center gap-2">
+                        <MailWarning style="color: var(--warning-color);" :size="16" />
+                        <span :class="{'d-none d-md-inline': activeTab !== 'all-pending-users'}">Pending Users</span>
                     </div>
                 </Tab>
                 <Tab value="user-form" v-show="activeTab === 'user-form'">
@@ -69,7 +70,7 @@
             <TabPanel v-if="authStore.isMonk" value="my-biography">
                 <UserMekudiBiographyView v-if="activeTab === 'my-biography'" />
             </TabPanel>
-            <TabPanel v-if="false" value="all-pending-users">
+            <TabPanel v-if="authStore.isSuperAdmin" value="all-pending-users">
                 <UserPendingView v-if="activeTab === 'all-pending-users'" />
             </TabPanel>
             <TabPanel value="biography-surveys">
@@ -109,6 +110,7 @@ const VALID_TABS = computed(() => {
     const tabs = ['all-users'];
     if (authStore.isMonk) tabs.push('my-biography');
     tabs.push('user-form', 'biography-surveys', 'student-biography');
+    if (authStore.isSuperAdmin) tabs.push('all-pending-users');
     return tabs;
 });
 
