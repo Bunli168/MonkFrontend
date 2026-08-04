@@ -115,7 +115,7 @@ import { useRoomStore } from '@/stores/rooms/room'
 import {
 	Building2, Layers, DoorOpen, Hash, ArrowRight, Search, Filter
 } from '@lucide/vue'
-import coverImg from '@/assets/images/cover_img.jpg'
+const coverImg = 'https://placehold.co/600x400'
 
 const router = useRouter()
 const roomStore = useRoomStore()

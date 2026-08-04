@@ -29,11 +29,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAdmin = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['SUPERADMIN', 'ADMIN', 'MEKUDI'].includes(uRole);
+        return ['ADMIN', 'MEKUDI'].includes(uRole);
     });
     const isSuperAdmin = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['SUPERADMIN'].includes(uRole);
+        return ['SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isTeacher = computed(() => {
         const uRole = userRole.value?.toUpperCase();
@@ -41,24 +41,30 @@ export const useAuthStore = defineStore('auth', () => {
     });
     const isStudent = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['MONK', 'STUDENT', 'BHIKKHU', 'ATTENDANCETAKER'].includes(uRole);
+        return ['MONK', 'STUDENT', 'BHIKKHU', 'ATTENDANCETAKER', 'ATTENDANCE_TAKER'].includes(uRole);
     });
     const isMonk = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['MONK', 'BHIKKHU', 'MEKUDI', 'ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(uRole);
+        return ['MONK', 'BHIKKHU', 'MEKUDI', 'ATTENDANCETAKER', 'ATTENDANCE_TAKER', 'ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isBhikkhu = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['BHIKKHU', 'ADMIN', 'SUPERADMIN'].includes(uRole);
+        return ['BHIKKHU', 'ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(uRole);
     });
     const isAttendanceTaker = computed(() => {
         const uRole = userRole.value?.toUpperCase();
-        return ['ATTENDANCETAKER'].includes(uRole);
+        return ['ATTENDANCETAKER', 'ATTENDANCE_TAKER'].includes(uRole);
     });
 
     const hasRole = (roles) => {
         const uRole = userRole.value?.toUpperCase();
-        const uppercaseRoles = roles.map(r => r.toUpperCase());
+        const uppercaseRoles = roles.map(r => {
+            const up = r.toUpperCase();
+            if (up === 'ADMIN') return ['ADMIN', 'MEKUDI'];
+            if (up === 'SUPERADMIN') return ['SUPERADMIN', 'SUPER_ADMIN'];
+            if (up === 'ATTENDANCETAKER') return ['ATTENDANCETAKER', 'ATTENDANCE_TAKER'];
+            return [up];
+        }).flat();
         return uppercaseRoles.includes(uRole);
     };
 
@@ -101,11 +107,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     const login = async (payload) => {
         try {
-            // Clear any stale tokens from previous incomplete logins
-            localStorage.removeItem('changePasswordToken');
-            localStorage.removeItem('otpSessionToken');
-            localStorage.removeItem('mfaType');
-
             if (!payload.email || !payload.password) throw new Error('Email and Password are required!')
             const response = await api.post('/auth/login', payload);
             const data = response.data?.data || response.data;
@@ -215,13 +216,12 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response = await api.put('/auth/change-password', payload);
             toastStore.showToast(response?.data?.message || 'ប្តូរពាក្យសម្ងាត់ជោគជ័យ!', 'success');
-            // Stay logged in! Update tokens if the backend returns them
-            if (response?.data?.accessToken) {
-                setTokens({ access: response.data.accessToken });
-                if (response.data.user) {
-                    user.value = response.data.user;
-                }
+            
+            // Set new tokens to stay logged in on the current device
+            if (response?.data?.data?.tokens?.accessToken) {
+                setTokens({ access: response.data.data.tokens.accessToken });
             }
+            
             return true;
         } catch (error) {
             handleApiError(error, toastStore);
@@ -286,18 +286,6 @@ export const useAuthStore = defineStore('auth', () => {
             return false;
         }
     }
-    const generateTelegramLinkToken = async () => {
-        try {
-            const response = await api.get('/auth/telegram-link-token');
-            if (response.data.success) {
-                return response.data.token;
-            }
-            return null;
-        } catch (error) {
-            console.error('Error generating telegram link token:', error);
-            return null;
-        }
-    };
 
     const unlinkTelegram = async () => {
         try {
@@ -306,21 +294,6 @@ export const useAuthStore = defineStore('auth', () => {
             if (user.value) {
                 user.value.telegram_chat_id = null;
                 user.value.telegram_username = null;
-            }
-            return true;
-        } catch (error) {
-            handleApiError(error, toastStore);
-            return false;
-        }
-    };
-
-    const unlinkOtpTelegram = async () => {
-        try {
-            const res = await api.post('auth/unlink-otp-telegram');
-            toastStore.showToast(res?.data?.message || 'OTP Telegram account unlinked', 'success');
-            if (user.value) {
-                user.value.otp_telegram_chat_id = null;
-                user.value.otp_telegram_username = null;
             }
             return true;
         } catch (error) {
@@ -389,12 +362,9 @@ export const useAuthStore = defineStore('auth', () => {
         verifyOtp,
         resendOtp,
         enableTotp,
-        verifyTotpSetup,
         disableTotp,
-        generateTelegramLinkToken,
         unlinkTelegram,
-        unlinkOtpTelegram,
-
+        verifyTotpSetup,
         changeDefaultPassword,
         hasRole,
         getProfile,
