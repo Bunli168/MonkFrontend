@@ -469,3 +469,25 @@ table {
         font-size: 16px !important;
     }
 }
+/* Fallback Dark Mode Overrides for Inputs & Labels */
+[data-theme="dark"] .form-label,
+[data-bs-theme="dark"] .form-label,
+[data-theme="dark"] .p-inputtext,
+[data-bs-theme="dark"] .p-inputtext,
+[data-theme="dark"] .p-inputnumber-input,
+[data-bs-theme="dark"] .p-inputnumber-input,
+[data-theme="dark"] .p-password-input,
+[data-bs-theme="dark"] .p-password-input,
+[data-theme="dark"] .p-textarea-dynamic,
+[data-bs-theme="dark"] .p-textarea-dynamic,
+[data-theme="dark"] .p-dropdown-label,
+[data-bs-theme="dark"] .p-dropdown-label,
+[data-theme="dark"] .p-selectbutton .p-button-label,
+[data-bs-theme="dark"] .p-selectbutton .p-button-label {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
