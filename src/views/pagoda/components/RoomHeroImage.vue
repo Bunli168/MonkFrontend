@@ -56,7 +56,7 @@
 
 <script setup>
 import { LayoutGrid, Layers, ChevronLeft, ChevronRight, ArrowLeft } from '@lucide/vue'
-import coverImg from '@/assets/images/cover_img.jpg'
+const coverImg = 'https://placehold.co/600x400'
 import { useTimeFormat } from '@/composables/useTimeFormat'
 
 // Swiper
