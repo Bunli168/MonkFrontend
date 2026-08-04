@@ -39,7 +39,7 @@ const isImageLoading = ref(true);
                             <div class="user-avatar overflow-hidden rounded-circle bg-light border position-relative" :class="{ 'active-profile': isOpen || route.name === 'settings' }">
                                 <div class="avatar-default" :class="{ 'is-hidden': isOpen }">
                                     <img v-if="user?.profile?.avatarUrl" :src="$authImg(user.profile.avatarUrl)" alt="Avatar" class="w-100 h-100 object-fit-cover" @load="isImageLoading = false" @error="isImageLoading = false" />
-                                    <img v-else src="/avatar.png" alt="Avatar" class="w-100 h-100 object-fit-cover" @load="isImageLoading = false" @error="isImageLoading = false" />
+                                    <img v-else src="/neakavorn-pagoda.png" alt="Avatar" class="w-100 h-100 object-fit-cover" @load="isImageLoading = false" @error="isImageLoading = false" />
                                 </div>
                                 <div class="avatar-active d-flex align-items-center justify-content-center w-100 h-100 bg-light" :class="{ 'is-visible': isOpen }">
                                     <X :size="20" class="text-muted" />

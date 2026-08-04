@@ -2,10 +2,10 @@
     <div class="retreat-event-settings">
         <!-- History Table -->
         <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <h5 class="card-title mb-0 fw-bold">Season History</h5>
-                <BaseButton variant="primary" size="sm" @click="openStartModal">
-                    <i class="bi bi-plus-circle me-1"></i> Start New Season
+                <BaseButton variant="primary" size="sm" @click="openStartModal" class="btn-responsive-width d-flex justify-content-center align-items-center">
+                    <PlusCircle :size="16" class="me-1" /> Start New Season
                 </BaseButton>
             </div>
             <div class="card-body p-0">
@@ -14,7 +14,8 @@
                         { field: 'name', header: 'Season Name' },
                         { field: 'start_date', header: 'Start Date' },
                         { field: 'end_date', header: 'End Date' },
-                        { field: 'status', header: 'Status' }
+                        { field: 'status', header: 'Status' },
+                        ...(authStore.isSuperAdmin ? [{ field: 'action', header: 'Action' }] : [])
                     ]"
                     :rows="paginatedEvents"
                     :total-records="eventsList.length"
@@ -33,17 +34,23 @@
                             {{ getStatusText(data) }}
                         </span>
                     </template>
+                    <template #action="{ data }">
+                        <BaseActionMenu 
+                            v-if="data.is_active && authStore.isSuperAdmin" 
+                            :items="getActionItems(data)" 
+                        />
+                    </template>
                 </BaseTable>
             </div>
         </div>
 
 
 
-        <!-- Start New Season Modal -->
-        <BaseModal v-model="isModalOpen" title="Start New Season" @close="isModalOpen = false">
-            <form @submit.prevent="submitStartSeason">
+        <!-- Add / Edit Season Modal -->
+        <BaseModal v-model="isModalOpen" :title="isEditMode ? 'Edit Season' : 'Start New Season'" @close="isModalOpen = false">
+            <form @submit.prevent="submitSeasonForm">
                 <div class="mb-4">
-                    <p class="text-muted mb-3">
+                    <p class="text-muted mb-3" v-if="!isEditMode">
                         Starting a new season will automatically archive any previous seasons. Users will be able to register for this new season immediately.
                     </p>
                     <div class="mb-3">
@@ -62,9 +69,26 @@
                 
                 <div class="d-flex justify-content-end gap-2">
                     <BaseButton type="button" variant="light" @click="isModalOpen = false">Cancel</BaseButton>
-                    <BaseButton type="submit" variant="primary" :isLoading="isSubmitting">Start Season</BaseButton>
+                    <BaseButton type="submit" variant="primary" :isLoading="isSubmitting">
+                        {{ isEditMode ? 'Save Changes' : 'Start Season' }}
+                    </BaseButton>
                 </div>
             </form>
+        </BaseModal>
+
+        <!-- Confirm Toggle Modal -->
+        <BaseModal v-model="isConfirmModalOpen" title="Confirm Action" @close="closeConfirmModal">
+            <div class="mb-4">
+                <p class="text-muted mb-0">
+                    Are you sure you want to <strong>{{ confirmActionText }}</strong> this season?
+                </p>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <BaseButton type="button" variant="light" @click="closeConfirmModal">Cancel</BaseButton>
+                <BaseButton type="button" :variant="confirmActionText === 'CLOSE' ? 'danger' : 'primary'" :isLoading="isSubmitting" @click="executeToggleSeason">
+                    Yes, {{ confirmActionText }} Season
+                </BaseButton>
+            </div>
         </BaseModal>
     </div>
 </template>
@@ -76,13 +100,22 @@ import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseTable from '@/components/base/BaseTable.vue';
+import BaseToggle from '@/components/base/BaseToggle.vue';
 import { useToastStore } from '@/stores/toast';
 import { useSystemStore } from '@/stores/system';
+import { useAuthStore } from '@/stores/auth';
+import { PlusCircle, Pencil, Power } from '@lucide/vue';
 
 const toast = useToastStore();
 const systemStore = useSystemStore();
+const authStore = useAuthStore();
 
 const isModalOpen = ref(false);
+const isEditMode = ref(false);
+const editEventId = ref(null);
+const isConfirmModalOpen = ref(false);
+const pendingEventToToggle = ref(null);
+const confirmActionText = ref('');
 const isSubmitting = ref(false);
 const formData = ref({
     name: '',
@@ -145,11 +178,24 @@ onMounted(() => {
 });
 
 const openStartModal = () => {
+    isEditMode.value = false;
+    editEventId.value = null;
     formData.value = { name: '', start_date: '', end_date: '' };
     isModalOpen.value = true;
 };
 
-const submitStartSeason = async () => {
+const openEditModal = (evt) => {
+    isEditMode.value = true;
+    editEventId.value = evt.id;
+    formData.value = { 
+        name: evt.name, 
+        start_date: evt.start_date ? evt.start_date.split('T')[0] : '', 
+        end_date: evt.end_date ? evt.end_date.split('T')[0] : '' 
+    };
+    isModalOpen.value = true;
+};
+
+const submitSeasonForm = async () => {
     if (!formData.value.name.trim()) {
         toast.showToast('Season name is required', 'error');
         return;
@@ -157,42 +203,92 @@ const submitStartSeason = async () => {
     
     isSubmitting.value = true;
     try {
-        const response = await api.post('/retreat-events/start-season', { 
+        const payload = { 
             name: formData.value.name,
             start_date: formData.value.start_date || null,
             end_date: formData.value.end_date || null
-        });
+        };
+        
+        let response;
+        if (isEditMode.value) {
+            response = await api.put(`/retreat-events/${editEventId.value}`, payload);
+        } else {
+            response = await api.post('/retreat-events/start-season', payload);
+        }
+        
         if (response.data.success) {
-            toast.showToast('New season started successfully', 'success');
+            toast.showToast(isEditMode.value ? 'Season updated successfully' : 'New season started successfully', 'success');
             isModalOpen.value = false;
             await systemStore.fetchCurrentSeason();
             fetchEventsList();
         }
     } catch (error) {
-        toast.showToast(error?.response?.data?.message || 'Failed to start season', 'error');
+        toast.showToast(error?.response?.data?.message || (isEditMode.value ? 'Failed to update season' : 'Failed to start season'), 'error');
     } finally {
         isSubmitting.value = false;
     }
 };
 
-const confirmCloseSeason = async () => {
-    if (confirm('Are you sure you want to CLOSE the current season? Users will no longer be able to take attendance.')) {
-        isSubmitting.value = true;
-        try {
-            const response = await api.post('/retreat-events/close-season');
-            if (response.data.success) {
-                toast.showToast('Season closed successfully', 'success');
-                await systemStore.fetchCurrentSeason();
-                fetchEventsList();
-            }
-        } catch (error) {
-            toast.showToast(error?.response?.data?.message || 'Failed to close season', 'error');
-        } finally {
-            isSubmitting.value = false;
+const toggleSeasonStatus = (evt) => {
+    pendingEventToToggle.value = evt;
+    confirmActionText.value = evt.is_closed ? 'OPEN' : 'CLOSE';
+    isConfirmModalOpen.value = true;
+};
+
+const closeConfirmModal = () => {
+    isConfirmModalOpen.value = false;
+    pendingEventToToggle.value = null;
+    // We don't reset the actual toggle UI model here easily unless we force table re-render, 
+    // but typically users will wait for API or we just re-fetch to reset it.
+    // Fetching events will reset the toggle to correct DB state.
+    fetchEventsList();
+};
+
+const executeToggleSeason = async () => {
+    if (!pendingEventToToggle.value) return;
+    
+    const evt = pendingEventToToggle.value;
+    const action = confirmActionText.value;
+    
+    isSubmitting.value = true;
+    try {
+        const response = await api.post(`/retreat-events/toggle-season/${evt.id}`);
+        if (response.data.success) {
+            toast.showToast(`Season ${action.toLowerCase()}d successfully`, 'success');
+            await systemStore.fetchCurrentSeason();
+            fetchEventsList();
+            isConfirmModalOpen.value = false;
         }
+    } catch (error) {
+        toast.showToast(error?.response?.data?.message || `Failed to ${action.toLowerCase()} season`, 'error');
+        fetchEventsList(); // reset toggle state
+    } finally {
+        isSubmitting.value = false;
+        pendingEventToToggle.value = null;
     }
 };
 
+const getActionItems = (evt) => {
+    return [
+        {
+            label: 'Edit Season',
+            icon: Pencil,
+            iconClass: 'text-primary',
+            command: () => {
+                openEditModal(evt);
+            }
+        },
+        {
+            label: evt.is_closed ? 'Re-open Season' : 'Close Season',
+            icon: Power,
+            textClass: evt.is_closed ? 'text-success fw-medium' : 'text-danger fw-medium',
+            iconClass: evt.is_closed ? 'text-success' : 'text-danger',
+            command: () => {
+                toggleSeasonStatus(evt);
+            }
+        }
+    ];
+};
 
 </script>
 

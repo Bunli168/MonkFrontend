@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
             <h6 class="fw-bold m-0 text-heading">Kudi Management / គ្រប់គ្រងកុដិ</h6>
-            <BaseButton @click="openCreateModal()" variant="primary" size="sm" class="d-flex align-items-center gap-2">
+            <BaseButton @click="openCreateModal()" variant="primary" size="sm" class="d-flex align-items-center justify-content-center gap-2 btn-responsive-width">
                 <i class="fas fa-plus"></i> Add New Kudi
             </BaseButton>
         </div>

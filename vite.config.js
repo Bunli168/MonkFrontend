@@ -14,23 +14,23 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
-      includeAssets: ['avatar.png', 'robots.txt'],
+      includeAssets: ['neakavorn-pagoda.png', 'robots.txt'],
       manifest: {
-        name: 'ប្រព័ន្ធគ្រប់គ្រងវត្តអារាម (Pagoda Management)',
-        short_name: 'វត្តអារាម',
-        description: 'ប្រព័ន្ធគ្រប់គ្រងវត្តអារាម និងព្រះសង្ឃ/និស្សិត',
+        name: 'វត្តនាគវ័ន (Neakavorn Pagoda)',
+        short_name: 'វត្តនាគវ័ន',
+        description: 'គ្រប់គ្រងព្រះសង្ឃ និងនិស្សិត',
         theme_color: '#f59e0b',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
         icons: [
           {
-            src: '/avatar.png',
+            src: '/neakavorn-pagoda.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/avatar.png',
+            src: '/neakavorn-pagoda.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'

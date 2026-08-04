@@ -44,8 +44,9 @@
                              :class="{ 'active-profile': route.name === 'pagoda-profile' || isOpen }"
                              @click="toggle" style="cursor: pointer;">
                             <div class="avatar-default" :class="{ 'is-hidden': isOpen }">
-                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/avatar.png'"
-                                    class="w-100 h-100 object-fit-cover" alt="User Avatar">
+                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/neakavorn-pagoda.png'"
+                                     alt="User Avatar" 
+                                     class="w-100 h-100 object-fit-cover" />
                             </div>
                             <div class="avatar-active d-flex align-items-center justify-content-center w-100 h-100 bg-light" :class="{ 'is-visible': isOpen }">
                                 <X :size="20" class="text-muted" />
@@ -102,10 +103,7 @@ const headerPaths = computed(() => {
         paths.push({ label: 'ប្រវត្តិរូបសង្ខេប', path: 'pagoda-monk-biography', icon: ClipboardList });
     }
     
-    // Add Scan Attendance for Monks/Students
-    if (authStore.isMonk || authStore.isStudent) {
-        paths.push({ label: 'Scan Attendance', path: 'pagoda-self-scan', icon: QrCode });
-    }
+
 
     if (authStore.isTeacher || authStore.isAdmin || authStore.isMekudi) {
         paths.push({ label: 'Users', path: 'pagoda-users', icon: Users });

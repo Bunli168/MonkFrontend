@@ -150,6 +150,31 @@
             </div>
 
         </div>
+
+        <!-- PWA Install Modal -->
+        <BaseModal v-model="showInstallModal" title="How to Install App" size="sm">
+            <div class="text-center py-3">
+                <div class="mb-3">
+                    <Download :size="48" class="text-primary mb-2" />
+                    <h6>កម្មវិធីនេះត្រូវបានដំឡើងរួចហើយ! <br><span class="text-muted fw-normal">(App is already installed or requires manual install)</span></h6>
+                </div>
+                
+                <p class="text-muted small text-start">
+                    <strong>On Computer (Chrome/Brave/Edge):</strong><br>
+                    Look at the right side of your URL address bar. If you see an "Open" or "Install" icon, click it to launch or install the app.
+                </p>
+                
+                <p class="text-muted small text-start mb-0">
+                    <strong>On iPhone/iPad (Safari):</strong><br>
+                    Tap the Share button <span class="border rounded px-1"><i class="pi pi-share-apple"></i></span> at the bottom of the screen, then select "Add to Home Screen".
+                </p>
+            </div>
+            <template #footer>
+                <div class="w-100 d-flex justify-content-end">
+                    <BaseButton @click="showInstallModal = false" variant="outline-primary">Close</BaseButton>
+                </div>
+            </template>
+        </BaseModal>
     </div>
 </template>
 
@@ -159,6 +184,7 @@ import { ShieldCheck, Bot, Trash2, Link2, Link2Off, Download } from '@lucide/vue
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/users/user';
 import { useToastStore } from '@/stores/toast';
+import BaseModal from '@/components/base/BaseModal.vue';
 
 const authStore = useAuthStore();
 const userStore = useUserStore();
@@ -166,6 +192,7 @@ const toastStore = useToastStore();
 const telegramUsername = import.meta.env.VITE_TELEGRAM_OTP_SUPPORT_USERNAME || 'optsecuritybot';
 const isUnlinking = ref(false);
 const isLoadingTelegram = ref(false);
+const showInstallModal = ref(false);
 
 const handleLinkTelegram = async () => {
     isLoadingTelegram.value = true;
@@ -243,7 +270,7 @@ const triggerInstall = async () => {
             deferredPrompt.value = null;
         }
     } else {
-        alert('សូមអនុវត្តតាមការណែនាំខាងក្រោម ដើម្បីដំឡើងកម្មវិធីចូលក្នុងឧបករណ៍របស់អ្នក!');
+        showInstallModal.value = true;
     }
 };
 

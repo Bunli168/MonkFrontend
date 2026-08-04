@@ -630,13 +630,13 @@ const colDefs = computed(() => {
 
 @media (min-width: 576px) {
     .status-select {
-        width: 150px;
+        width: 130px;
     }
     .kut-select {
-        width: 180px;
+        width: 130px;
     }
     .search-input {
-        width: 350px;
+        width: 250px;
     }
 }
 </style>

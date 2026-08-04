@@ -1,83 +1,73 @@
 <template>
-    <div class="card bg-white p-3 shadow-sm border-0 rounded-4">
-        <div class="text-center mb-4">
-
-            <div class="mt-3 p-3 rounded-3 d-inline-block text-start border" style="background-color: var(--surface-ground);" v-if="authStore.user?.profile?.seating_row_id || authStore.user?.UserProfile?.seating_row_id">
-                <div class="d-flex align-items-center gap-3">
-                    <div>
-                        <h6 class="fw-bold mb-1 text-primary">Your Seating</h6>
-                        <div class="text-dark fw-medium" style="font-size: 0.95rem;">
-                            Row {{ authStore.user?.profile?.seatingRow?.row_num || authStore.user?.profile?.seating_row_id || authStore.user?.UserProfile?.seating_row_id }}
-                            <span v-if="authStore.user?.profile?.seat_number || authStore.user?.UserProfile?.seat_number" class="ms-1">
-                                (Seat {{ authStore.user?.profile?.seat_number || authStore.user?.UserProfile?.seat_number }})
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-3 p-3 rounded-3 d-inline-block text-start border bg-white shadow-sm" v-else>
-                <div class="d-flex align-items-center gap-2 text-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h6 class="fw-bold mb-0">No Seat Assigned</h6>
-                </div>
-                <p class="text-muted small mb-0 mt-2">Please go to "Register Seat" tab to register your seat.</p>
-            </div>
-        </div>
+    <div class="d-flex flex-column gap-4 pt-2">
         
         <!-- Success State -->
-        <div v-if="scannedData && !isError" class="text-center py-4">
-            <div class="mb-4 d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 80px; height: 80px;">
+        <div v-if="scannedData && !isError" class="text-center py-5 animation-fade-in">
+            <div class="mb-4 mx-auto d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle shadow-sm" style="width: 90px; height: 90px; transition: transform 0.3s ease;">
                 <i class="fas fa-check fa-3x"></i>
             </div>
-            <h4 class="fw-bold text-dark mb-1">Scan Successful!</h4>
-            <p class="text-muted mb-4">You have been marked as present.</p>
+            <h3 class="fw-bold text-dark mb-2">Scan Successful!</h3>
+            <p class="text-muted mb-4 fs-6">You have been marked as present for today.</p>
             
-            <div class="bg-light rounded-4 p-4 text-start d-inline-block shadow-sm border mb-4" style="min-width: 250px;">
-                <div class="small text-muted text-uppercase fw-bold mb-2">Attendance Details</div>
-                <div class="fs-5 fw-bold text-primary mb-2">{{ scannedData.name }}</div>
-                <div class="d-flex align-items-center gap-3 text-dark fw-medium">
-                    <div><i class="fas fa-chair text-muted me-2"></i>Row {{ scannedData.row }}</div>
-                    <div><i class="fas fa-user text-muted me-2"></i>Seat {{ scannedData.seat }}</div>
+            <div class="bg-surface rounded-4 p-4 text-start d-inline-block shadow-sm border mb-4" style="min-width: 280px;">
+                <div class="small text-muted text-uppercase fw-bold mb-3 tracking-wide">Attendance Details</div>
+                <div class="fs-4 fw-bold text-primary mb-3">{{ scannedData.name }}</div>
+                <div class="d-flex align-items-center gap-4 text-dark fw-medium">
+                    <div class="d-flex align-items-center gap-2"><div class="bg-light p-2 rounded-circle"><i class="fas fa-chair text-muted"></i></div>Row {{ scannedData.row }}</div>
+                    <div class="d-flex align-items-center gap-2"><div class="bg-light p-2 rounded-circle"><i class="fas fa-user text-muted"></i></div>Seat {{ scannedData.seat }}</div>
                 </div>
             </div>
             
-            <div>
-                <BaseButton variant="primary" class="px-5 py-2 shadow-sm" @click="confirmScan">
-                    Confirm
+            <div class="mt-2">
+                <BaseButton variant="primary" class="px-5 py-2 shadow-sm rounded-pill" @click="confirmScan">
+                    Done
                 </BaseButton>
             </div>
         </div>
         
         <!-- Scanner State -->
-        <div v-else>
-            <div class="d-flex justify-content-center w-100 mb-4">
-                <div style="position: relative; width: 100%; max-width: 500px; min-height: 300px;">
-                    <div id="qr-reader" style="width: 100%; height: 100%; border-radius: 16px; overflow: hidden; border: 2px solid var(--primary-color); background-color: var(--surface-ground);">
+        <div v-else class="d-flex flex-column align-items-center w-100">
+            <div class="w-100 position-relative mb-4" style="max-width: 450px; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background-color: var(--surface-ground); border: 2px solid rgba(var(--bs-primary-rgb), 0.1); box-shadow: inset 0 0 20px rgba(0,0,0,0.05);">
+                <div id="qr-reader" style="width: 100%; height: 100%;"></div>
+                
+                <!-- Placeholder when camera is off -->
+                <div v-if="!isScanning" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(0,0,0,0.02); backdrop-filter: blur(4px);">
+                    <div class="bg-white p-4 rounded-circle shadow-sm mb-3 text-muted">
+                        <i class="fas fa-qrcode fa-2x"></i>
                     </div>
-                    <div v-if="!isScanning" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-                        <span class="text-muted"><i class="fas fa-camera fa-2x mb-2 d-block text-center"></i> Camera Off</span>
+                    <span class="text-muted fw-medium">Camera is offline</span>
+                    <span class="text-muted small mt-1">Tap the button below to start scanning</span>
+                </div>
+                
+                <!-- Scanning Overlay Guidelines -->
+                <div v-if="isScanning" class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none d-flex align-items-center justify-content-center">
+                    <div style="width: 65%; height: 65%; border: 2px solid rgba(255,255,255,0.4); border-radius: 16px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);">
+                        <!-- Corner brackets for modern feel -->
+                        <div class="position-absolute top-0 start-0 border-top border-start border-white border-4" style="width: 30px; height: 30px; border-top-left-radius: 14px; transform: translate(-2px, -2px);"></div>
+                        <div class="position-absolute top-0 end-0 border-top border-end border-white border-4" style="width: 30px; height: 30px; border-top-right-radius: 14px; transform: translate(2px, -2px);"></div>
+                        <div class="position-absolute bottom-0 start-0 border-bottom border-start border-white border-4" style="width: 30px; height: 30px; border-bottom-left-radius: 14px; transform: translate(-2px, 2px);"></div>
+                        <div class="position-absolute bottom-0 end-0 border-bottom border-end border-white border-4" style="width: 30px; height: 30px; border-bottom-right-radius: 14px; transform: translate(2px, 2px);"></div>
                     </div>
                 </div>
             </div>
             
-            <div v-if="isError && scanResult" class="p-3 rounded-3 mb-4 text-center bg-danger bg-opacity-10 text-danger border border-danger">
+            <div v-if="isError && scanResult" class="w-100 p-3 rounded-3 mb-4 text-center bg-danger bg-opacity-10 text-danger border border-danger">
                 <div class="d-flex align-items-center justify-content-center gap-2">
                     <i class="fas fa-exclamation-circle"></i>
                     <span class="fw-bold">{{ scanResult }}</span>
                 </div>
             </div>
             
-            <div class="text-center d-flex justify-content-center gap-2">
-                <BaseButton variant="primary" class="px-4 py-2 shadow-sm" @click="startScanner" v-if="!isScanning">
-                    <i class="fas fa-camera me-2"></i> Open Camera
+            <div class="text-center d-flex justify-content-center gap-3">
+                <BaseButton variant="primary" class="px-4 py-2 shadow-sm rounded-pill d-flex align-items-center gap-2" @click="startScanner" v-if="!isScanning">
+                    <i class="fas fa-camera"></i> <span>Open Camera</span>
                 </BaseButton>
                 <template v-if="isScanning">
-                    <BaseButton variant="outline-danger" class="px-4 py-2" @click="stopScanner">
-                        <i class="fas fa-stop me-2"></i> Stop
+                    <BaseButton variant="outline-danger" class="px-4 py-2 rounded-pill d-flex align-items-center gap-2" @click="stopScanner">
+                        <i class="fas fa-stop"></i> <span>Stop</span>
                     </BaseButton>
-                    <BaseButton variant="outline-secondary" class="px-4 py-2" @click="flipCamera">
-                        <i class="fas fa-sync-alt me-2"></i> Flip Camera
+                    <BaseButton variant="outline-secondary" class="px-4 py-2 rounded-pill d-flex align-items-center gap-2" @click="flipCamera">
+                        <i class="fas fa-sync-alt"></i> <span>Flip</span>
                     </BaseButton>
                 </template>
             </div>

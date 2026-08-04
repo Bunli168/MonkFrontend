@@ -179,7 +179,7 @@ const exportToCSV = async () => {
         isExporting.value = true;
 
         // Fetch all monk surveys with user profile data
-        const response = await api.get('/monk-surveys');
+        const response = await api.get('/monk-surveys', { params: { role_id: 7 } });
         const records = response.data?.data || [];
 
         const headers = [

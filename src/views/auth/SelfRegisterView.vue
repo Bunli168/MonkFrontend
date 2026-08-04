@@ -3,58 +3,72 @@
   <div class="py-4 container-fluid px-2 px-sm-3 px-md-4" style="overflow-x: hidden;">
     <div>
       <!-- Header Area -->
-      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center mb-4 gap-3">
-        <div class="flex-grow-1" style="min-width: 0;">
-          <h3 class="fw-bold mb-1 d-block d-sm-flex align-items-baseline gap-1 gap-sm-2" style="color: var(--text-heading-color); word-break: break-word;">
-            <span class="d-block">Attendance & Seating</span>
-            <span class="text-primary fs-5 fs-sm-4 d-block mt-1 mt-sm-0">/ វត្តមាន និង កៅអី</span>
-          </h3>
-          <p class="text-muted mb-0 subtitle small" style="word-break: break-word;">Manage your seating registration and absence permissions.</p>
+      <!-- Header Area -->
+      <div class="mb-4">
+        <h3 class="fw-bold mb-1" style="color: var(--text-heading-color);">
+          Attendance & Seating
+          <span class="text-primary fs-5 fs-sm-4">/ វត្តមាន និង កៅអី</span>
+        </h3>
+        <p class="text-muted mb-0 subtitle small" style="word-break: break-word;">Manage your seating registration and absence permissions.</p>
+      </div>
+
+      <!-- Toolbar & Summary Area -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 w-100 mb-4">
+        
+        <!-- Summary Cards (Left) -->
+        <div v-if="summary" class="d-flex flex-wrap gap-2 gap-sm-3 flex-grow-1">
+          <!-- Permission Count -->
+          <div class="py-2 px-2 border d-flex align-items-center gap-2 shadow-sm rounded-3 flex-grow-1" style="background-color: var(--surface-card); border-color: rgba(var(--bs-primary-rgb), 0.3) !important; min-width: 100px; max-width: 200px;">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-2">
+              <CalendarRange class="text-primary" :size="16" />
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <span class="text-muted tracking-wide" style="font-size: 0.75rem; font-weight: 600; margin-bottom: 2px;">ច្បាប់</span>
+              <div class="fw-bold" style="color: var(--text-color); font-size: 1.1rem; line-height: 1;">{{ summary.permission || 0 }} <span class="text-muted fw-normal" style="font-size: 0.8rem;">ថ្ងៃ</span></div>
+            </div>
+          </div>
+          
+          <!-- Absent Count -->
+          <div class="py-2 px-2 border d-flex align-items-center gap-2 shadow-sm rounded-3 flex-grow-1" style="background-color: var(--surface-card); border-color: rgba(var(--bs-danger-rgb), 0.3) !important; min-width: 100px; max-width: 200px;">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 p-2">
+              <AlertCircle class="text-danger" :size="16" />
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <span class="text-muted tracking-wide" style="font-size: 0.75rem; font-weight: 600; margin-bottom: 2px;">អវត្តមាន</span>
+              <div class="fw-bold" style="color: var(--text-color); font-size: 1.1rem; line-height: 1;">{{ summary.absent || 0 }} <span class="text-muted fw-normal" style="font-size: 0.8rem;">ថ្ងៃ</span></div>
+            </div>
+          </div>
+
+          <!-- Fine Amount -->
+          <div class="py-2 px-2 border d-flex align-items-center gap-2 shadow-sm rounded-3 flex-grow-1" style="background-color: var(--surface-card); border-color: rgba(var(--bs-warning-rgb), 0.3) !important; min-width: 100px; max-width: 200px;">
+            <div class="d-flex align-items-center justify-content-center rounded-circle p-2" style="background-color: rgba(184, 134, 11, 0.1);">
+              <Coins style="color: #b8860b;" :size="16" />
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <span class="text-muted tracking-wide" style="font-size: 0.75rem; font-weight: 600; margin-bottom: 2px;">ពិន័យសរុប</span>
+              <div class="fw-bold" style="color: var(--text-color); font-size: 1.1rem; line-height: 1;"><span class="text-muted fw-normal me-1" style="font-size: 0.9rem;">$</span>{{ Number(summary.fine || 0).toLocaleString() }}</div>
+            </div>
+          </div>
         </div>
-        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end w-100 w-lg-auto mt-3 mt-lg-0">
-          <!-- Button Register Seat -->
-          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill w-100 w-sm-auto">
+
+        <!-- Action Buttons (Right) -->
+        <div class="d-flex flex-wrap justify-content-start justify-content-md-end gap-2 flex-grow-1">
+          <BaseButton type="button" @click="showScanModal = true" variant="outline" class="col-12 col-md-auto d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-md-grow-0">
+            <QrCode :size="18" class="flex-shrink-0 text-primary" />
+            <span class="fw-medium">ស្កេនវត្តមាន</span>
+          </BaseButton>
+          
+          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-grow-1 flex-md-grow-0">
             <Armchair :size="18" class="flex-shrink-0 text-primary" />
             <span class="text-truncate fw-medium" style="max-width: 250px;">
-              {{ hasRegisteredSeat ? `Seat: Row ${authStore.user?.profile?.seating_row?.row_num || ''} - Seat ${authStore.user?.profile?.seat_number || ''}` : 'Register Seat / ចុះឈ្មោះកៅអី' }}
+              {{ hasRegisteredSeat ? `ជួរទី ${authStore.user?.profile?.seating_row?.row_num || ''} - លេខ ${authStore.user?.profile?.seat_number || ''}` : 'ចុះឈ្មោះកៅអី' }}
             </span>
           </BaseButton>
           
-          <!-- Button Leave Request -->
-          <BaseButton type="button" @click="handleLeaveRequestClick" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 flex-fill shadow-sm w-100 w-sm-auto">
+          <BaseButton type="button" @click="handleLeaveRequestClick" variant="primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-grow-1 flex-md-grow-0">
             <CalendarRange :size="18" class="flex-shrink-0" />
-            <span class="fw-medium">Leave Request / ស្នើសុំច្បាប់</span>
+            <span class="fw-medium">ស្នើសុំច្បាប់</span>
           </BaseButton>
-        </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <div v-if="summary" class="row g-2 mb-3">
-        <!-- Permission Count -->
-        <div class="col-12 col-md-4">
-          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-primary-rgb), 0.3) !important;">
-            <CalendarRange class="text-primary" :size="18" />
-            <span class="small fw-medium text-muted">Permission:</span>
-            <span class="fw-bold text-dark text-nowrap">{{ summary.permission || 0 }} <small class="text-muted fw-normal">days</small></span>
-          </div>
-        </div>
-        
-        <!-- Absent Count -->
-        <div class="col-12 col-md-4">
-          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-danger-rgb), 0.3) !important;">
-            <AlertCircle class="text-danger" :size="18" />
-            <span class="small fw-medium text-muted">Absent:</span>
-            <span class="fw-bold text-dark text-nowrap">{{ summary.absent || 0 }} <small class="text-muted fw-normal">days</small></span>
-          </div>
-        </div>
-
-        <!-- Fine Amount -->
-        <div class="col-12 col-md-4">
-          <div class="px-3 py-2 border bg-white d-flex align-items-center justify-content-center justify-content-sm-start gap-2 shadow-sm w-100" style="border-radius: var(--border-inner-radius); border-color: rgba(var(--bs-warning-rgb), 0.3) !important; background-color: #fffdf5 !important;">
-            <Coins style="color: #b8860b;" :size="18" />
-            <span class="small fw-medium text-muted">Fine:</span>
-            <span class="fw-bold text-dark text-nowrap"><small class="text-muted fw-normal">$</small>{{ Number(summary.fine || 0).toLocaleString() }}</span>
-          </div>
         </div>
       </div>
 
@@ -145,6 +159,11 @@
     <div class="text-center p-0">
       <img v-if="currentImageModalUrl" :src="currentImageModalUrl" class="img-fluid rounded shadow" style="max-height: 70vh;" alt="Attachment View" />
     </div>
+  </BaseModal>
+
+  <!-- Scan Attendance Modal -->
+  <BaseModal v-model="showScanModal" title="Scan Attendance / ស្កេនវត្តមាន" size="lg">
+    <PagodaSelfScanView @close="showScanModal = false" />
   </BaseModal>
 
   <!-- Dialog Seating Registration -->
@@ -271,23 +290,27 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import api from '@/api/api';
 import { socket } from '@/utils/socket';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useToastStore } from '@/stores/toast';
-import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList, ArrowRight, FileEdit, Trash2, Coins, UploadCloud, Maximize2 } from '@lucide/vue';
+import { Lock, Armchair, CalendarRange, AlertCircle, ClipboardList, ArrowRight, FileEdit, Trash2, Coins, UploadCloud, Maximize2, QrCode } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import PagodaSelfScanView from '@/views/pagoda/PagodaSelfScanView.vue';
 import * as bootstrap from 'bootstrap';
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 
 const authStore = useAuthStore();
 const toast = useToastStore();
+const router = useRouter();
 
 const showRegisterModal = ref(false);
 const showLeaveModal = ref(false);
+const showScanModal = ref(false);
 const isSubmitting = ref(false);
 const isSubmittingLeave = ref(false);
 const isLoading = ref(false);
