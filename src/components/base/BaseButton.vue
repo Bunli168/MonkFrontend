@@ -38,7 +38,7 @@ button {
     justify-content: center;
     gap: 10px;
     border: none;
-    font-size: 15px;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 

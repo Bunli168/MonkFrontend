@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h5 class="mb-3">Telegram Integration</h5>
+    <h5 class="mb-3">Telegram Notifications</h5>
     <div class="card bg-transparent" style=" border-radius: calc(var(--border-radius) - 1rem);">
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div class="d-flex align-items-center gap-2">
@@ -15,7 +15,7 @@
             <p class="mb-0 small" style="color: var(--danger-color);" v-else>
               Not connected
             </p>
-            <span class="small">Link to telegram bot.</span>
+            <span class="small">Receive leave requests and system alerts via Telegram.</span>
           </div>
         </div>
 

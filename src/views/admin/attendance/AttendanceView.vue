@@ -16,20 +16,20 @@
                 <TabList>
                     <Tab value="attendance">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-calendar-check" style="color: var(--primary-color);"></i>
+                            <CalendarCheck :size="16" class="text-primary" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'attendance'}">Master Attendance</span>
                         </div>
                     </Tab>
 
                     <Tab value="report">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-history" style="color: var(--info-color, #0dcaf0);"></i>
+                            <History :size="16" class="text-info" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
                         </div>
                     </Tab>
                     <Tab value="leave">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-envelope-open-text" style="color: var(--warning-color, #ffc107);"></i>
+                            <MailOpen :size="16" class="text-warning" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'leave'}">Leave Requests</span>
                             <span
                                 v-if="leaveViewRef?.pendingCount > 0"
@@ -40,7 +40,7 @@
                     </Tab>
                     <Tab value="takers">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-users-cog" style="color: var(--success-color, #198754);"></i>
+                            <UsersRound :size="16" class="text-success" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'takers'}">Attendance Takers</span>
                         </div>
                     </Tab>
@@ -191,6 +191,7 @@
 <script setup>
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 import { ref, computed, watch, onMounted } from 'vue';
+import { CalendarCheck, History, MailOpen, UsersRound, Search, Save, Check, X, BedDouble } from '@lucide/vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseButton from '@/components/base/BaseButton.vue';

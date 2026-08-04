@@ -389,11 +389,12 @@ export const useAuthStore = defineStore('auth', () => {
         verifyOtp,
         resendOtp,
         enableTotp,
+        verifyTotpSetup,
         disableTotp,
         generateTelegramLinkToken,
         unlinkTelegram,
         unlinkOtpTelegram,
-        verifyTotpSetup,
+
         changeDefaultPassword,
         hasRole,
         getProfile,

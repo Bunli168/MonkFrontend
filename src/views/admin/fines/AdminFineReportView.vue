@@ -46,6 +46,7 @@
                             :rows="filteredPayments" 
                             :loading="isLoading"
                             :show-index="true"
+                            :hideIndexOnMobile="true"
                         >
                             <template #payment_date="{ data: payment }">
                                 <div class="fw-bold" style="color: var(--text-heading-color);">{{ formatDate(payment.payment_date) }}</div>
@@ -114,11 +115,11 @@ import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
 
 const colDefs = [
-    { field: 'payment_date', header: 'Date (កាលបរិច្ឆេទ)' },
-    { field: 'payer_name', header: 'Monk (អ្នកបង់)' },
-    { field: 'collector_name', header: 'Collected By (អ្នកប្រមូល)' },
-    { field: 'cleared_absents', header: 'Cleared Absents (អវត្តមានដែលបានលុប)', align: 'center' },
-    { field: 'amount', header: 'Amount Paid (ប្រាក់ដែលបានបង់)', align: 'end' }
+    { field: 'payment_date', header: 'Date (កាលបរិច្ឆេទ)', class: 'mobile-stack' },
+    { field: 'payer_name', header: 'Monk (អ្នកបង់)', class: 'mobile-stack' },
+    { field: 'collector_name', header: 'Collected By (អ្នកប្រមូល)', class: 'mobile-stack' },
+    { field: 'cleared_absents', header: 'Cleared Absents (អវត្តមានដែលបានលុប)', align: 'center', class: 'mobile-stack' },
+    { field: 'amount', header: 'Amount Paid (ប្រាក់ដែលបានបង់)', align: 'end', class: 'mobile-stack' }
 ];
 
 const props = defineProps({
@@ -368,6 +369,28 @@ onMounted(() => {
     flex-wrap: wrap;
     gap: 0;
 }
+
+/* BaseTable Action Fixes */
+:deep(.cell-value .btn-group) {
+    justify-content: flex-end;
+}
+
+@media screen and (max-width: 767.98px) {
+    :deep(td.mobile-stack .cell-content) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.25rem !important;
+    }
+    :deep(td.mobile-stack .cell-value) {
+        justify-content: flex-start !important;
+        align-items: flex-start !important;
+        flex-direction: column !important;
+        text-align: left !important;
+        width: 100% !important;
+        gap: 0.15rem;
+    }
+}
+
 .total-footer__item {
     display: flex;
     flex-direction: column;

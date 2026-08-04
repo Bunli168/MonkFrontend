@@ -64,6 +64,13 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 mt-4 text-end">
+            <BaseButton @click="handleChangePassword" variant="danger" :disabled="cpLoading">
+                <span v-if="cpLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <KeyRound v-else :size="18" class="me-1" />
+                {{ cpLoading ? 'Updating...' : 'Update Password' }}
+            </BaseButton>
+        </div>
     </div>
 </template>
 

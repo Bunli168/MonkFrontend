@@ -6,7 +6,7 @@
                 <p class="text-muted small mb-0">View all users assigned as Attendance Takers.</p>
             </div>
             
-            <div class="d-flex align-items-center gap-2 ms-auto" style="width: 100%; max-width: 500px;">
+            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100 ms-sm-auto mt-2 mt-sm-0" style="max-width: 500px;">
                 <div class="position-relative flex-grow-1">
                     <Search size="16" class="position-absolute text-muted" style="left: 1rem; top: 50%; transform: translateY(-50%);" />
                     <input 
@@ -17,7 +17,7 @@
                         placeholder="Search by name, email, or phone..." 
                     />
                 </div>
-                <BaseButton @click="showCreateModal = true" variant="primary" class="fw-bold shadow-sm rounded text-nowrap px-4 py-2 d-flex align-items-center">
+                <BaseButton @click="showCreateModal = true" variant="primary" class="fw-bold shadow-sm rounded text-nowrap px-4 py-2 d-flex justify-content-center align-items-center mt-2 mt-sm-0">
                     <Plus size="16" class="me-1" /> Add Taker
                 </BaseButton>
             </div>
@@ -32,6 +32,7 @@
                 v-model:perPage="perPage"
                 :loading="isLoading"
                 :show-index="true"
+                :hideIndexOnMobile="true"
             >
                 <template #name="{ data: row }">
                     <div class="d-flex align-items-center gap-3 py-1">
@@ -143,10 +144,10 @@ const users = ref([]);
 const seatingRows = ref([]);
 
 const colDefs = [
-    { field: 'name', header: 'Taker Name', width: '25%' },
+    { field: 'name', header: 'Taker Name', width: '25%', class: 'mobile-stack' },
     { field: 'phone', header: 'Phone Number', width: '20%' },
-    { field: 'assigned_rows', header: 'Assigned Rows', width: '40%' },
-    { field: 'actions', header: 'Actions', width: '15%', class: 'text-end', sortable: false }
+    { field: 'assigned_rows', header: 'Assigned Rows', width: '40%', class: 'mobile-stack' },
+    { field: 'actions', header: 'Actions', width: '15%', class: 'text-end mobile-stack', sortable: false }
 ];
 
 const showCreateModal = ref(false);
@@ -354,5 +355,30 @@ onMounted(() => {
 }
 .avatar-circle {
     font-size: 1.1rem;
+}
+
+@media screen and (max-width: 767.98px) {
+    :deep(td.mobile-stack .cell-content) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+    }
+    :deep(td.mobile-stack .cell-value) {
+        justify-content: flex-start !important;
+        text-align: left !important;
+        width: 100% !important;
+    }
+    :deep(td.mobile-stack .cell-value > div),
+    :deep(td.mobile-stack .cell-value > button) {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+    :deep(td.mobile-stack .cell-value > button) {
+        justify-content: center !important;
+    }
+    /* Name column specific override for text alignment on mobile */
+    :deep(td.mobile-stack .cell-value .text-start) {
+        text-align: left !important;
+    }
 }
 </style>

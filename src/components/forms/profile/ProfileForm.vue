@@ -46,7 +46,6 @@ import { ref, watch, onMounted } from 'vue';
 import { User } from '@lucide/vue';
 import { useForm, useField } from 'vee-validate';
 import { profileSchemas } from '@/utils/validations';
-
 const props = defineProps({
     initialData: {
         type: Object,

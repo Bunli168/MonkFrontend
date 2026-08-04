@@ -18,8 +18,8 @@ const isImageLoading = ref(true);
     <header class="dashboard-header d-flex align-items-center justify-content-between px-lg-4 px-3 border-bottom">
         <div class="header-left d-flex align-items-center gap-3">
             <!-- Mobile Sidebar Toggle -->
-            <button class="btn btn-light d-lg-none p-2 rounded d-flex align-items-center justify-content-center" @click="sidebar.toggleMobile()">
-                <Menu :size="20" />
+            <button class="btn bg-transparent border-0 shadow-none d-lg-none p-2 rounded d-flex align-items-center justify-content-center" style="color: inherit;" @click="sidebar.toggleMobile()">
+                <Menu :size="24" />
             </button>
             
             <h5 class="mb-0 fw-medium d-none d-lg-block">{{ route.meta.title }}</h5>

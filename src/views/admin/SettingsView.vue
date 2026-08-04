@@ -61,6 +61,17 @@
                         </div>
                     </div>
                 </TabPanel>
+                
+                <TabPanel value="security">
+                    <div class="row g-3">
+                        <div class="col-lg-6 col-md-12 d-flex flex-column gap-3">
+                            <div class="card p-4 gap-3"
+                                style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
+                                <ChangePasswordForm />
+                            </div>
+                        </div>
+                    </div>
+                </TabPanel>
                 <TabPanel value="password">
                     <div class="row">
                         <div class="col-lg-7 col-md-12">
@@ -72,7 +83,7 @@
                     </div>
                 </TabPanel>
                 <TabPanel value="appearance">
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-lg-6 col-md-12">
                             <div class="card p-3 gap-3" style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <AppearanceForm />

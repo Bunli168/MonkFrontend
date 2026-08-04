@@ -298,7 +298,7 @@ watch(() => props.rows, async (newRows) => {
 
 :deep(.p-datatable-column-title) {
     font-weight: 600 !important;
-    font-size: 15px !important;
+    font-size: 1rem !important;
 }
 
 :deep(.p-datatable-thead > tr > th.text-center .p-column-header-content) {
@@ -317,7 +317,7 @@ watch(() => props.rows, async (newRows) => {
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-base);
-    font-size: 14px;
+    font-size: 0.95rem;
     background-color: var(--body-bg-color) !important;
     border-bottom: 1px solid var(--border-clr);
 }
@@ -413,7 +413,7 @@ watch(() => props.rows, async (newRows) => {
     }
     .table-stacked .p-column-title {
         flex-shrink: 0;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
         padding-top: 0.1rem;
     }
     .table-stacked .cell-value {
