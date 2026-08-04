@@ -17,7 +17,7 @@
                                     {{ roleLabelKhmer }}
                                 </span>
                                 <span v-if="authStore.user?.profile?.kut" class="badge px-3 py-2 text-base text-uppercase" style="letter-spacing: 0.5px; font-weight: 600; border-radius: var(--border-inner-radius); background-color: var(--surface-ground);">
-                                    Kut: {{ authStore.user.profile.kut.name }}
+                                    កុដិ: {{ authStore.user.profile.kut.name }}
                                 </span>
                             </div>
                         </div>
@@ -57,10 +57,6 @@
                             </div>
                             <span class="fw-bold text-heading">My Profile Summary / ព័ត៌មានផ្ទាល់ខ្លួន</span>
                         </div>
-                        <router-link :to="{ name: 'pagoda-profile' }" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 text-nowrap rounded-pill px-3 py-1 fw-medium shadow-sm" style="font-size: 0.85rem;">
-                            <Edit :size="14" />
-                            <span>Edit Details</span>
-                        </router-link>
                     </div>
                     
                     <div class="row g-3" style="font-size: 0.9rem;">
@@ -113,7 +109,7 @@ const roleLabelKhmer = computed(() => {
     const labels = {
         'SUPERADMIN': 'មេដឹកនាំ',
         'ADMIN': 'មេកុដិ',
-        'MONK': 'ព្រះសង្ឃ',
+        'MONK': 'សាមណេរ',
         'BHIKKHU': 'ភិក្ខុ',
         'STUDENT': 'និស្សិត',
         'MEKUDI': 'មេកុដិ',

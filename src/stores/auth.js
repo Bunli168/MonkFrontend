@@ -60,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
         const uRole = userRole.value?.toUpperCase();
         const uppercaseRoles = roles.map(r => {
             const up = r.toUpperCase();
+            if (up === 'ADMIN') return ['ADMIN', 'MEKUDI'];
             if (up === 'SUPERADMIN') return ['SUPERADMIN', 'SUPER_ADMIN'];
             if (up === 'ATTENDANCETAKER') return ['ATTENDANCETAKER', 'ATTENDANCE_TAKER'];
             return [up];

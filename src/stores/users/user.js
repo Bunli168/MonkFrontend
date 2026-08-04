@@ -33,9 +33,13 @@ export const useUserStore = defineStore('user', () => {
         { id: 3, name: 'MONK' }
     ];
 
-    const fetchRoleStats = async (forceRefresh = false) => {
+    const fetchRoleStats = async (forceRefresh = false, isActive = null) => {
         try {
-            const response = await api.get('/users/stats/roles');
+            const params = {};
+            if (isActive !== null && isActive !== undefined && isActive !== '') {
+                params.isActive = isActive;
+            }
+            const response = await api.get('/users/stats/roles', { params });
             const data = response.data?.data || response.data;
             if (data) {
                 roleStats.value = {
@@ -282,7 +286,40 @@ export const useUserStore = defineStore('user', () => {
     }
 
     const requestTelegramLink = async () => {
-        return null;
+        try {
+            const response = await api.get('/auth/telegram-link-token');
+            const data = response.data?.data || response.data;
+            if (data?.token) {
+                const username = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'Monk_permission_bot';
+                return {
+                    telegramLink: `https://t.me/${username}?start=${data.token}`,
+                    expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+                };
+            }
+            return null;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return null;
+        }
+    }
+
+    const requestOtpTelegramLink = async () => {
+        try {
+            const response = await api.get('/auth/otp-telegram-link-token');
+            const data = response.data?.data || response.data;
+            if (data?.token) {
+                // Hardcoding this because the cached .env still says Monk_permission_bot
+                const username = 'optsecuritybot';
+                return {
+                    telegramLink: `https://t.me/${username}?start=${data.token}`,
+                    expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+                };
+            }
+            return null;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return null;
+        }
     }
 
     const unlinkTelegram = async () => {
@@ -312,6 +349,7 @@ export const useUserStore = defineStore('user', () => {
         uploadProfileAvatar,
         deleteProfileAvatar,
         requestTelegramLink,
+        requestOtpTelegramLink,
         unlinkTelegram,
         getNotificationSettings,
         updateNotificationSettings,

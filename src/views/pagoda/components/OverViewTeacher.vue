@@ -18,7 +18,7 @@
                             </span>
                             <span v-if="authStore.user?.profile?.kut" class="badge text-white rounded-pill px-3 py-2"
                                 style="background-color: rgba(255, 255, 255, 0.25); backdrop-filter: blur(4px);">
-                                Kut: {{ authStore.user.profile.kut.name }}
+                                កុដិ: {{ authStore.user.profile.kut.name }}
                             </span>
                         </div>
                     </div>

@@ -2,9 +2,12 @@
     <section class="our-profile-section py-5" ref="sectionRef">
         <div class="container">
             <div class="section-title mb-3">
-                <h2>រចនាសម្ព័ន្ធវត្តនាគវ័ន</h2>
+                <h2>Meet the Development Team</h2>
                 <p class="text-subheading">
-                   រចនាសម្ព័ន្ធនៃវត្តនាគវ័ន អាចចែកចេញជា ២ ផ្នែកសំខាន់ៗ គឺ រចនាសម្ព័ន្ធគ្រប់គ្រងដឹកនាំ (រដ្ឋបាល-សាសនា) និង រចនាសម្ព័ន្ធហេដ្ឋារចនាសម្ព័ន្ធ (ស្ថាបត្យកម្មសំណង់)៖
+                    We are a passionate group of developers dedicated to building innovative digital solutions.
+                    Together, we crafted the ANT Portal to transform the educational experience through intuitive design
+                    and robust engineering.
+                  
                 </p>
             </div>
 
@@ -19,7 +22,6 @@
                                 <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center" 
                                     style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);">
                                     <h4 class="mb-0 text-white">{{ member.firstName }} {{ member.lastName }}</h4>
-                                    <p class="mb-0 text-white">{{ member.role }}</p>
                                 </div>
                             </div>
                         </div>
@@ -35,19 +37,15 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Bunli from '@/assets/images/member/Bunli.JPG';
-import ginKhim from '@/assets/images/member/ginKhim.JPG';
-import chanSavorn from '@/assets/images/member/chenSavorn.JPG'
-import ketKimlyeang from '@/assets/images/member/Kimleang.jpg'
+
 
 gsap.registerPlugin(ScrollTrigger);
 
 const members = [
-    { id: 1, firstName: 'ងិន', lastName: 'ឃីម', top: '16px', image: ginKhim, role: "ព្រះគ្រូចៅអធិការវត្តនាគវ័ន", memberBg: '#efe0ff' },
-    { id: 2, firstName: '----', lastName: 'ភាព', top: '16px', image: ginKhim, role: "-----", memberBg: '#efe0ff' },
-    { id: 3, firstName: 'ចាន់', lastName: 'សាវ៉ន', top: '16px', image: chanSavorn, role: "ព្រះគ្រូសូត្រឆ្វេង វត្តនាគវ័ន", memberBg: '#efe0ff' },
-    { id: 4, firstName: '----', lastName: '----', top: '16px', image: ketKimlyeang, role: "----", memberBg: '#efe0ff' },
-    { id: 5, firstName: 'កេត', lastName: 'គឹមលាង', top: '16px', image: ketKimlyeang, role: "ព្រះគ្រូលេខា វត្តនាគវ័ន", memberBg: '#efe0ff' },
-
+    { id: 1, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 2, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 3, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
+    { id: 4, firstName: 'Bunli', lastName: '', top: '16px', image: Bunli, memberBg: '#efe0ff' },
 ]
 
 const sectionRef = ref(null);

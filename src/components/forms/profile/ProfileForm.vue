@@ -37,10 +37,6 @@
                 <BaseDatePicker id="dateOfBirth" v-model="dateOfBirth" label="Date of Birth" :error="errors.dateOfBirth"
                     :disabled="props.disabled" />
             </div>
-
-            <div class="col-12 mt-4">
-                <ChangePasswordForm />
-            </div>
         </div>
     </div>
 </template>
@@ -50,8 +46,6 @@ import { ref, watch, onMounted } from 'vue';
 import { User } from '@lucide/vue';
 import { useForm, useField } from 'vee-validate';
 import { profileSchemas } from '@/utils/validations';
-import ChangePasswordForm from './ChangePasswordForm.vue';
-
 const props = defineProps({
     initialData: {
         type: Object,

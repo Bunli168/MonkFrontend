@@ -2,9 +2,22 @@
     <div>
         <div class="card border-0" style="background-color: var(--surface-ground);">
             <!-- Filters Bar -->
-            <div class="mb-3 d-flex justify-content-between align-items-center w-100">
-                <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 0;">
+            <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center w-100 gap-2">
+                <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1 w-100" style="min-width: 0;">
                     <BaseFilter v-model="statusFilter" :options="filterOptions" :wrap="true" />
+                    <!-- Search input for TakerAbsentPermissionView -->
+                    <div v-if="statusFilter === 'view'" class="d-flex gap-2 ms-auto justify-content-end" style="max-width: 500px; flex-grow: 1;">
+                        <div class="input-group flex-grow-1" style="min-width: 200px; max-width: 400px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <Search size="18" />
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name, kudi, phone..." v-model="searchQuery" style="outline: none; box-shadow: none;">
+                        </div>
+                        <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0" style="min-width: 120px;" @click="handleRefresh">
+                            <RefreshCcw size="16" :class="{ 'fa-spin': isRefreshing }" />
+                            Refresh
+                        </button>
+                    </div>
                 </div>
                 <BaseButton v-if="!authStore.isAdmin && !authStore.isAttendanceTaker" @click="showModal = true" variant="primary">
                     <i class="fas fa-plus me-1"></i> New Request
@@ -12,7 +25,12 @@
             </div>
 
             <!-- Table -->
+            <div v-if="statusFilter === 'view'">
+                <TakerAbsentPermissionView ref="takerAbsentRef" :searchQuery="searchQuery" />
+            </div>
+            
             <BaseTable 
+                v-else
                 :columns="colDefs" 
                 :rows="paginatedRequests" 
                 :totalRecords="filteredRequests.length"
@@ -26,7 +44,8 @@
             >
                 <template #monk="{ data: row }">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="avatar-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden"
+                        <img v-if="row.User?.UserProfile?.avatar_url" :src="`http://localhost:3006${row.User.UserProfile.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 32px; height: 32px;" />
+                        <div v-else class="avatar-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden"
                             style="width: 32px; height: 32px; background: color-mix(in srgb, var(--primary-color) 15%, transparent);">
                             <User :size="14" style="color: var(--primary-color);" />
                         </div>
@@ -57,6 +76,15 @@
                 <template #status="{ data: row }">
                     <BaseBadge v-if="row.status" :status="getBadgeStatusColor(row.status)" :label="formatStatus(row.status)" />
                     <span v-else>—</span>
+                </template>
+                
+                <template #attachment="{ data: row }">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
+                            <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                        </a>
+                        <span v-else class="text-muted fst-italic">-</span>
+                    </div>
                 </template>
                 
                 <template #actions="{ data: row }">
@@ -107,6 +135,22 @@
                     </BaseButton>
                 </div>
             </BaseModal>
+
+            <!-- Image Viewer Modal -->
+            <Teleport to="body">
+            <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true" ref="imageModalRef">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content border-0 shadow bg-transparent">
+                        <div class="modal-header border-0 pb-0 justify-content-end">
+                            <button type="button" class="btn-close btn-close-white shadow-none bg-white rounded-circle p-2 m-2" data-bs-dismiss="modal" @click="closeImageModal"></button>
+                        </div>
+                        <div class="modal-body text-center p-0">
+                            <img v-if="currentImageModalUrl" :src="currentImageModalUrl" class="img-fluid rounded shadow" style="max-height: 80vh;" alt="Attachment View" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </Teleport>
         </div>
     </div>
 </template>
@@ -116,19 +160,42 @@ import { ref, computed, onMounted, watch } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
-import { CheckCircle, XCircle, User } from '@lucide/vue';
+import { CheckCircle, XCircle, User, Search, RefreshCcw } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseFilter from '@/components/base/BaseFilter.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
+import TakerAbsentPermissionView from './TakerAbsentPermissionView.vue';
 
 const toast = useToastStore();
 const authStore = useAuthStore();
 const isLoading = ref(false);
 const requests = ref([]);
-const statusFilter = ref('');
+
+// Search state for TakerAbsentPermissionView
+const searchQuery = ref('');
+const isRefreshing = ref(false);
+const takerAbsentRef = ref(null);
+
+const handleRefresh = async () => {
+    isRefreshing.value = true;
+    if (takerAbsentRef.value) {
+        await takerAbsentRef.value.fetchData();
+    }
+    isRefreshing.value = false;
+};
+
+const props = defineProps({
+    pendingCount: {
+        type: Number,
+        default: 0
+    }
+});
+
+const emit = defineEmits(['refresh-pending-count']);
+const statusFilter = ref(authStore.isAdmin || authStore.isAttendanceTaker ? 'view' : '');
 const showModal = ref(false);
 const isSubmitting = ref(false);
 
@@ -136,6 +203,11 @@ const showConfirmModal = ref(false);
 const isUpdatingStatus = ref(false);
 const confirmAction = ref('');
 const confirmId = ref(null);
+
+// Image Viewer State
+const imageModalRef = ref(null);
+let imageModalInstance = null;
+const currentImageModalUrl = ref('');
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -147,12 +219,18 @@ const formData = ref({
 
 const filterOptions = computed(() => {
     const pendingValue = false ? 'pending_superadmin' : 'pending';
-    return [
-        { label: 'All Requests', value: '' },
+    const options = [
+        { label: 'View', value: 'view' },
         { label: 'Approved', value: 'approved' },
-        { label: 'Pending', value: pendingValue },
+        { label: 'Pending', value: pendingValue, badge: props.pendingCount > 0 ? props.pendingCount : null, variant: props.pendingCount > 0 ? 'danger' : '' },
         { label: 'Rejected', value: 'rejected' }
     ];
+    if (!authStore.isAdmin && !authStore.isAttendanceTaker) {
+        // Members don't have the View tab
+        options.shift(); 
+        options.unshift({ label: 'All Requests', value: '' });
+    }
+    return options;
 });
 
 const colDefs = computed(() => {
@@ -163,6 +241,7 @@ const colDefs = computed(() => {
     cols.push(
         { field: 'date_range', header: 'Date Range', sortable: false },
         { field: 'reason', header: 'Reason', sortable: false },
+        { field: 'attachment', header: 'Attachment', sortable: false },
         { field: 'status', header: 'Status', sortable: true },
         { field: 'actions', header: 'Details', sortable: false, class: 'text-end' }
     );
@@ -217,16 +296,23 @@ const getBadgeStatusColor = (status) => {
 };
 
 const fetchRequests = async () => {
+    if (statusFilter.value === 'view') return;
     isLoading.value = true;
     try {
         if (authStore.isAdmin || authStore.isAttendanceTaker) {
+            const statusParams = statusFilter.value === 'view' ? '' : statusFilter.value;
             const response = await api.get('/leave-requests', {
-                params: { status: statusFilter.value }
+                params: { status: statusParams }
             });
             requests.value = response.data || [];
         } else {
             const response = await api.get('/leave-requests/my');
             requests.value = response.data || [];
+        }
+        
+        // Refresh pending count when fetching requests
+        if (authStore.isAdmin || authStore.isAttendanceTaker) {
+            emit('refresh-pending-count');
         }
     } catch (error) {
         console.error('Failed to load leave requests:', error);
@@ -236,12 +322,34 @@ const fetchRequests = async () => {
     }
 };
 
+onMounted(() => {
+    fetchRequests();
+});
+
 watch(statusFilter, () => {
     currentPage.value = 1;
     if (authStore.isAdmin || authStore.isAttendanceTaker) {
         fetchRequests();
     }
 });
+
+// Image Modal Functions
+import * as bootstrap from 'bootstrap';
+
+const openImageModal = (url) => {
+    currentImageModalUrl.value = url;
+    if (!imageModalInstance && imageModalRef.value) {
+        imageModalInstance = new bootstrap.Modal(imageModalRef.value);
+    }
+    imageModalInstance?.show();
+};
+
+const closeImageModal = () => {
+    imageModalInstance?.hide();
+    setTimeout(() => {
+        currentImageModalUrl.value = '';
+    }, 300);
+};
 
 const getActionItems = (row) => {
     const isAwaitingSuperAdmin = row.status === 'pending_superadmin';
@@ -299,6 +407,9 @@ const executeStatusUpdate = async () => {
         toast.showToast(`Request ${confirmAction.value} successfully`, 'success');
         showConfirmModal.value = false;
         fetchRequests();
+        if (authStore.isAdmin || authStore.isAttendanceTaker) {
+            emit('refresh-pending-count');
+        }
     } catch (error) {
         console.error(`Failed to ${confirmAction.value} request:`, error);
         toast.showToast(error.response?.data?.message || `Failed to ${confirmAction.value} request`, 'error');

@@ -2,7 +2,7 @@
     <div class="student-profile-summary-view pb-3 h-100 d-flex flex-column align-items-center">
         <div class="w-100" style="max-width: 1000px;">
             <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
-                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Student Profile Summary / ព័ត៌មានសិស្ស (ប្រវត្តិរូបសង្ខេប)</h5>
+                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Student Profile Summary <span class="d-none d-md-inline">/ ព័ត៌មានសិស្ស (ប្រវត្តិរូបសង្ខេប)</span></h5>
             </div>
 
             <!-- Summary View (Read Only) -->

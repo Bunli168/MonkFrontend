@@ -2,12 +2,12 @@
     <div style="background-color: var(--surface-ground);">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biographies / ប្រវត្តិព្រះសង្ឃ</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Monk Biographies <span class="d-none d-md-inline">/ ប្រវត្តិព្រះសង្ឃ</span></h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
                 <BaseButton variant="outline-success" class="d-flex align-items-center gap-2" @click="exportToCSV" :isLoading="isExporting">
-                    <FileDown :size="16" />
+                    <FileUp :size="16" />
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
                 <div class="kudi-select" style="min-width: 180px;" v-if="authStore.isSuperAdmin">
@@ -97,7 +97,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { Search, User, FileDown } from '@lucide/vue';
+import { Search, User, FileUp } from '@lucide/vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import api from '@/api/api';
 import BaseTable from '@/components/base/BaseTable.vue';
@@ -156,7 +156,7 @@ const fetchMonks = async () => {
         const params = {
             page: page.value,
             perPage: perPage.value,
-            roleIds: '2,3,7', // Mekudi, Monks, Bhikkhus
+            roleIds: '3,7', // Monks/Samaneras and Bhikkhus
             search: searchQuery.value || undefined,
             kutId: selectedKut.value || undefined
         };
@@ -178,8 +178,8 @@ const exportToCSV = async () => {
     try {
         isExporting.value = true;
 
-        // Fetch all monk surveys with user profile data
-        const response = await api.get('/monk-surveys');
+        // Fetch all monk surveys with user profile data (both Samaneras and Bhikkhus)
+        const response = await api.get('/monk-surveys', { params: { role_id: '3,7' } });
         const records = response.data?.data || [];
 
         // Fetch locations to map IDs to names

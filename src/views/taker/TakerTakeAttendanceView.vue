@@ -12,12 +12,35 @@
                     />
                 </div>
             </div>
+
+            <!-- QR Session Panel -->
+            <div v-if="activeRow" class="card mx-2 border-0 shadow-sm mb-2 bg-primary bg-opacity-10">
+                <div class="card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <div>
+                        <h6 class="fw-bold mb-1 text-primary">Self-Scan Attendance</h6>
+                        <p class="text-muted small mb-0">Allow monks to scan a QR code to mark themselves present.</p>
+                    </div>
+                    
+                    <div v-if="qrSession.active" class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="fw-bold text-success me-auto"><i class="fas fa-circle-notch fa-spin me-2"></i>Active</div>
+                        <button class="btn btn-primary btn-sm px-3 fw-bold text-nowrap" @click="showQRModal = true">
+                            <i class="fas fa-expand me-1"></i> Show QR
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm px-3 text-nowrap" @click="stopQRSession">Stop Session</button>
+                    </div>
+                    <div v-else class="d-flex align-items-center gap-2 flex-wrap">
+                        <button class="btn btn-primary btn-sm px-3 fw-bold text-nowrap" @click="startQRSession">
+                            <i class="fas fa-qrcode me-2"></i> Start Session
+                        </button>
+                    </div>
+                </div>
+            </div>
             
             <div class="w-100" style="min-width: 0;">
                 <div class="row-pills-container d-flex flex-nowrap gap-2 pb-2 px-2" style="overflow-x: auto;">
                     <button v-for="(row, idx) in seatingRows" :key="idx" 
                         @click="selectRow(row)"
-                        class="btn rounded-pill px-3 border flex-shrink-0 d-flex align-items-center btn-sm"
+                        class="btn px-3 border flex-shrink-0 d-flex align-items-center btn-sm"
                         :class="activeRow?.id === row.id ? 'btn-primary' : 'btn-light'"
                     >
                         <span>Row {{ row.row_num }}</span>
@@ -65,10 +88,14 @@
                 </div>
                 
                 <div v-show="activeRow && !isLoadingMonks && activeRowMonks.length > 0">
-                    <BaseTable 
+                    <!-- Desktop Table View -->
+                    <div class="d-none d-md-block">
+                        <BaseTable 
                         :columns="colDefs" 
                         :rows="activeRowMonks" 
                         :selectable="true"
+                        :hideIndexOnMobile="true"
+                        :stackOnMobile="false"
                         v-model:selection="selectedAbsentMonks"
                     >
                         <template #seatNumber="{ data: monk }">
@@ -79,9 +106,12 @@
                         
                         <template #name="{ data: monk }">
                             <div class="d-flex align-items-center gap-3 py-1 cursor-pointer w-100" @click="toggleSelection(monk)">
-                                <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" 
+                                <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold overflow-hidden" 
                                      style="width: 35px; height: 35px; font-size: 0.9rem; flex-shrink: 0;">
-                                    {{ monk.fullName.charAt(0).toUpperCase() }}
+                                    <img v-if="monk.profile?.avatar_url || monk.profile?.avatarUrl" :src="$authImg(monk.profile?.avatar_url || monk.profile?.avatarUrl)" class="w-100 h-100 object-fit-cover" />
+                                    <template v-else>
+                                        {{ monk.fullName.charAt(0).toUpperCase() }}
+                                    </template>
                                 </div>
                                 <div class="flex-grow-1" style="min-width: 0;">
                                     <div class="fw-bold text-dark d-flex align-items-center gap-2" style="font-size: 0.95rem;">
@@ -96,12 +126,15 @@
 
                         <template #status="{ data: monk }">
                             <div class="text-end">
-                                <span class="badge bg-opacity-10" :class="[
-                                    monk.attendance?.status === 'permission' ? 'bg-warning text-dark' :
-                                    (monk.attendance?.status === 'absent' || selectedAbsentMonks.some(m => m.id === monk.id)) ? 'bg-danger text-danger' :
-                                    'bg-success text-success'
+                                <span class="badge border px-2 py-1" :class="[
+                                    monk.attendance?.status === 'permission' ? 'bg-warning text-dark border-warning' :
+                                    monk.attendanceNotes === 'Scanned QR' ? 'bg-success text-white border-success' :
+                                    (monk.attendance?.status === 'absent' || selectedAbsentMonks.some(m => m.id === monk.id)) ? 'bg-danger text-white border-danger' :
+                                    'bg-light text-success border-success'
                                 ]">
+                                    <i v-if="monk.attendanceNotes === 'Scanned QR'" class="fas fa-qrcode me-1"></i>
                                     {{ monk.attendance?.status === 'permission' ? 'Leave' :
+                                       monk.attendanceNotes === 'Scanned QR' ? 'Scanned' :
                                        (monk.attendance?.status === 'absent' || selectedAbsentMonks.some(m => m.id === monk.id)) ? 'Absent' :
                                        'Present'
                                     }}
@@ -109,6 +142,44 @@
                             </div>
                         </template>
                     </BaseTable>
+                    </div>
+
+                    <!-- Mobile Notification List View -->
+                    <div class="d-md-none p-2 p-sm-3 d-flex flex-column gap-2" style="background-color: var(--body-bg-color);">
+                        <div v-for="monk in activeRowMonks" :key="monk.id"
+                             class="notification-card bg-white p-3 d-flex align-items-center gap-3 position-relative"
+                             :class="{ 'is-absent': selectedAbsentMonks.some(m => m.id === monk.id) || monk.attendance?.status === 'absent' }"
+                             @click="toggleSelection(monk)">
+                            
+                            <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm overflow-hidden" 
+                                 style="width: 48px; height: 48px; font-size: 1.2rem; flex-shrink: 0;">
+                                <img v-if="monk.profile?.avatar_url || monk.profile?.avatarUrl" :src="$authImg(monk.profile?.avatar_url || monk.profile?.avatarUrl)" class="w-100 h-100 object-fit-cover" />
+                                <template v-else>
+                                    {{ monk.fullName.charAt(0).toUpperCase() }}
+                                </template>
+                            </div>
+                            
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <div class="fw-bold text-dark text-truncate mb-1" style="font-size: 1rem;">
+                                    {{ monk.fullName }}
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.75rem; font-weight: 500;">Row {{ activeRow?.row_num || '-' }}</span>
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.75rem; font-weight: 500;">Seat {{ monk.seatNumber || '-' }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center ms-2">
+                                <div v-if="monk.attendance?.status === 'permission'" class="badge bg-warning text-dark px-2 py-1">Leave</div>
+                                <div v-else-if="monk.attendanceNotes === 'Scanned QR'" class="badge bg-success px-2 py-1"><i class="fas fa-qrcode me-1"></i> Scanned</div>
+                                <div v-else class="form-check m-0 custom-check">
+                                    <input class="form-check-input" type="checkbox" style="width: 1.5rem; height: 1.5rem; cursor: pointer;"
+                                           :checked="selectedAbsentMonks.some(m => m.id === monk.id)"
+                                           @click.stop="toggleSelection(monk)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="card-footer bg-white p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 border-top">
                         <div v-show="isRowConfirmed" class="text-success fw-bold d-flex align-items-center justify-content-center justify-content-sm-start gap-2">
@@ -118,7 +189,7 @@
                         <div v-show="!isRowConfirmed" class="d-none d-sm-block"></div>
                         <BaseButton 
                             :variant="isRowConfirmed ? 'outline-primary' : 'primary'" 
-                            class="w-100 w-sm-auto"
+                            class="px-5"
                             @click="confirmAttendance" 
                             :isLoading="isSaving"
                         >
@@ -128,17 +199,33 @@
                 </div>
             </div>
         </div>
+        
+        <BaseModal v-model="showQRModal" title="Self-Scan Attendance" size="lg" @close="onModalClose">
+            <div v-if="qrSession.active" class="d-flex flex-column align-items-center justify-content-center py-2 py-md-4 px-2">
+                <p class="text-muted mb-3 mb-md-4 fs-6 fs-md-5 text-center">Ask monks to point their camera at this QR code.</p>
+                <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm border mb-4 d-flex justify-content-center align-items-center w-100 mx-auto" style="max-width: 400px; aspect-ratio: 1;">
+                    <QrcodeVue :value="JSON.stringify({ token: qrSession.token, seating_row_id: activeRow.id, date: selectedDate })" :size="400" level="H" style="width: 100%; height: auto; max-width: 350px;" />
+                </div>
+                <div class="h3 fw-bold text-success mb-4 text-center"><i class="fas fa-circle-notch fa-spin me-2"></i> Scanning Active</div>
+                <button class="btn btn-outline-danger btn-lg rounded-pill w-100 mx-auto" style="max-width: 300px;" @click="stopQRSession">
+                    Stop Session
+                </button>
+            </div>
+        </BaseModal>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import QrcodeVue from 'qrcode.vue';
+import { io } from 'socket.io-client';
 
 const toast = useToastStore();
 const authStore = useAuthStore();
@@ -170,7 +257,7 @@ const colDefs = computed(() => {
     return [
         { field: 'seatNumber', header: 'Seat', sortable: true, class: 'text-center', style: 'width: 80px;' },
         { field: 'name', header: 'Monk Name', sortable: false },
-        { field: 'status', header: '', sortable: false, class: 'text-end', style: 'width: 150px;' },
+        { field: 'status', header: '', sortable: false, class: 'text-end d-none d-md-table-cell', headerClass: 'd-none d-md-table-cell', style: 'width: 150px;' },
     ];
 });
 
@@ -214,7 +301,7 @@ const setStatus = (monk, status) => {
 let isSyncingSelection = false;
 
 const toggleSelection = (monk) => {
-    if (monk.attendance?.status === 'permission') {
+    if (monk.attendance?.status === 'permission' || monk.attendanceNotes === 'Scanned QR') {
         return;
     }
     const isSelected = selectedAbsentMonks.value.some(s => s.id === monk.id);
@@ -233,9 +320,18 @@ watch(() => activeRowMonks.value, (newMonks) => {
 
 watch(() => selectedAbsentMonks.value, (newSelection) => {
     if (isSyncingSelection) return;
+
+    const permissionMonksInSelection = newSelection.filter(s => s.attendance?.status === 'permission' || s.attendanceNotes === 'Scanned QR');
+    if (permissionMonksInSelection.length > 0) {
+        isSyncingSelection = true;
+        selectedAbsentMonks.value = newSelection.filter(s => s.attendance?.status !== 'permission' && s.attendanceNotes !== 'Scanned QR');
+        setTimeout(() => isSyncingSelection = false, 0);
+        return; // The watch will re-trigger with the clean selection
+    }
+
     activeRowMonks.value.forEach(monk => {
-        // Do not override if the monk has an approved leave
-        if (monk.attendance?.status === 'permission') return;
+        // Do not override if the monk has an approved leave or scanned QR
+        if (monk.attendance?.status === 'permission' || monk.attendanceNotes === 'Scanned QR') return;
         
         const isSelected = newSelection.some(s => s.id === monk.id);
         setStatus(monk, isSelected ? 'absent' : 'present');
@@ -318,9 +414,108 @@ const confirmAttendance = async () => {
     }
 };
 
+// --- QR Session Logic ---
+const qrSession = ref({ active: false, token: null, expiresAt: null });
+const showQRModal = ref(false);
+
+const checkQRSession = async () => {
+    if (!activeRow.value) return;
+    try {
+        const res = await api.get('/attendances/session/check', { params: { seating_row_id: activeRow.value.id } });
+        if (res.data.success && res.data.data.active) {
+            qrSession.value = { ...res.data.data, active: true };
+        } else {
+            qrSession.value.active = false;
+        }
+    } catch (e) {
+        console.error('Check QR Error:', e);
+    }
+};
+
+const startQRSession = async () => {
+    if (!activeRow.value) return;
+    try {
+        const res = await api.post('/attendances/session/toggle', { 
+            seating_row_id: activeRow.value.id, 
+            date: selectedDate.value, 
+            action: 'start',
+            duration_minutes: 1440 // Never expires essentially
+        });
+        
+        if (res.data.success) {
+            qrSession.value = { active: true, ...res.data.data };
+            showQRModal.value = true;
+            toast.showToast('QR Session started', 'success');
+        }
+    } catch (e) {
+        toast.showToast('Failed to start QR session', 'error');
+    }
+};
+
+const stopQRSession = async () => {
+    if (!activeRow.value) return;
+    try {
+        await api.post('/attendances/session/toggle', { 
+            seating_row_id: activeRow.value.id, 
+            date: selectedDate.value, 
+            action: 'stop'
+        });
+        qrSession.value.active = false;
+        showQRModal.value = false;
+        toast.showToast('QR Session stopped', 'info');
+        
+        // Auto mark everyone who didn't scan and isn't on leave as absent
+        const unscannedMonks = activeRowMonks.value.filter(monk => 
+            monk.attendance?.status !== 'permission' && 
+            monk.attendanceNotes !== 'Scanned QR'
+        );
+        
+        // Add them to the absent selection and directly update their status
+        const existingAbsent = [...selectedAbsentMonks.value];
+        unscannedMonks.forEach(monk => {
+            if (monk.attendance) {
+                monk.attendance.status = 'absent';
+            } else {
+                monk.attendance = { status: 'absent' };
+            }
+            if (!existingAbsent.some(m => m.id === monk.id)) {
+                existingAbsent.push(monk);
+            }
+        });
+        selectedAbsentMonks.value = existingAbsent;
+        
+        await nextTick();
+        
+        // Auto update the attendance since session is over
+        await confirmAttendance();
+    } catch (e) {
+        toast.showToast('Failed to stop QR session', 'error');
+    }
+};
+
+const onModalClose = () => {
+    showQRModal.value = false;
+};
+
+// Real-time socket updates for scanning
+let socket = null;
+
 onMounted(() => {
     fetchData();
+    socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
+        auth: { token: authStore.token }
+    });
+    socket.on('attendance_updated', (data) => {
+        if (String(data.seating_row_id) === String(activeRow.value?.id) && data.date === selectedDate.value) {
+            fetchData();
+        }
+    });
 });
+
+watch(activeRow, () => {
+    checkQRSession();
+});
+
 </script>
 
 <style scoped>
@@ -362,5 +557,30 @@ onMounted(() => {
     .date-picker-wrapper {
         width: auto;
     }
+}
+
+/* iOS Notification Style Card */
+.notification-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.04);
+    cursor: pointer;
+}
+.notification-card:active {
+    transform: scale(0.98);
+    background-color: var(--surface-ground) !important;
+}
+.notification-card.is-absent {
+    background-color: #fff8f8 !important;
+    border-color: #ffcccc;
+}
+.custom-check .form-check-input {
+    border-color: #cbd5e1;
+    border-radius: 6px;
+}
+.custom-check .form-check-input:checked {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
 }
 </style>

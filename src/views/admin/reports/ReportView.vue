@@ -6,25 +6,25 @@
                 <Tab value="report-list" :disabled="activeTab === 'category-form' || activeTab === 'report-detail'">
                     <div class="d-flex align-items-center gap-2">
                         <MessageCircleWarning style="color: var(--warning-color);" :size="16" />
-                        All Province District Commune Reports
+                        <span :class="{'d-none d-md-inline': activeTab !== 'report-list'}">All Province District Commune Reports</span>
                     </div>
                 </Tab>
                 <Tab value="report-category" :disabled="activeTab === 'category-form' || activeTab === 'report-detail'">
                     <div class="d-flex align-items-center gap-2">
                         <Tags style="color: var(--success-color);" :size="16" />
-                        Report Category
+                        <span :class="{'d-none d-md-inline': activeTab !== 'report-category'}">Report Category</span>
                     </div>
                 </Tab>
                 <Tab value="category-form" v-show="activeTab === 'category-form'">
                     <div class="d-flex align-items-center gap-2">
                         <FileSignature style="color: var(--primary-color);" :size="16" />
-                        {{ editingCategory ? 'Edit Category' : 'New Category' }}
+                        <span :class="{'d-none d-md-inline': activeTab !== 'category-form'}">{{ editingCategory ? 'Edit Category' : 'New Category' }}</span>
                     </div>
                 </Tab>
                 <Tab value="report-detail" v-show="activeTab === 'report-detail'" @click="onDetailClose">
                     <div class="d-flex align-items-center gap-2">
                         <ArrowLeft :size="16" />
-                        Report Details (Back)
+                        <span :class="{'d-none d-md-inline': activeTab !== 'report-detail'}">Report Details (Back)</span>
                     </div>
                 </Tab>
             </TabList>

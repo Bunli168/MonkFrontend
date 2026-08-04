@@ -2,15 +2,15 @@
     <div class="monk-profile-form d-flex flex-column align-items-center" style="max-height: var(--profile-form-max-height, auto);">
         <div class="w-100" style="max-width: var(--profile-form-max-width, 1000px);">
             <!-- Summary View (Read Only) -->
-            <div v-if="!isEditing" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+            <div v-if="!isEditing" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-                    <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Monk Profile Summary / ព័ត៌មានផ្ទាល់ខ្លួន</h5>
+                    <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">Monk Profile Summary <span class="d-none d-md-inline">/ ព័ត៌មានផ្ទាល់ខ្លួន</span></h5>
                     <BaseButton variant="outline-primary" @click="isEditing = true">
                         Edit Profile / កែសម្រួលព័ត៌មាន
                     </BaseButton>
                 </div>
 
-                <div class="row g-4">
+                <div class="row g-3 g-md-4">
                     <!-- Personal Info -->
                     <div class="col-12 col-md-6">
                         <div class="p-3 rounded h-100" style="background-color: var(--surface-ground);">
@@ -74,8 +74,8 @@
                 <form @submit.prevent="handleNextOrSave" class="d-flex flex-column">
                     
                     <!-- Step 1: Personal Info -->
-                    <div v-show="currentStep === 1" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Personal Information / ព័ត៌មានផ្ទាល់ខ្លួន</h5>
+                    <div v-show="currentStep === 1" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Personal Information <span class="d-none d-md-inline">/ ព័ត៌មានផ្ទាល់ខ្លួន</span></h5>
                         
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
@@ -106,8 +106,8 @@
                     </div>
 
                     <!-- Step 2: Hometown -->
-                    <div v-show="currentStep === 2" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Wat Origin / មកពិវត្តណា</h5>
+                    <div v-show="currentStep === 2" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Wat Origin <span class="d-none d-md-inline">/ មកពិវត្តណា</span></h5>
                         
                         <div class="row g-3">
                             <div class="col-12">
@@ -161,8 +161,8 @@
                     </div>
 
                     <!-- Step 3: Education -->
-                    <div v-show="currentStep === 3" class="card p-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Education / ការសិក្សា</h5>
+                    <div v-show="currentStep === 3" class="card p-3 p-md-4 mx-auto w-100" style="background-color: var(--body-bg-color); border-radius: var(--border-radius); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                        <h5 class="fw-bold mb-4" style="color: var(--text-heading-color);">Education <span class="d-none d-md-inline">/ ការសិក្សា</span></h5>
                         
                         <div class="row g-3">
                             <div class="col-12 col-md-6">

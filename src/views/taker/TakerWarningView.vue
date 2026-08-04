@@ -1,5 +1,5 @@
 <template>
-    <div class="taker-absent-permission-view container-xl py-4">
+    <div class="taker-absent-permission-view py-4">
         <!-- Header Section -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
             <div>

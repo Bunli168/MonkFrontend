@@ -9,7 +9,7 @@
                 <!-- Top Section: User Info -->
                 <div class="user-info-section d-flex align-items-center gap-3 mb-2">
                     <div class="dropdown-avatar">
-                        <img :src="$authImg(user?.profile?.avatarUrl) || '/avatar.png'" alt="User Avatar" class="w-100 h-100 object-fit-cover">
+                        <img :src="$authImg(user?.profile?.avatarUrl) || '/neakavorn-pagoda.png'" alt="User Avatar" class="w-100 h-100 object-fit-cover">
                     </div>
                     <div class="d-flex flex-column overflow-hidden" style="flex: 1; min-width: 0;">
                         <span class="fw-bold dropdown-name text-truncate w-100 d-block">{{ user?.name || 'User' }}</span>

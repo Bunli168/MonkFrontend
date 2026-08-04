@@ -434,7 +434,7 @@ const isLoading = ref(false);
 const isSuccess = ref(false);
 const showTelegramContact = ref(false);
 const authStore = useAuthStore();
-const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'chm_kiwi';
+const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'Monk_permission_bot';
 const openTelegramLink = () => window.open('https://t.me/' + telegramUsername, '_blank');
 
 const { handleSubmit, errors } = useForm({

@@ -2,12 +2,12 @@
     <div style="background-color: var(--surface-ground);">
         <div class="mb-2 d-flex flex-column flex-xl-row align-items-xl-center gap-2 w-100">
             <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap" style="min-width: 0;">
-                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Student Biography Surveys / ប្រវត្តិរូបសង្ខេបសិស្សនិស្សិត</h5>
+                <h5 class="fw-semibold mb-0" style="color: var(--text-heading-color);">Student Biography Surveys <span class="d-none d-md-inline">/ ប្រវត្តិរូបសង្ខេបសិស្សនិស្សិត</span></h5>
             </div>
 
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-shrink-0">
                 <BaseButton variant="outline-success" class="d-flex align-items-center gap-2" @click="exportToCSV" :isLoading="isExporting">
-                    <FileDown :size="16" />
+                    <FileUp :size="16" />
                     <span>Export Excel (CSV)</span>
                 </BaseButton>
 
@@ -81,9 +81,15 @@
             </template>
 
             <template #action="{ data }">
-                <span class="text-muted small">No Detail</span>
+                <BaseButton variant="outline-primary" size="sm" @click="viewBiography(data)">
+                    View Biography
+                </BaseButton>
             </template>
         </BaseTable>
+
+        <BaseModal v-model="showSurveyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
+            <PagodaStudentBiographyView :user-id="selectedUserId" @close="closeBiography" hide-header :is-read-only="true" />
+        </BaseModal>
 
 
     </div>
@@ -91,12 +97,14 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { Search, User, BookOpen, FileDown } from '@lucide/vue';
+import { Search, User, BookOpen, FileUp } from '@lucide/vue';
 import api from '@/api/api';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
+import PagodaStudentBiographyView from '@/views/pagoda/PagodaStudentBiographyView.vue';
 
 import { useAuthStore } from '@/stores/auth';
 
@@ -114,6 +122,16 @@ const kuts = ref([]);
 
 const selectedUserId = ref(null);
 const showSurveyModal = ref(false);
+
+const viewBiography = (user) => {
+    selectedUserId.value = user.id;
+    showSurveyModal.value = true;
+};
+
+const closeBiography = () => {
+    showSurveyModal.value = false;
+    selectedUserId.value = null;
+};
 
 const fetchKuts = async () => {
     try {
@@ -198,7 +216,8 @@ const exportToCSV = async () => {
             perPage: 10000,
             roleId: 4, // Students
             search: searchQuery.value || undefined,
-            kutId: selectedKut.value || undefined
+            kutId: selectedKut.value || undefined,
+            isActive: true
         };
         const response = await api.get('/users', { params });
         const records = response.data?.data || response.data || [];

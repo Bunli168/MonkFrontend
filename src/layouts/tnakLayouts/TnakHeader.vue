@@ -44,8 +44,9 @@
                              :class="{ 'active-profile': route.name === 'pagoda-profile' || isOpen }"
                              @click="toggle" style="cursor: pointer;">
                             <div class="avatar-default" :class="{ 'is-hidden': isOpen }">
-                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/avatar.png'"
-                                    class="w-100 h-100 object-fit-cover" alt="User Avatar">
+                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/neakavorn-pagoda.png'"
+                                     alt="User Avatar" 
+                                     class="w-100 h-100 object-fit-cover" />
                             </div>
                             <div class="avatar-active d-flex align-items-center justify-content-center w-100 h-100 bg-light" :class="{ 'is-visible': isOpen }">
                                 <X :size="20" class="text-muted" />
@@ -63,7 +64,7 @@
 import { useAuthStore } from '@/stores/auth';
 import { useSystemStore } from '@/stores/system';
 import { useRouter, useRoute } from 'vue-router';
-import { LayoutDashboard, DoorOpen, FileText, Menu, ClipboardList, X, Bookmark, Users, Calendar } from '@lucide/vue';
+import { LayoutDashboard, DoorOpen, FileText, Menu, ClipboardList, X, Bookmark, Users, Calendar, QrCode } from '@lucide/vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import Logo from '@/components/Logo.vue';
 import ProfileDropdown from '@/components/common/ProfileDropdown.vue';
@@ -101,6 +102,9 @@ const headerPaths = computed(() => {
     if (authStore.isMonk) {
         paths.push({ label: 'ប្រវត្តិរូបសង្ខេប', path: 'pagoda-monk-biography', icon: ClipboardList });
     }
+    
+
+
     if (authStore.isTeacher || authStore.isAdmin || authStore.isMekudi) {
         paths.push({ label: 'Users', path: 'pagoda-users', icon: Users });
     }

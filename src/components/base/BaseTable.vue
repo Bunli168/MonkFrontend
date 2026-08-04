@@ -1,5 +1,5 @@
 <template>
-    <div class="base-table-container">
+    <div class="base-table-container" :class="{ 'table-stacked': stackOnMobile }">
         <DataTable removableSort resizableColumns columnResizeMode="expand" :value="tableRows" :lazy="true"
             :paginator="true" :totalRecords="totalRecords" :rows="perPage" :first="firstRowIndex" :sortField="sortBy"
             :sortOrder="primeSortOrder" @page="onServerPage" @sort="onServerSort" :rowClass="getRowClass"
@@ -16,13 +16,14 @@
 
             <Column v-if="selectable" selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-            <Column v-if="showIndex" header="No." headerStyle="width: 5rem" :sortable="true" sortField="id">
+            <Column v-if="showIndex" header="No." headerStyle="width: 5rem" :sortable="true" sortField="id" :class="hideIndexOnMobile ? 'd-none d-md-table-cell' : ''" :headerClass="hideIndexOnMobile ? 'd-none d-md-table-cell' : ''">
                 <template #body="{ index }">
                     <div v-if="showSkeleton" class="skeleton-cell py-1">
                         <Skeleton width="1.5rem" height="1.25rem" borderRadius="var(--border-radius)" />
                     </div>
                     <div v-else class="cell-content">
-                        {{ getRowNumber(index) }}
+                        <span class="p-column-title d-md-none fw-bold me-2 text-muted">No.</span>
+                        <div class="cell-value">{{ getRowNumber(index) }}</div>
                     </div>
                 </template>
             </Column>
@@ -35,9 +36,12 @@
                         <Skeleton width="85%" height="1.25rem" borderRadius="var(--border-radius)" />
                     </div>
                     <div v-else class="cell-content">
-                        <slot :name="col.field || 'default'" :data="data" :field="col.field" :value="resolveField(data, col.field)">
-                            {{ resolveField(data, col.field) }}
-                        </slot>
+                        <span class="p-column-title d-md-none fw-bold me-2 text-muted">{{ col.header || col.label || col.field }}</span>
+                        <div class="cell-value">
+                            <slot :name="col.field || 'default'" :data="data" :field="col.field" :value="resolveField(data, col.field)">
+                                {{ resolveField(data, col.field) }}
+                            </slot>
+                        </div>
                     </div>
                 </template>
             </Column>
@@ -73,6 +77,8 @@ const props = defineProps({
 
     selectable: { type: Boolean, default: false },
     showIndex: { type: Boolean, default: true },
+    hideIndexOnMobile: { type: Boolean, default: false },
+    stackOnMobile: { type: Boolean, default: true },
     dataKey: { type: String, default: 'id' },
     selection: { type: Array, default: () => [] }
 });
@@ -292,7 +298,7 @@ watch(() => props.rows, async (newRows) => {
 
 :deep(.p-datatable-column-title) {
     font-weight: 600 !important;
-    font-size: 15px !important;
+    font-size: 1rem !important;
 }
 
 :deep(.p-datatable-thead > tr > th.text-center .p-column-header-content) {
@@ -311,7 +317,7 @@ watch(() => props.rows, async (newRows) => {
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-base);
-    font-size: 14px;
+    font-size: 0.95rem;
     background-color: var(--body-bg-color) !important;
     border-bottom: 1px solid var(--border-clr);
 }
@@ -367,6 +373,62 @@ watch(() => props.rows, async (newRows) => {
 
 .empty-state-wrapper i {
     font-size: 1.75rem;
+}
+
+/* Mobile Card Layout for DataTable */
+@media screen and (max-width: 767.98px) {
+    .table-stacked :deep(.p-datatable-thead) {
+        display: none !important;
+    }
+    .table-stacked :deep(.p-datatable-tbody > tr) {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-clr) !important;
+        border-radius: var(--border-inner-radius) !important;
+        background-color: var(--surface-card) !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+    }
+    .table-stacked :deep(.p-datatable-tbody > tr > td) {
+        display: block !important;
+        width: 100% !important;
+        text-align: left !important;
+        padding: 0.75rem 1rem !important;
+        border: none !important;
+        border-bottom: 1px solid var(--surface-ground) !important;
+        white-space: normal !important;
+    }
+    .table-stacked :deep(.p-datatable-tbody > tr > td.d-none) {
+        display: none !important;
+    }
+    .table-stacked :deep(.p-datatable-tbody > tr > td:last-child) {
+        border-bottom: none !important;
+    }
+    .table-stacked .cell-content {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .table-stacked .p-column-title {
+        flex-shrink: 0;
+        font-size: 0.95rem;
+        padding-top: 0.1rem;
+    }
+    .table-stacked .cell-value {
+        flex-grow: 1;
+        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        word-break: break-word;
+    }
+    
+    /* Ensure action buttons in cell-value render properly on mobile */
+    .table-stacked :deep(.cell-value .btn-group) {
+        justify-content: flex-end;
+        width: 100% !important;
+    }
 }
 </style>
 

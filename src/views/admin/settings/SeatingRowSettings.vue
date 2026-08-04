@@ -7,17 +7,17 @@
                     <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">Seating Row Management</h5>
                     <p class="mb-0 small text-muted">Manage global seating rows for attendance.</p>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <BaseButton @click="showBulkAssignModal = true" variant="outline-success">
+                <div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto mt-3 mt-md-0">
+                    <BaseButton @click="showBulkAssignModal = true" variant="outline-success" class="flex-grow-1 flex-md-grow-0">
                         <i class="fas fa-users-cog me-2"></i> Assign Taker
                     </BaseButton>
-                    <BaseButton @click="showBulkCapacityModal = true" variant="outline-primary">
+                    <BaseButton @click="showBulkCapacityModal = true" variant="outline-primary" class="flex-grow-1 flex-md-grow-0">
                         <i class="fas fa-layer-group me-2"></i> Set All Capacity
                     </BaseButton>
-                    <BaseButton @click="initializeRows" variant="primary" :isLoading="isInitializing">
+                    <BaseButton @click="initializeRows" variant="primary" :isLoading="isInitializing" class="flex-grow-1 flex-md-grow-0">
                         <i class="fas fa-plus me-2"></i> Initialize 17 Rows
                     </BaseButton>
-                    <BaseButton v-if="false" @click="showDeleteAllModal = true" variant="danger">
+                    <BaseButton v-if="false" @click="showDeleteAllModal = true" variant="danger" class="flex-grow-1 flex-md-grow-0">
                         <i class="fas fa-trash-alt me-2"></i> Delete All Rows
                     </BaseButton>
                 </div>
@@ -377,7 +377,7 @@ const getUsersForRow = (rowId) => {
         const profile = user.UserProfile || user.profile || {};
         const rowValue = profile.seating_row_id || profile.seatingRowId || user.seating_row_id || user.seatingRowId;
         const roleName = (user.Role?.name || user.role?.name || '').toUpperCase().replace(/\s+/g, '');
-        const isManagement = ['ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(roleName);
+        const isManagement = ['ATTENDANCETAKER', 'SUPERADMIN'].includes(roleName);
         return Number(rowValue) === Number(rowId) && !isManagement;
     });
 };
@@ -388,7 +388,7 @@ const unassignedUsers = computed(() => {
         const rowValue = profile.seating_row_id || profile.seatingRowId || user.seating_row_id || user.seatingRowId;
         const roleName = (user.Role?.name || user.role?.name || '').toUpperCase().replace(/\s+/g, '');
         
-        const isManagement = ['ATTENDANCETAKER', 'ADMIN', 'SUPERADMIN'].includes(roleName);
+        const isManagement = ['ATTENDANCETAKER', 'SUPERADMIN'].includes(roleName);
         
         return !rowValue && !isManagement;
     }).sort((a, b) => {
