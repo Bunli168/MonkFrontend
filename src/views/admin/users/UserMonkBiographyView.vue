@@ -90,7 +90,7 @@
 
         <!-- Biography Modal -->
         <BaseModal v-model="showBiographyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
-            <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" />
+            <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" :force-is-samanera="true" />
         </BaseModal>
     </div>
 </template>
@@ -156,7 +156,7 @@ const fetchMonks = async () => {
         const params = {
             page: page.value,
             perPage: perPage.value,
-            roleIds: '3,7', // Monks/Samaneras and Bhikkhus
+            roleIds: '3', // Monks/Samaneras only
             search: searchQuery.value || undefined,
             kutId: selectedKut.value || undefined
         };
@@ -178,8 +178,8 @@ const exportToCSV = async () => {
     try {
         isExporting.value = true;
 
-        // Fetch all monk surveys with user profile data (both Samaneras and Bhikkhus)
-        const response = await api.get('/monk-surveys', { params: { role_id: '3,7' } });
+        // Fetch all monk surveys with user profile data (Samaneras only)
+        const response = await api.get('/monk-surveys', { params: { role_id: '3' } });
         const records = response.data?.data || [];
 
         // Fetch locations to map IDs to names
