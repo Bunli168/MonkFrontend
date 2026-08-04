@@ -65,7 +65,7 @@ const verify = async () => {
             toastStore.showToast('Email verified successfully!', 'success');
             setTimeout(() => {
                 if (authStore.isAuthenticated) {
-                    if (authStore.isAdmin) {
+                    if (authStore.isAdmin || authStore.isSuperAdmin) {
                         router.push({ name: 'dashboard' });
                     } else {
                         router.push({ name: 'pagoda-overview' });

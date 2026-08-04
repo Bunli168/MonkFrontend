@@ -17,14 +17,7 @@
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
-            <div class="mb-3" v-if="authStore.isSuperAdmin && kut_id">
-                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
-                    label="Seating Row" placeholder="Select Seating Row" :error="errors.seating_row_id" />
-            </div>
-            <div class="mb-3" v-if="authStore.isSuperAdmin && seating_row_id">
-                <BaseInput type="number" v-model="seat_number" 
-                    label="Seat Number" placeholder="e.g. 1" :error="errors.seat_number" />
-            </div>
+
         </div>
 
         <div v-else>
@@ -44,14 +37,7 @@
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
                     label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
-            <div class="mb-3" v-if="authStore.isSuperAdmin && kut_id">
-                <BaseSelect v-model="seating_row_id" :options="seatingRowsOptions"
-                    label="Seating Row" placeholder="Select Seating Row" :error="errors.seating_row_id" />
-            </div>
-            <div class="mb-3" v-if="authStore.isSuperAdmin && seating_row_id">
-                <BaseInput type="number" v-model="seat_number" 
-                    label="Seat Number" placeholder="e.g. 1" :error="errors.seat_number" />
-            </div>
+
         </div>
     </form>
 </template>
@@ -68,12 +54,7 @@ const authStore = useAuthStore();
 const userStore = useUserStore();
 
 const kuts = ref([]);
-const seatingRows = ref([]);
 const kutsOptions = computed(() => kuts.value.map(k => ({ label: k.name, value: k.id })));
-const seatingRowsOptions = computed(() => {
-    const options = [{ label: 'No Seating Row', value: null }];
-    return options.concat(seatingRows.value.map(row => ({ label: row.name || `Row ${row.id}`, value: row.id })));
-});
 
 const { value: kut_id } = useField('kut_id');
 
@@ -92,37 +73,11 @@ const fetchKuts = async () => {
     }
 };
 
-const fetchSeatingRows = async () => {
-    if (!kut_id.value) {
-        seatingRows.value = [];
-        return;
-    }
 
-    try {
-        const response = await api.get('/seating-rows', {
-            params: { kut_id: kut_id.value }
-        });
-        seatingRows.value = response.data?.data || response.data || [];
-    } catch (error) {
-        console.error('Error fetching seating rows:', error);
-        seatingRows.value = [];
-    }
-};
-
-watch(kut_id, (newKutId) => {
-    if (newKutId) {
-        fetchSeatingRows();
-    } else {
-        seatingRows.value = [];
-    }
-});
 
 onMounted(() => {
     if (authStore.isSuperAdmin) {
         fetchKuts();
-    }
-    if (kut_id.value) {
-        fetchSeatingRows();
     }
 });
 

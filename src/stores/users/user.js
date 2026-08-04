@@ -141,8 +141,15 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    const resendVerificationEmail = async (email) => {
-        return true;
+    const resendVerificationEmail = async (payload) => {
+        try {
+            const response = await api.post('/users/resend-verification', payload);
+            toastStore.showToast("Verification email resent successfully", 'success');
+            return response.data;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
     }
 
     const getUserRoles = async () => {

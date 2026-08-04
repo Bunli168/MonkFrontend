@@ -375,7 +375,7 @@ const handleValidSubmit = async (values) => {
         } else {
             if (route.query.redirect) {
                 router.push(route.query.redirect);
-            } else if (authStore.isAdmin) {
+            } else if (authStore.isAdmin || authStore.isSuperAdmin) {
                 router.push({ name: 'dashboard' });
             } else {
                 router.push({ name: 'pagoda-overview' });
