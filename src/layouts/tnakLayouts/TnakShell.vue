@@ -6,10 +6,10 @@
 
         <div class="tnak-layout-body position-relative p-1 p-md-2">
             <div class="container-xl h-100 p-0">
-                <router-view v-slot="{ Component }">
-                    
-                        <component :is="Component" />
-                    
+                <router-view v-slot="{ Component, route }">
+                    <keep-alive>
+                        <component :is="Component" :key="route.name" />
+                    </keep-alive>
                 </router-view>
             </div>
         </div>

@@ -69,7 +69,7 @@ export const useUserStore = defineStore('user', () => {
     const pendingSortDir = ref('desc');
     const pendingSortBy = ref('createdAt');
 
-    const sortBy = ref('id');
+    const sortBy = ref('role');
     const sortOrder = ref('asc');
     const search = ref('');
     const filters = ref({});
@@ -257,6 +257,18 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const changeUserRole = async (id, roleId) => {
+        try {
+            const response = await api.put(`/users/${id}/change-role`, { role_id: roleId });
+            toastStore.showToast("User role updated successfully", 'success');
+            return response.data;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
+    }
+
+
     const resetUserPassword = async (id) => {
         try {
             const response = await api.post(`/users/${id}/reset-password`);
@@ -352,6 +364,7 @@ export const useUserStore = defineStore('user', () => {
         bulkRegister,
         requestRegisterAdmin,
         updateUser,
+        changeUserRole,
         resetUserPassword,
         uploadProfileAvatar,
         deleteProfileAvatar,
