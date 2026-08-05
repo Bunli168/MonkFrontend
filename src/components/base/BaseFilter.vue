@@ -19,7 +19,7 @@
                 v-for="option in visibleOptions" 
                 :key="option.value"
                 type="button" 
-                class="flex-grow-1 flex-md-grow-0 text-nowrap"
+                class="text-nowrap flex-grow-1 flex-lg-grow-0"
                 :variant="modelValue === option.value ? (option.variant ? `badge ${option.variant} active` : 'badge primary active') : (option.variant ? `badge ${option.variant}` : 'badge')"
                 :label="option.label"
                 :badge="option.badge" 

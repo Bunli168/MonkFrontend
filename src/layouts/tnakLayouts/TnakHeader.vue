@@ -31,6 +31,7 @@
                     class="nav-link menu-link d-flex align-items-center px-3 py-2 gap-2" @click="showNavLinks = false">
                     <component :is="headerPath.icon" :size="18" :stroke-width="2" />
                     <span class="fw-medium" style="font-size: 0.9rem;">{{ headerPath.label }}</span>
+                    <span v-if="headerPath.path === 'pagoda-my-events' && pendingEventCount > 0" class="badge rounded-pill bg-danger ms-1">{{ pendingEventCount }}</span>
                 </router-link>
             </div>
             
@@ -68,6 +69,8 @@ import { LayoutDashboard, DoorOpen, FileText, Menu, ClipboardList, X, Bookmark, 
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import Logo from '@/components/Logo.vue';
 import ProfileDropdown from '@/components/common/ProfileDropdown.vue';
+import api from '@/api/api';
+import { socket } from '@/utils/socket';
 
 const authStore = useAuthStore();
 const systemStore = useSystemStore();
@@ -100,6 +103,7 @@ const headerPaths = computed(() => {
         paths.push({ label: 'ប្រវត្តិរូបនិស្សិត', path: 'pagoda-student-biography', icon: ClipboardList });
     }
     if (authStore.isMonk) {
+        paths.push({ label: 'ការនិមន្តរបស់ខ្ញុំ', path: 'pagoda-my-events', icon: Calendar });
         paths.push({ label: 'ប្រវត្តិរូបសង្ខេប', path: 'pagoda-monk-biography', icon: ClipboardList });
     }
     
@@ -140,6 +144,19 @@ const headerPaths = computed(() => {
 
 const showNavLinks = ref(false);
 const headerRef = ref(null);
+const pendingEventCount = ref(0);
+
+const fetchPendingEventCount = async () => {
+    if (authStore.isMonk) {
+        try {
+            const res = await api.get('/ceremony-events/my-assignments');
+            const assignments = res.data?.data || [];
+            pendingEventCount.value = assignments.filter(a => a.status === 'ASSIGNED').length;
+        } catch (error) {
+            console.error('Error fetching pending events count:', error);
+        }
+    }
+};
 
 const handleClickOutside = (event) => {
     if (showNavLinks.value && headerRef.value && !headerRef.value.contains(event.target)) {
@@ -152,10 +169,17 @@ onMounted(() => {
     if (!systemStore.hasLoaded) {
         systemStore.fetchCurrentSeason();
     }
+    fetchPendingEventCount();
+    socket.on('ceremony_event_created', fetchPendingEventCount);
+    socket.on('ceremony_event_updated', fetchPendingEventCount);
+    socket.on('ceremony_assignment_updated', fetchPendingEventCount);
 });
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+    socket.off('ceremony_event_created', fetchPendingEventCount);
+    socket.off('ceremony_event_updated', fetchPendingEventCount);
+    socket.off('ceremony_assignment_updated', fetchPendingEventCount);
 });
 
 </script>

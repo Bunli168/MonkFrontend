@@ -96,7 +96,13 @@ const MyCustomPreset = definePreset(Aura, {
 app.use(PrimeVue, {
     theme: {
         preset: MyCustomPreset,
+        options: {
+            darkModeSelector: '[data-theme="dark"]'
+        }
     }
 })
+
+import ConfirmationService from 'primevue/confirmationservice';
+app.use(ConfirmationService);
 
 app.mount('#app')

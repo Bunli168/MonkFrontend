@@ -129,6 +129,12 @@ const routes = [
 				meta: { title: 'My Bookings' }
 			},
 			{
+				path: 'my-events',
+				name: 'pagoda-my-events',
+				component: () => import('@/views/pagoda/PagodaMyEventsView.vue'),
+				meta: { title: 'My Events', roles: ['MONK', 'BHIKKHU'] }
+			},
+			{
 				path: 'leave-requests',
 				name: 'pagoda-leave-requests',
 				component: () => import('@/views/pagoda/PagodaLeaveRequestView.vue'),
@@ -248,9 +254,15 @@ const routes = [
 			},
 			{
 				path: 'taker/management',
-				name: 'dashboard-taker-management',
+				name: 'taker-management',
 				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Attendance', roles: ['ATTENDANCETAKER', 'ADMIN'] }
+				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN'] }
+			},
+			{
+				path: 'ceremony-events',
+				name: 'ceremony-events',
+				component: () => import('@/views/admin/events/EventsTabView.vue'),
+				meta: { title: 'Events & Assignments', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] }
 			},
 			{
 				path: 'leave-requests',
@@ -286,8 +298,11 @@ const router = createRouter({
 	linkExactActiveClass: 'active'
 });
 
-router.beforeEach(async (to) => {
-	NProgress.start()
+router.beforeEach(async (to, from) => {
+	// Don't show loading bar when switching between tabs in the Pagoda dashboard
+	if (!(to.path.startsWith('/pagoda') && from.path.startsWith('/pagoda'))) {
+		NProgress.start()
+	}
 	const authStore = useAuthStore()
 
 	if (authStore.accessToken && !authStore.user) {

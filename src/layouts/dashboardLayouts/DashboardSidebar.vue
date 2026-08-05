@@ -320,7 +320,8 @@
                     <li class="nav-item" v-for="(item, index) in navItems" :key="item.id"
                         :ref="el => { if (el) itemRefs[index] = el }">
                         <router-link :to="item.link" class="nav-link" :class="{ 'is-active': isParentActive(item) }">
-                            {{ item.label }}
+                            <span class="d-none d-lg-inline">{{ item.label }}</span>
+                            <span class="d-lg-none">{{ item.shortLabel || item.label }}</span>
                         </router-link>
                     </li>
                 </ul>
@@ -384,6 +385,7 @@ const navItems = computed(() => {
         { id: 4, label: 'Attendance', link: '/dashboard/attendance', icon: Calendar, roles: ['SuperAdmin', 'MEKUDI'] },
         { id: 11, label: 'Attendance', link: '/dashboard/taker/management', icon: ClipboardList, roles: ['ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
         // { id: 12, label: 'Leave Requests', link: '/dashboard/leave-requests', icon: FileText, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
+        { id: 13, label: 'Events & Assignments', shortLabel: 'Events', link: '/dashboard/ceremony-events', icon: Flag, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
         { id: 10, label: 'System Settings', link: '/dashboard/system-settings', icon: Settings2, roles: ['SuperAdmin'] },
         { id: 9, label: 'Settings', link: '/dashboard/settings', icon: Settings },
     ];
