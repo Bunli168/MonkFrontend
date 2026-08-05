@@ -90,8 +90,8 @@
                         </template>
                         <template #attachment="{ data: row }">
                             <div class="d-flex justify-content-start align-items-center">
-                                <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
-                                    <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                                <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`https://neakavorn.work.gd${row.image_url}`)" class="d-block" title="Click to view full image">
+                                    <img :src="`https://neakavorn.work.gd${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
                                 </a>
                                 <span v-else class="text-muted fst-italic">-</span>
                             </div>

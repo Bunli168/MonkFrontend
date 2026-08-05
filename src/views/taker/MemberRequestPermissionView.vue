@@ -44,7 +44,7 @@
             >
                 <template #monk="{ data: row }">
                     <div class="d-flex align-items-center gap-2">
-                        <img v-if="row.User?.UserProfile?.avatar_url" :src="`http://localhost:3006${row.User.UserProfile.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 32px; height: 32px;" />
+                        <img v-if="row.User?.UserProfile?.avatar_url" :src="`https://neakavorn.work.gd${row.User.UserProfile.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 32px; height: 32px;" />
                         <div v-else class="avatar-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden"
                             style="width: 32px; height: 32px; background: color-mix(in srgb, var(--primary-color) 15%, transparent);">
                             <User :size="14" style="color: var(--primary-color);" />
@@ -80,8 +80,8 @@
                 
                 <template #attachment="{ data: row }">
                     <div class="d-flex justify-content-start align-items-center">
-                        <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`http://localhost:3006${row.image_url}`)" class="d-block" title="Click to view full image">
-                            <img :src="`http://localhost:3006${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
+                        <a v-if="row.image_url" href="#" @click.prevent="openImageModal(`https://neakavorn.work.gd${row.image_url}`)" class="d-block" title="Click to view full image">
+                            <img :src="`https://neakavorn.work.gd${row.image_url}`" alt="Leave Attachment" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.2s ease;" class="shadow-sm border border-secondary border-opacity-25 attachment-thumbnail" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" />
                         </a>
                         <span v-else class="text-muted fst-italic">-</span>
                     </div>
