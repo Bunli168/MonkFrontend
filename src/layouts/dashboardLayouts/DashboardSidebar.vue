@@ -380,10 +380,10 @@ const pillReady = ref(false);
 
 const navItems = computed(() => {
     const items = [
-        { id: 1, label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
-        { id: 2, label: 'Users', link: '/dashboard/user', icon: Users },
+        { id: 1, label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
+        { id: 2, label: 'Users', link: '/dashboard/user', icon: Users, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
         { id: 4, label: 'Attendance', link: '/dashboard/attendance', icon: Calendar, roles: ['SuperAdmin', 'MEKUDI'] },
-        { id: 11, label: 'Attendance', link: '/dashboard/taker/management', icon: ClipboardList, roles: ['ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
+        { id: 11, label: 'Attendance', link: '/pagoda/taker/management', icon: ClipboardList, roles: ['ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
         // { id: 12, label: 'Leave Requests', link: '/dashboard/leave-requests', icon: FileText, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
         { id: 13, label: 'Events & Assignments', shortLabel: 'Events', link: '/dashboard/ceremony-events', icon: Flag, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
         { id: 10, label: 'System Settings', link: '/dashboard/system-settings', icon: Settings2, roles: ['SuperAdmin'] },

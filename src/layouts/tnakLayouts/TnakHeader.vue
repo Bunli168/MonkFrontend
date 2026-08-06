@@ -79,7 +79,7 @@ const route = useRoute();
 
 const goHome = () => {
     if (authStore.userRole?.toUpperCase() === 'ATTENDANCETAKER') {
-        router.push({ name: 'taker-attendance' });
+        router.push({ name: 'taker-management' });
     } else {
         router.push({ name: 'pagoda-overview' });
     }
@@ -88,6 +88,7 @@ const goHome = () => {
 const headerPaths = computed(() => {
     if (authStore.userRole?.toUpperCase() === 'ATTENDANCETAKER') {
         return [
+            { label: 'Taker Dashboard', path: 'taker-management', icon: LayoutDashboard },
             { label: 'Take Attendance', path: 'taker-attendance', icon: ClipboardList },
             { label: 'Absences', path: 'taker-absent-permission', icon: FileText },
             { label: '3+ Absences', path: 'taker-warnings', icon: FileText }
