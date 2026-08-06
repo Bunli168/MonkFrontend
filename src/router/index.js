@@ -236,6 +236,12 @@ const routes = [
 				component: () => import('@/views/admin/attendance/AttendanceView.vue'),
 				meta: { title: 'Attendance Management', roles: ['SuperAdmin', 'MEKUDI'] }
 			},
+			{
+				path: 'taker/management',
+				name: 'dashboard-taker-management',
+				component: () => import('@/views/taker/TakerManagementView.vue'),
+				meta: { title: 'Member Request Permission', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] }
+			},
 
 			{
 				path: 'kudi',
