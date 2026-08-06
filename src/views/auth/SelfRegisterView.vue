@@ -53,12 +53,12 @@
 
         <!-- Action Buttons (Right) -->
         <div class="d-flex flex-wrap justify-content-start justify-content-md-end gap-2 flex-grow-1">
-          <BaseButton type="button" @click="showScanModal = true" variant="outline" class="col-12 col-md-auto d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-md-grow-0">
+          <BaseButton type="button" @click="showScanModal = true" variant="outline-primary" class="col-12 col-md-auto d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-md-grow-0">
             <QrCode :size="18" class="flex-shrink-0 text-primary" />
             <span class="fw-medium">ស្កេនវត្តមាន</span>
           </BaseButton>
           
-          <BaseButton type="button" @click="showRegisterModal = true" variant="outline" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-grow-1 flex-md-grow-0">
+          <BaseButton type="button" @click="showRegisterModal = true" variant="outline-primary" class="d-flex align-items-center justify-content-center gap-2 py-2 px-3 shadow-sm flex-grow-1 flex-md-grow-0">
             <Armchair :size="18" class="flex-shrink-0 text-primary" />
             <span class="text-truncate fw-medium" style="max-width: 250px;">
               {{ hasRegisteredSeat ? `ជួរទី ${authStore.user?.profile?.seating_row?.row_num || ''} - លេខ ${authStore.user?.profile?.seat_number || ''}` : 'ចុះឈ្មោះកៅអី' }}
@@ -277,7 +277,7 @@
   <BaseModal v-model="showConfirmModal" title="Confirm Delete" size="sm">
     <p class="mb-4 text-muted fw-medium">Are you sure you want to delete this leave request?</p>
     <div class="d-flex justify-content-end gap-2">
-      <BaseButton type="button" variant="outline" @click="showConfirmModal = false">Cancel</BaseButton>
+      <BaseButton type="button" variant="outline-secondary" @click="showConfirmModal = false">Cancel</BaseButton>
       <BaseButton type="button" variant="danger" :isLoading="isDeleting" @click="executeDelete">
         Delete
       </BaseButton>
