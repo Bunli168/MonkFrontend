@@ -23,10 +23,10 @@
         <div v-else>
             <div class="row g-3 mb-3">
                 <div class="col-sm-6 mb-3 mb-sm-0">
-                    <BaseInput type="text" placeholder="John" label="First Name" v-model="firstName" :maxlength="30" :error="errors.firstName" required />
+                    <BaseInput type="text" placeholder="Bunli" label="First Name" v-model="firstName" :maxlength="30" :error="errors.firstName" required />
                 </div>
                 <div class="col-sm-6">
-                    <BaseInput type="text" placeholder="Doe" label="Last Name" v-model="lastName" :maxlength="30" :error="errors.lastName" required />
+                    <BaseInput type="text" placeholder="Phi" label="Last Name" v-model="lastName" :maxlength="30" :error="errors.lastName" required />
                 </div>
             </div>
             <div class="mb-3">
@@ -82,6 +82,19 @@ onMounted(() => {
 });
 
 
+const roleKhmerTranslations = {
+    'SuperAdmin': 'អ្នកគ្រប់គ្រងកំពូល (SuperAdmin)',
+    'Admin': 'មេកុដិ (Admin)',
+    'Monk': 'សាមណេរ (Samanera)',
+    'Student': 'សិស្ស/និស្សិត (Student)',
+    'AttendanceTaker': 'អ្នកស្រង់អវត្តមាន (Attendance Taker)',
+    'Bhikkhu': 'ភិក្ខុ (Bhikkhu)'
+};
+
+const getRoleLabel = (r) => {
+    return roleKhmerTranslations[r.name] || (r.description ? `${r.name} (${r.description.split('—')[0].trim()})` : r.name);
+};
+
 const roles = computed(() => {
     let availableRoles = userStore.userRoles;
     
@@ -89,8 +102,18 @@ const roles = computed(() => {
         // Admins and non-admins can only create Monk (3), Student (4), or Bhikkhu (7)
         availableRoles = availableRoles.filter(r => r.id === 3 || r.id === 4 || r.id === 7);
     }
+    
+    const roleOrder = ['SuperAdmin', 'Admin', 'Bhikkhu', 'Monk', 'Student', 'AttendanceTaker'];
+    availableRoles = availableRoles.slice().sort((a, b) => {
+        let indexA = roleOrder.indexOf(a.name);
+        let indexB = roleOrder.indexOf(b.name);
+        if (indexA === -1) indexA = 999;
+        if (indexB === -1) indexB = 999;
+        return indexA - indexB;
+    });
+
     return availableRoles.map(r => ({ 
-        label: r.description ? `${r.name} (${r.description.split('—')[0].trim()})` : r.name, 
+        label: getRoleLabel(r), 
         value: r.id 
     }));
 });
@@ -106,8 +129,17 @@ const autoRoles = computed(() => {
         availableRoles = availableRoles.filter(r => r.id !== 1 && r.name !== 'SuperAdmin');
     }
     
+    const roleOrder = ['SuperAdmin', 'Admin', 'Bhikkhu', 'Monk', 'Student', 'AttendanceTaker'];
+    availableRoles = availableRoles.slice().sort((a, b) => {
+        let indexA = roleOrder.indexOf(a.name);
+        let indexB = roleOrder.indexOf(b.name);
+        if (indexA === -1) indexA = 999;
+        if (indexB === -1) indexB = 999;
+        return indexA - indexB;
+    });
+
     return availableRoles.map(r => ({ 
-        label: r.description ? `${r.name} (${r.description.split('—')[0].trim()})` : r.name, 
+        label: getRoleLabel(r), 
         value: r.id 
     }));
 });
