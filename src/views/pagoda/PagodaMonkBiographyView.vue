@@ -136,7 +136,7 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label" style="color: var(--text-color);">Surname-Name (គោត្តនាម-នាម) - Latin <span class="text-danger">*</span></label>
-                                <BaseInput v-model="form.latin_name" placeholder="E.g., PHI BUNLICH" :required="currentStep === 1" />
+                                <BaseInput v-model="form.latin_name" placeholder="E.g., PHI BUNLI" :required="currentStep === 1" />
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label" style="color: var(--text-color);">Nationality (សញ្ជាតិ) <span class="text-danger">*</span></label>
