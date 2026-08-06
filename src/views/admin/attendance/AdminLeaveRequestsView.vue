@@ -56,7 +56,7 @@
             </template>
 
             <template #attachment="{ data: row }">
-                <a v-if="row.image_url" :href="`http://localhost:3006${row.image_url}`" target="_blank" class="text-primary text-decoration-none">
+                <a v-if="row.image_url" :href="`https://neakavorn.work.gd${row.image_url}`" target="_blank" class="text-primary text-decoration-none">
                     <i class="bi bi-paperclip"></i> View
                 </a>
                 <span v-else class="text-muted fst-italic">-</span>

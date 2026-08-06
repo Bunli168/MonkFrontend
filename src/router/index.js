@@ -193,7 +193,7 @@ const routes = [
 	{
 		path: '/dashboard',
 		component: () => import('@/layouts/dashboardLayouts/DashboardShell.vue'),
-		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] },
+		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
 		children: [
 			{
 				path: '',
@@ -256,7 +256,7 @@ const routes = [
 				path: 'taker/management',
 				name: 'taker-management',
 				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN'] }
+				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] }
 			},
 			{
 				path: 'ceremony-events',
