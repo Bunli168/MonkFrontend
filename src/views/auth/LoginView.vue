@@ -377,6 +377,8 @@ const handleValidSubmit = async (values) => {
                 router.push(route.query.redirect);
             } else if (authStore.isAdmin || authStore.isSuperAdmin) {
                 router.push({ name: 'dashboard' });
+            } else if (authStore.isAttendanceTaker) {
+                router.push({ name: 'taker-management' });
             } else {
                 router.push({ name: 'pagoda-overview' });
             }

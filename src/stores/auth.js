@@ -302,6 +302,21 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const unlinkOtpTelegram = async () => {
+        try {
+            const res = await api.post('auth/unlink-otp-telegram');
+            toastStore.showToast(res?.data?.message || 'OTP Telegram account unlinked', 'success');
+            if (user.value) {
+                user.value.otp_telegram_chat_id = null;
+                user.value.otp_telegram_username = null;
+            }
+            return true;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
+    };
+
     const logout = async (callApi = true) => {
         clearAuth();
         return true;
@@ -364,6 +379,7 @@ export const useAuthStore = defineStore('auth', () => {
         enableTotp,
         disableTotp,
         unlinkTelegram,
+        unlinkOtpTelegram,
         verifyTotpSetup,
         changeDefaultPassword,
         hasRole,
