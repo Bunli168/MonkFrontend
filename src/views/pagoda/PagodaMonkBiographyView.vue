@@ -6,7 +6,7 @@
         
         <div v-if="!isLoading" class="w-100" style="max-width: 1000px;">
             <div v-if="!hideHeader" class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 mt-2 gap-3">
-                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title || `Monk Profile Summary ` }}<span class="d-none d-md-inline">{{ title ? '' : `/ ប្រវត្តិរូបសង្ខេប (${isSamanera ? 'សាមណេរ' : 'ភិក្ខុ'})` }}</span></h5>
+                <h5 class="fw-bold mb-0" style="color: var(--text-heading-color);">{{ title || `${getRoleTextEn()} Profile Summary ` }}<span class="d-none d-md-inline">{{ title ? '' : `/ ប្រវត្តិរូបសង្ខេប (${getRoleTextKh()})` }}</span></h5>
             </div>
 
             <!-- Summary View (Read Only) - Modern Dashboard Style -->
@@ -98,7 +98,7 @@
             </div>
 
             <div v-else :class="['mx-auto w-100', hideHeader ? '' : 'card p-3 p-md-4']" :style="hideHeader ? { paddingBottom: '1rem' } : { backgroundColor: 'var(--body-bg-color)', borderRadius: 'var(--border-radius)', border: '1px solid var(--border-color, rgba(0,0,0,0.06))', maxWidth: '1000px' }">
-                <h5 v-if="!hideHeader" class="fw-bold mb-4 text-primary">Biography Survey / ប្រវត្តិរូបសង្ខេប ({{ isSamanera ? 'សាមណេរ' : 'ភិក្ខុ' }})</h5>
+                <h5 v-if="!hideHeader" class="fw-bold mb-4 text-primary">Biography Survey / ប្រវត្តិរូបសង្ខេប ({{ getRoleTextKh() }})</h5>
                 
                 <form @submit.prevent="currentStep === 5 ? saveSurvey() : currentStep++">
                     
@@ -322,6 +322,22 @@ const isEditing   = ref(false);
 const hasSurvey   = ref(false);
 const currentStep = ref(1);
 const isSamanera  = ref(false);
+const isAdmin = ref(false);
+const isSuperAdmin = ref(false);
+
+const getRoleTextEn = () => {
+    if (isSuperAdmin.value) return 'SuperAdmin';
+    if (isAdmin.value) return 'Admin';
+    if (isSamanera.value) return 'Samanera';
+    return 'Bhikkhu';
+};
+
+const getRoleTextKh = () => {
+    if (isSuperAdmin.value) return 'អ្នកគ្រប់គ្រងកំពូល';
+    if (isAdmin.value) return 'មេកុដិ';
+    if (isSamanera.value) return 'សាមណេរ';
+    return 'ភិក្ខុ';
+};
 
 const pobLoc = useLocation();
 const ordLoc = useLocation();
@@ -464,11 +480,15 @@ const fetchSurvey = async () => {
             // Backend returns raw column: avatar_url (not avatarUrl)
             viewedUserAvatar.value = data.User?.UserProfile?.avatar_url || ownProfile?.avatarUrl || '';
             
-            // Set isSamanera based on role_id (3 is Samanera)
+            // Set role flags
             if (data.User?.role_id) {
                 isSamanera.value = data.User.role_id === 3;
+                isAdmin.value = data.User.role_id === 2;
+                isSuperAdmin.value = data.User.role_id === 1;
             } else if (authStore.user?.role_id) {
                 isSamanera.value = authStore.user.role_id === 3;
+                isAdmin.value = authStore.user.role_id === 2;
+                isSuperAdmin.value = authStore.user.role_id === 1;
             }
 
             // Load cascading data
