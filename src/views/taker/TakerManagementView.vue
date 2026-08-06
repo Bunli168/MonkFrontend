@@ -10,7 +10,7 @@
                             <span :class="{'d-none d-md-inline': activeTab !== 'take-attendance'}">Take Attendance</span>
                         </div>
                     </Tab>
-                    <Tab value="request-permission">
+                    <Tab value="request-permission" v-if="authStore.isAdmin || authStore.isSuperAdmin">
                         <div class="d-flex align-items-center gap-2">
                             <ClipboardList style="color: var(--primary-color);" :size="16" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'request-permission'}">Member Request Permission</span>
@@ -36,7 +36,7 @@
                 <TabPanel value="take-attendance" v-if="authStore.isAttendanceTaker">
                     <TakerTakeAttendanceView v-if="activeTab === 'take-attendance'" />
                 </TabPanel>
-                <TabPanel value="request-permission">
+                <TabPanel value="request-permission" v-if="authStore.isAdmin || authStore.isSuperAdmin">
                     <MemberRequestPermissionView v-if="activeTab === 'request-permission'" :pending-count="pendingCount" @refresh-pending-count="fetchPendingCount" />
                 </TabPanel>
                 <TabPanel value="my-leave-request">
@@ -74,7 +74,7 @@ const activeTab = ref('request-permission');
 const pendingCount = ref(0);
 
 const fetchPendingCount = async () => {
-    if (!authStore.isAdmin && !authStore.isAttendanceTaker) return;
+    if (!authStore.isAdmin && !authStore.isSuperAdmin) return;
     try {
         const response = await api.get('/leave-requests', {
             params: { status: 'pending' }
