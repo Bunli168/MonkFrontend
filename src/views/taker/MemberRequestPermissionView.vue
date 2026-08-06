@@ -19,7 +19,7 @@
                         </button>
                     </div>
                 </div>
-                <BaseButton v-if="!authStore.isAdmin && !authStore.isAttendanceTaker" @click="showModal = true" variant="primary">
+                <BaseButton v-if="!authStore.isAdmin && !authStore.isSuperAdmin && !authStore.isAttendanceTaker" @click="showModal = true" variant="primary">
                     <i class="fas fa-plus me-1"></i> New Request
                 </BaseButton>
             </div>
@@ -195,7 +195,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['refresh-pending-count']);
-const statusFilter = ref(authStore.isAdmin || authStore.isAttendanceTaker ? 'view' : '');
+const statusFilter = ref(authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker ? 'view' : '');
 const showModal = ref(false);
 const isSubmitting = ref(false);
 
@@ -225,7 +225,7 @@ const filterOptions = computed(() => {
         { label: 'Pending', value: pendingValue, badge: props.pendingCount > 0 ? props.pendingCount : null, variant: props.pendingCount > 0 ? 'danger' : '' },
         { label: 'Rejected', value: 'rejected' }
     ];
-    if (!authStore.isAdmin && !authStore.isAttendanceTaker) {
+    if (!authStore.isAdmin && !authStore.isSuperAdmin && !authStore.isAttendanceTaker) {
         // Members don't have the View tab
         options.shift(); 
         options.unshift({ label: 'All Requests', value: '' });
@@ -235,7 +235,7 @@ const filterOptions = computed(() => {
 
 const colDefs = computed(() => {
     const cols = [];
-    if (authStore.isAdmin || authStore.isAttendanceTaker) {
+    if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) {
         cols.push({ field: 'monk', header: 'Monk', sortable: false });
     }
     cols.push(
@@ -252,7 +252,7 @@ const filteredRequests = computed(() => {
     if (!statusFilter.value) return requests.value;
     // Note: Backend handles 'pending' combining 'pending_mekudi' and 'pending' 
     // for Admin. But for regular members we do client-side filtering if it's '/my' endpoint
-    if (!authStore.isAdmin && !authStore.isAttendanceTaker) {
+    if (!authStore.isAdmin && !authStore.isSuperAdmin && !authStore.isAttendanceTaker) {
         if (statusFilter.value === 'pending') {
             return requests.value.filter(req => req.status === 'pending_mekudi' || req.status === 'pending' || req.status === 'pending_superadmin');
         }
@@ -299,7 +299,7 @@ const fetchRequests = async () => {
     if (statusFilter.value === 'view') return;
     isLoading.value = true;
     try {
-        if (authStore.isAdmin || authStore.isAttendanceTaker) {
+        if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) {
             const statusParams = statusFilter.value === 'view' ? '' : statusFilter.value;
             const response = await api.get('/leave-requests', {
                 params: { status: statusParams }
@@ -311,7 +311,7 @@ const fetchRequests = async () => {
         }
         
         // Refresh pending count when fetching requests
-        if (authStore.isAdmin || authStore.isAttendanceTaker) {
+        if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) {
             emit('refresh-pending-count');
         }
     } catch (error) {
@@ -328,7 +328,7 @@ onMounted(() => {
 
 watch(statusFilter, () => {
     currentPage.value = 1;
-    if (authStore.isAdmin || authStore.isAttendanceTaker) {
+    if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) {
         fetchRequests();
     }
 });
@@ -374,7 +374,7 @@ const getActionItems = (row) => {
     }
 
     if (isAwaitingAdmin) {
-        if (!authStore.isAdmin && !authStore.isAttendanceTaker) return [];
+        if (!authStore.isAdmin && !authStore.isSuperAdmin && !authStore.isAttendanceTaker) return [];
         return [
             {
                 label: 'Approve',
@@ -407,7 +407,7 @@ const executeStatusUpdate = async () => {
         toast.showToast(`Request ${confirmAction.value} successfully`, 'success');
         showConfirmModal.value = false;
         fetchRequests();
-        if (authStore.isAdmin || authStore.isAttendanceTaker) {
+        if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) {
             emit('refresh-pending-count');
         }
     } catch (error) {
