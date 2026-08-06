@@ -99,7 +99,8 @@ export const useAuthStore = defineStore('auth', () => {
             accessToken.value = access;
             Cookies.set('accessToken', access, {
                 secure: window.location.protocol === 'https:',
-                sameSite: 'Lax'
+                sameSite: 'Lax',
+                expires: 7
             });
             socket.disconnect();
             socket.connect();
