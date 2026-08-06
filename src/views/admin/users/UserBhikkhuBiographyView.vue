@@ -90,7 +90,7 @@
 
         <!-- Biography Modal -->
         <BaseModal v-model="showBiographyModal" size="lg" title="Biography Survey / ប្រវត្តិរូបសង្ខេប" @close="closeBiography">
-            <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" />
+            <PagodaMonkBiographyView :user-id="selectedUser?.id" @close="closeBiography" hide-header :is-read-only="true" :force-is-samanera="false" />
         </BaseModal>
     </div>
 </template>

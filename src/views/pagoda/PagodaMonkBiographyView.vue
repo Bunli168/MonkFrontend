@@ -293,6 +293,10 @@ const props = defineProps({
     isReadOnly: {
         type: Boolean,
         default: false
+    },
+    forceIsSamanera: {
+        type: Boolean,
+        default: null
     }
 });
 
@@ -481,14 +485,16 @@ const fetchSurvey = async () => {
             viewedUserAvatar.value = data.User?.UserProfile?.avatar_url || ownProfile?.avatarUrl || '';
             
             // Set role flags
-            if (data.User?.role_id) {
-                isSamanera.value = data.User.role_id === 3;
-                isAdmin.value = data.User.role_id === 2;
-                isSuperAdmin.value = data.User.role_id === 1;
+            if (props.forceIsSamanera !== null) {
+                isSamanera.value = props.forceIsSamanera;
+            } else if (data.User?.role_id) {
+                isSamanera.value = String(data.User.role_id) === '3';
+                isAdmin.value = String(data.User.role_id) === '2';
+                isSuperAdmin.value = String(data.User.role_id) === '1';
             } else if (authStore.user?.role_id) {
-                isSamanera.value = authStore.user.role_id === 3;
-                isAdmin.value = authStore.user.role_id === 2;
-                isSuperAdmin.value = authStore.user.role_id === 1;
+                isSamanera.value = String(authStore.user.role_id) === '3';
+                isAdmin.value = String(authStore.user.role_id) === '2';
+                isSuperAdmin.value = String(authStore.user.role_id) === '1';
             }
 
             // Load cascading data
@@ -521,6 +527,12 @@ const fetchSurvey = async () => {
             hasSurvey.value = false;
 
             // Even when no survey exists, auto-fill from own profile
+            if (props.forceIsSamanera !== null) {
+                isSamanera.value = props.forceIsSamanera;
+            } else if (authStore.user?.role_id) {
+                isSamanera.value = String(authStore.user.role_id) === '3';
+            }
+
             if (ownProfile) {
                 if (!form.value.surname_name) form.value.surname_name = `${ownProfile.last_name_kh || ''} ${ownProfile.first_name_kh || ''}`.trim();
                 if (!form.value.date_of_birth && ownProfile.dateOfBirth) form.value.date_of_birth = ownProfile.dateOfBirth;
