@@ -54,7 +54,8 @@ async function refreshAccessToken() {
     if (newAccessToken) {
         Cookies.set('accessToken', newAccessToken, {
             secure: window.location.protocol === 'https:',
-            sameSite: 'Lax'
+            sameSite: 'Lax',
+            expires: 7
         });
 
         try {
