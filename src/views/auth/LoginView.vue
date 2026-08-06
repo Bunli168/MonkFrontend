@@ -373,15 +373,14 @@ const handleValidSubmit = async (values) => {
         } else if (result.requirePasswordChange) {
             router.push({ name: 'change-password' })
         } else {
-            if (route.query.redirect) {
-                router.push(route.query.redirect);
-            } else if (authStore.isAdmin || authStore.isSuperAdmin) {
-                router.push({ name: 'dashboard' });
-            } else if (authStore.isAttendanceTaker) {
-                router.push({ name: 'taker-management' });
-            } else {
-                router.push({ name: 'pagoda-overview' });
-            }
+            const target = route.query.redirect 
+                ? route.query.redirect 
+                : (authStore.isAdmin || authStore.isSuperAdmin) 
+                    ? '/dashboard' 
+                    : authStore.isAttendanceTaker 
+                        ? '/pagoda/taker/management' 
+                        : '/pagoda';
+            window.location.href = target;
         }
     } finally {
         isLoading.value = false;
