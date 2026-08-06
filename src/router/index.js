@@ -176,6 +176,13 @@ const routes = [
 				component: () => import('@/views/taker/TakerWarningView.vue'),
 				meta: { title: '3+ Absences Warning', roles: ['ATTENDANCETAKER', 'SuperAdmin', 'ADMIN'] }
 			},
+			{
+				path: 'taker/management',
+				name: 'taker-management',
+				component: () => import('@/views/taker/TakerManagementView.vue'),
+				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] }
+			},
+
 
 			{
 				path: 'ledger',
@@ -193,19 +200,19 @@ const routes = [
 	{
 		path: '/dashboard',
 		component: () => import('@/layouts/dashboardLayouts/DashboardShell.vue'),
-		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] },
+		meta: { requiresAuth: true, roles: ['SuperAdmin', 'ADMIN'] },
 		children: [
 			{
 				path: '',
 				name: 'dashboard',
 				component: () => import('@/views/admin/OverviewView.vue'),
-				meta: { title: 'Overview' }
+				meta: { title: 'Overview', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] }
 			},
 			{
 				path: 'user',
 				name: 'dashboard-user',
 				component: () => import('@/views/admin/users/UserView.vue'),
-				meta: { title: 'Users Management' }
+				meta: { title: 'Users Management', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI'] }
 			},
 			{
 				path: 'monk-biography',
@@ -251,12 +258,6 @@ const routes = [
 				name: 'admin-fines-report',
 				component: () => import('@/views/admin/fines/AdminFineReportView.vue'),
 				meta: { title: 'Fine Payment Report', roles: ['SuperAdmin', 'ADMIN', 'ATTENDANCETAKER'] }
-			},
-			{
-				path: 'taker/management',
-				name: 'taker-management',
-				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] }
 			},
 			{
 				path: 'ceremony-events',
