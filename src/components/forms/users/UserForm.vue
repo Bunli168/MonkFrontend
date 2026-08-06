@@ -15,7 +15,7 @@
             </div>
             <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
-                    label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
+                    label="Kudi" placeholder="Select Kudi (Optional)" :error="errors.kut_id" />
             </div>
 
         </div>
@@ -35,7 +35,7 @@
             </div>
             <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
-                    label="Kudi" placeholder="Select Kudi" required :error="errors.kut_id" />
+                    label="Kudi" placeholder="Select Kudi (Optional)" :error="errors.kut_id" />
             </div>
 
         </div>
