@@ -41,7 +41,7 @@
                 
                 <!-- Scanning Overlay Guidelines -->
                 <div v-if="isScanning" class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none d-flex align-items-center justify-content-center">
-                    <div style="width: 65%; height: 65%; border: 2px solid rgba(255,255,255,0.4); border-radius: 16px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);">
+                    <div style="width: 75%; height: 75%; border: 2px solid rgba(255,255,255,0.4); border-radius: 16px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);">
                         <!-- Corner brackets for modern feel -->
                         <div class="position-absolute top-0 start-0 border-top border-start border-white border-4" style="width: 30px; height: 30px; border-top-left-radius: 14px; transform: translate(-2px, -2px);"></div>
                         <div class="position-absolute top-0 end-0 border-top border-end border-white border-4" style="width: 30px; height: 30px; border-top-right-radius: 14px; transform: translate(2px, -2px);"></div>
@@ -106,7 +106,7 @@ const startScanner = async () => {
             { facingMode: currentFacingMode.value },
             {
                 fps: 10,
-                qrbox: { width: 250, height: 250 }
+                aspectRatio: 1.0
             },
             onScanSuccess,
             onScanFailure
