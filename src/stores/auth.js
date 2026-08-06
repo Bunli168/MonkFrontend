@@ -22,9 +22,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     const userRole = computed(() => {
         if (!user.value?.role) return null;
-        return typeof user.value.role === 'string'
+        const rawRole = typeof user.value.role === 'string'
             ? user.value.role
             : user.value.role?.name || user.value.role;
+        return rawRole ? rawRole.replace(/\s+/g, '') : null;
     });
 
     const isAdmin = computed(() => {
