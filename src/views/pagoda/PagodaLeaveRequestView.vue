@@ -7,7 +7,7 @@
             </div>
             
             <div class="d-flex align-items-center flex-wrap flex-md-nowrap gap-2 mt-2 mt-md-0">
-                <BaseButton variant="badge" type="button" @click="showScanModal = true" class="flex-grow-1 flex-md-grow-0 text-nowrap justify-content-center">
+                <BaseButton v-if="!authStore.isAttendanceTaker" variant="badge" type="button" @click="showScanModal = true" class="flex-grow-1 flex-md-grow-0 text-nowrap justify-content-center">
                     <i class="fas fa-qrcode text-primary"></i> Scan Attendance
                 </BaseButton>
                 <BaseButton v-if="innerTab === 'leave-requests'" variant="badge primary active" type="button" @click="showForm = true" class="flex-grow-1 flex-md-grow-0 text-nowrap justify-content-center">
@@ -148,6 +148,7 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
+import { useAuthStore } from '@/stores/auth';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseFilter from '@/components/base/BaseFilter.vue';
 import PagodaRegisterSeatView from './PagodaRegisterSeatView.vue';
@@ -161,14 +162,20 @@ import { FileEdit, Trash2 } from '@lucide/vue';
 import * as bootstrap from 'bootstrap';
 
 const toast = useToastStore();
+const authStore = useAuthStore();
 const showForm = ref(false);
 const showScanModal = ref(false);
 
 const innerTab = ref('leave-requests');
-const innerTabOptions = computed(() => [
-    { label: 'Leave Requests', value: 'leave-requests' },
-    { label: 'Register Seat', value: 'register-seat' }
-]);
+const innerTabOptions = computed(() => {
+    const options = [
+        { label: 'Leave Requests', value: 'leave-requests' }
+    ];
+    if (!authStore.isAttendanceTaker) {
+        options.push({ label: 'Register Seat', value: 'register-seat' });
+    }
+    return options;
+});
 const isSubmitting = ref(false);
 const isLoading = ref(false);
 const myRequests = ref([]);
