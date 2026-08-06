@@ -284,9 +284,10 @@
             </div>
 
             <div class="footer-col">
-                <a :href="`https://t.me/${telegramUsername}?start=${authStore.user?.phone || ''}`" target="_blank" class="theme-btn mb-2" v-tooltip.right="'Link Telegram'" style="text-decoration: none; color: #0088cc;">
-                    <Send :size="18" :stroke-width="2" />
-                </a>
+                <button @click="handleLinkTelegram" class="theme-btn mb-2" v-tooltip.right="'Link Telegram'" style="border: none; background: transparent; color: #0088cc;">
+                    <i v-if="isLoadingTelegram" class="fas fa-spinner fa-spin" style="font-size: 16px;"></i>
+                    <Send v-else :size="18" :stroke-width="2" />
+                </button>
 
                 <div class="theme-switcher mb-3">
                     <button aria-label="Light theme" class="theme-btn" :class="{ active: theme === 'light' }"
@@ -342,11 +343,31 @@ import Logo from '@/components/Logo.vue';
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useSidebarStore } from '@/stores/sidebar';
+import { useUserStore } from '@/stores/users/user';
 
 const authStore = useAuthStore();
-
 const sidebar = useSidebarStore();
+const userStore = useUserStore();
+
 const telegramUsername = import.meta.env.VITE_TELEGRAM_SUPPORT_USERNAME || 'Monk_permission_bot';
+
+const isLoadingTelegram = ref(false);
+
+const handleLinkTelegram = async () => {
+    isLoadingTelegram.value = true;
+    try {
+        const result = await userStore.requestTelegramLink();
+        if (result && result.telegramLink) {
+            window.open(result.telegramLink, '_blank');
+        } else {
+            // fallback if token generation failed
+            const phone = authStore.user?.phone || '';
+            window.open(`https://t.me/${telegramUsername}?start=${phone}`, '_blank');
+        }
+    } finally {
+        isLoadingTelegram.value = false;
+    }
+};
 
 let savedAppearance = {};
 try {
