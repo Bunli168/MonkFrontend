@@ -74,7 +74,7 @@ const routes = [
 	{
 		path: '/pagoda',
 		component: () => import('@/layouts/tnakLayouts/TnakShell.vue'),
-		meta: { requiresAuth: true, roles: ['MEKUDI', 'MONK', 'BHIKKHU', 'ADMIN', 'SuperAdmin', 'STUDENT', 'ATTENDANCETAKER'] },
+		meta: { requiresAuth: true, roles: ['MEKUDI', 'MONK', 'BHIKKHU', 'STUDENT', 'ATTENDANCETAKER'] },
 		children: [
 			{
 				path: '',
@@ -103,7 +103,7 @@ const routes = [
 				path: 'monk-biography',
 				name: 'pagoda-monk-biography',
 				component: () => import('@/views/pagoda/PagodaMonkBiographyView.vue'),
-				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI', 'ADMIN', 'SuperAdmin'] }
+				meta: { roles: ['MONK', 'BHIKKHU', 'MEKUDI'] }
 			},
 			{
 				path: 'student-profile-summary',
@@ -144,19 +144,19 @@ const routes = [
 				path: 'users',
 				name: 'pagoda-users',
 				component: () => import('@/views/admin/users/UserView.vue'),
-				meta: { title: 'Users Management', roles: ['MEKUDI', 'ADMIN', 'SuperAdmin'] }
+				meta: { title: 'Users Management', roles: ['MEKUDI'] }
 			},
 			{
 				path: 'attendance',
 				name: 'pagoda-attendance',
 				component: () => import('@/views/admin/attendance/AttendanceView.vue'),
-				meta: { title: 'Attendance', roles: ['SuperAdmin', 'MEKUDI'] }
+				meta: { title: 'Attendance', roles: ['MEKUDI'] }
 			},
 			{
 				path: 'taker/attendance',
 				name: 'taker-attendance',
 				component: () => import('@/views/taker/TakerTakeAttendanceView.vue'),
-				meta: { title: 'Take Attendance', roles: ['ATTENDANCETAKER', 'SuperAdmin'] }
+				meta: { title: 'Take Attendance', roles: ['ATTENDANCETAKER'] }
 			},
 			{
 				path: 'scan-attendance',
@@ -168,19 +168,19 @@ const routes = [
 				path: 'taker/absences',
 				name: 'taker-absent-permission',
 				component: () => import('@/views/taker/TakerAbsentPermissionView.vue'),
-				meta: { title: 'Absence & Permission', roles: ['ATTENDANCETAKER', 'SuperAdmin', 'ADMIN'] }
+				meta: { title: 'Absence & Permission', roles: ['ATTENDANCETAKER'] }
 			},
 			{
 				path: 'taker/warnings',
 				name: 'taker-warnings',
 				component: () => import('@/views/taker/TakerWarningView.vue'),
-				meta: { title: '3+ Absences Warning', roles: ['ATTENDANCETAKER', 'SuperAdmin', 'ADMIN'] }
+				meta: { title: '3+ Absences Warning', roles: ['ATTENDANCETAKER'] }
 			},
 			{
 				path: 'taker/management',
 				name: 'taker-management',
 				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN', 'MEKUDI', 'ATTENDANCETAKER'] }
+				meta: { title: 'Attendance Taker Management', roles: ['MEKUDI', 'ATTENDANCETAKER'] }
 			},
 
 
@@ -276,6 +276,30 @@ const routes = [
 				name: 'settings',
 				component: () => import('@/views/admin/SettingsView.vue'),
 				meta: { title: 'Profile Settings' }
+			},
+			{
+				path: 'taker/attendance',
+				name: 'dashboard-taker-attendance',
+				component: () => import('@/views/taker/TakerTakeAttendanceView.vue'),
+				meta: { title: 'Take Attendance', roles: ['SuperAdmin', 'ADMIN'] }
+			},
+			{
+				path: 'taker/absences',
+				name: 'dashboard-taker-absent-permission',
+				component: () => import('@/views/taker/TakerAbsentPermissionView.vue'),
+				meta: { title: 'Absence & Permission', roles: ['SuperAdmin', 'ADMIN'] }
+			},
+			{
+				path: 'taker/warnings',
+				name: 'dashboard-taker-warnings',
+				component: () => import('@/views/taker/TakerWarningView.vue'),
+				meta: { title: '3+ Absences Warning', roles: ['SuperAdmin', 'ADMIN'] }
+			},
+			{
+				path: 'taker/management',
+				name: 'dashboard-taker-management',
+				component: () => import('@/views/taker/TakerManagementView.vue'),
+				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN'] }
 			}
 		]
 	},
