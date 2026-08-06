@@ -31,7 +31,7 @@
                             {{ row.User?.UserProfile?.first_name_kh }} {{ row.User?.UserProfile?.last_name_kh }}
                         </div>
                         <div class="text-muted small" v-if="row.User?.UserProfile?.kut_id">
-                            Kudi: {{ row.User.UserProfile.kut_id }}
+                            Kudi: {{ row.User.UserProfile.Kut ? row.User.UserProfile.Kut.name : row.User.UserProfile.kut_id }}
                         </div>
                     </div>
                 </div>
