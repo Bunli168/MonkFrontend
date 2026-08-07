@@ -39,6 +39,17 @@
                                     :disabledDates="requestedDates"
                                 />
                             </div>
+                            <div class="col-12" v-if="calculatedDays > 0">
+                                <div class="alert alert-info py-2 px-3 mb-1 d-flex align-items-center justify-content-between">
+                                    <span class="small fw-medium">
+                                        <i class="fas fa-calendar-check me-2"></i>
+                                        រយះពេលសុំច្បាប់ (Total Leave Duration):
+                                    </span>
+                                    <span class="badge bg-primary fs-6">
+                                        {{ calculatedDays }} ថ្ងៃ ({{ calculatedDays }} {{ calculatedDays === 1 ? 'day' : 'days' }})
+                                    </span>
+                                </div>
+                            </div>
                             <div class="col-12">
                                 <label class="form-label fw-medium">Reason for Leave</label>
                                 <textarea class="form-control" v-model="formData.reason" rows="3" required placeholder="Please explain why you need to take leave..."></textarea>
@@ -217,6 +228,15 @@ const requestedDates = computed(() => {
 });
 
 const today = new Date().toISOString().split('T')[0];
+
+const calculatedDays = computed(() => {
+    if (!formData.value.start_date || !formData.value.end_date) return 0;
+    const start = new Date(formData.value.start_date);
+    const end = new Date(formData.value.end_date);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) return 0;
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+});
 
 const formData = ref({
     start_date: '',
