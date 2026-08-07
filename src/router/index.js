@@ -300,13 +300,9 @@ const routes = [
 				name: 'dashboard-taker-warnings',
 				component: () => import('@/views/taker/TakerWarningView.vue'),
 				meta: { title: '3+ Absences Warning', roles: ['SuperAdmin', 'ADMIN'] }
-			},
-			{
-				path: 'taker/management',
-				name: 'dashboard-taker-management',
-				component: () => import('@/views/taker/TakerManagementView.vue'),
-				meta: { title: 'Attendance Taker Management', roles: ['SuperAdmin', 'ADMIN'] }
 			}
+			// ✅ Removed duplicate 'dashboard-taker-management' route (was defined twice,
+			//    causing undefined Vue Router behavior). The canonical definition is above at line ~241.
 		]
 	},
 	{
@@ -346,8 +342,9 @@ router.beforeEach(async (to, from) => {
 	}
 
 	const isAuthenticated = authStore.isAuthenticated
-	const needsPasswordChange = !!localStorage.getItem('changePasswordToken');
-	const needOtpVerify = !!localStorage.getItem('otpSessionToken');
+	// ✅ Use sessionStorage (tab-scoped) for auth flow tokens — consistent with auth.js
+	const needsPasswordChange = !!sessionStorage.getItem('changePasswordToken');
+	const needOtpVerify = !!sessionStorage.getItem('otpSessionToken');
 	const authPages = ['login', 'otp', 'change-password', 'forgot-password', 'reset-password']
 
 	if ((!needOtpVerify && to.name == 'otp') || (!needsPasswordChange && to.name == 'change-password')) {

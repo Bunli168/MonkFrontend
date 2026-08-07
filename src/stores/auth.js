@@ -9,7 +9,10 @@ import { socket } from "@/utils/socket";
 export const useAuthStore = defineStore('auth', () => {
     const toastStore = useToastStore();
 
-    const accessToken = ref(Cookies.get('accessToken') || sessionStorage.getItem('accessToken') || null);
+    // ⚠️  SECURITY: Never read the access token from sessionStorage — it is fully readable by XSS.
+    //    The cookie MUST be set as httpOnly by the server (backend) so JS cannot read it at all.
+    //    js-cookie (client-side) cannot set httpOnly; this is a backend responsibility.
+    const accessToken = ref(Cookies.get('accessToken') || null);
     const user = ref(null);
 
     // Always authenticated in mock mode
@@ -97,12 +100,16 @@ export const useAuthStore = defineStore('auth', () => {
     const setTokens = ({ access }) => {
         if (access) {
             accessToken.value = access;
+            // ⚠️  SECURITY NOTE FOR BACKEND TEAM:
+            //    This cookie MUST be set server-side with httpOnly: true to prevent JS access.
+            //    The frontend sets it here as a fallback only; remove once backend sets it.
+            //    Cookie expires in 1 day — access tokens should be short-lived.
             Cookies.set('accessToken', access, {
                 secure: window.location.protocol === 'https:',
-                sameSite: 'Lax',
-                expires: 7
+                sameSite: 'Strict',
+                expires: 1
             });
-            sessionStorage.setItem('accessToken', access);
+            // ✅  Do NOT store the access token in sessionStorage — it is fully readable by JS.
             socket.disconnect();
             socket.connect();
         }
@@ -115,18 +122,20 @@ export const useAuthStore = defineStore('auth', () => {
             const data = response.data?.data || response.data;
             
             if (data.requirePasswordChange) {
-                localStorage.setItem('changePasswordToken', data.token);
+                // ✅ sessionStorage: scoped to this tab only (better than localStorage)
+                sessionStorage.setItem('changePasswordToken', data.token);
                 return { requirePasswordChange: true };
             }
             
             if (data.requireOtp) {
-                localStorage.setItem('mfaType', data.mfaType || 'email');
-                localStorage.setItem('otpSessionToken', data.otpSessionToken);
+                // ✅ sessionStorage: scoped to this tab — prevents cross-tab MFA token theft
+                sessionStorage.setItem('mfaType', data.mfaType || 'email');
+                sessionStorage.setItem('otpSessionToken', data.otpSessionToken);
                 return { requireOtp: true };
             }
 
             if (data.tokens?.accessToken) {
-                localStorage.removeItem('changePasswordToken');
+                sessionStorage.removeItem('changePasswordToken');
                 setTokens({ access: data.tokens.accessToken });
                 user.value = data.user;
                 joinSocketRooms();
@@ -141,23 +150,23 @@ export const useAuthStore = defineStore('auth', () => {
 
     const verifyOtp = async (otpCode) => {
         try {
-            const otpSessionToken = localStorage.getItem('otpSessionToken');
+            const otpSessionToken = sessionStorage.getItem('otpSessionToken');
             if (!otpSessionToken) throw new Error('Invalid session. Please login again.');
             if (!otpCode) throw new Error('OTP Code is required!');
 
             const response = await api.post('/auth/verify-otp', { otpSessionToken, otpCode });
             const data = response.data?.data || response.data;
 
-            localStorage.removeItem('otpSessionToken');
-            localStorage.removeItem('mfaType');
+            sessionStorage.removeItem('otpSessionToken');
+            sessionStorage.removeItem('mfaType');
 
             if (data.requirePasswordChange) {
-                localStorage.setItem('changePasswordToken', data.token);
+                sessionStorage.setItem('changePasswordToken', data.token);
                 return { requirePasswordChange: true };
             }
 
             if (data.accessToken) {
-                localStorage.removeItem('changePasswordToken');
+                sessionStorage.removeItem('changePasswordToken');
                 setTokens({ access: data.accessToken });
                 user.value = data.user;
                 joinSocketRooms();
@@ -168,8 +177,8 @@ export const useAuthStore = defineStore('auth', () => {
         } catch (error) {
             handleApiError(error, toastStore);
             if (error?.response?.data?.message === 'Invalid or expired session') {
-                localStorage.removeItem('otpSessionToken');
-                localStorage.removeItem('mfaType');
+                sessionStorage.removeItem('otpSessionToken');
+                sessionStorage.removeItem('mfaType');
                 setTimeout(() => {
                     window.location.href = '/login';
                 }, 1500);
@@ -180,33 +189,38 @@ export const useAuthStore = defineStore('auth', () => {
 
     const resendOtp = async () => {
         try {
-            const otpSessionToken = { otpSessionToken: localStorage.getItem('otpSessionToken') };
-            if (!otpSessionToken) throw new Error('Invalid session. Please login again.');
+            // ✅ Fixed: was checking an object (always truthy) — now checks the raw string value
+            const rawToken = sessionStorage.getItem('otpSessionToken');
+            if (!rawToken) throw new Error('Invalid session. Please login again.');
+            const otpSessionToken = { otpSessionToken: rawToken };
 
-            const res = await api.post('auth/resend-otp', otpSessionToken)
+            const res = await api.post('auth/resend-otp', otpSessionToken);
 
-            toastStore.showToast(res?.data?.message, 'success')
+            toastStore.showToast(res?.data?.message, 'success');
             return true;
         } catch (error) {
-            handleApiError(error, toastStore)
+            handleApiError(error, toastStore);
             return false;
         }
     }
 
     const changeDefaultPassword = async (payload) => {
         try {
-            const changePasswordToken = localStorage.getItem('changePasswordToken');
+            const changePasswordToken = sessionStorage.getItem('changePasswordToken');
             if (!changePasswordToken) return;
 
-            const response = await api.put(`/auth/change-default-password/${changePasswordToken}`, payload);
+            // ✅ SECURITY FIX: Token sent in request body instead of URL path.
+            //    Previously `/auth/change-default-password/${token}` leaked the token
+            //    into server logs, browser history, and Referer headers.
+            const response = await api.put('/auth/change-default-password', { ...payload, token: changePasswordToken });
             toastStore.showToast(response?.data?.message, 'success');
 
-            localStorage.removeItem('changePasswordToken');
+            sessionStorage.removeItem('changePasswordToken');
             return true;
         } catch (error) {
             handleApiError(error, toastStore);
             if (error?.response?.data?.message === 'Invalid or expired token' || error?.response?.data?.message === 'User not found') {
-                localStorage.removeItem('changePasswordToken');
+                sessionStorage.removeItem('changePasswordToken');
                 setTimeout(() => {
                     window.location.href = '/login';
                 }, 1500);
@@ -337,11 +351,12 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null;
         Cookies.remove('accessToken', {
             secure: window.location.protocol === 'https:',
-            sameSite: 'Lax'
+            sameSite: 'Strict'
         });
-        sessionStorage.removeItem('accessToken');
-        localStorage.removeItem('otpSessionToken');
-        localStorage.removeItem('changePasswordToken');
+        // ✅ Clear all session-scoped auth state
+        sessionStorage.removeItem('otpSessionToken');
+        sessionStorage.removeItem('mfaType');
+        sessionStorage.removeItem('changePasswordToken');
         socket.disconnect();
     };
 

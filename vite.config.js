@@ -8,7 +8,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    ...(process.env.NODE_ENV !== 'production' ? [vueDevTools()] : []),
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {

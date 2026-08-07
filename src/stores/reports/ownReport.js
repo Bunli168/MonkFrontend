@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "@/api/api";
 import { useToastStore } from "../toast";
+import { sanitizeId } from "@/utils/security";
 
 export const useOwnReportstore = defineStore('ownReport', () => {
     const ownReports = ref([]);
@@ -41,10 +42,8 @@ export const useOwnReportstore = defineStore('ownReport', () => {
             totalPages.value = res.data.pagination?.totalPages || 1;
             return res.data.data;
         } catch (error) {
-            console.error('Failed to fetch own reports:', error);
             if (!options.silent) {
-                const errMsg = error.response?.data?.message || error.message || 'Unknown error';
-                toast.showToast(`Failed to fetch your reports: ${errMsg}`, 'error');
+                toast.showToast('Failed to fetch your reports', 'error');
             }
             return [];
         } finally {
@@ -54,12 +53,12 @@ export const useOwnReportstore = defineStore('ownReport', () => {
 
     const getOwnReportById = async (id) => {
         try {
+            const safeId = sanitizeId(id);
             isLoading.value = true;
-            const res = await api.get(`/reports/${id}`);
+            const res = await api.get(`/reports/${safeId}`);
             ownReport.value = res.data.data;
             return res.data.data;
         } catch (error) {
-            console.error('Failed to fetch own report:', error);
             toast.showToast('Failed to fetch report', 'error');
             return null;
         } finally {
@@ -103,7 +102,6 @@ export const useOwnReportstore = defineStore('ownReport', () => {
             await getOwnReports();
             return res.data;
         } catch (error) {
-            console.error('Failed to submit report:', error);
             toast.showToast('Failed to submit report', 'error');
             return null;
         } finally {
@@ -113,6 +111,7 @@ export const useOwnReportstore = defineStore('ownReport', () => {
 
     const updateReport = async (id, data) => {
         try {
+            const safeId = sanitizeId(id);
             isLoading.value = true;
             
             const isFile = (img) => img instanceof File || img instanceof Blob || (img && typeof img === 'object' && img.name && img.size !== undefined);
@@ -142,12 +141,11 @@ export const useOwnReportstore = defineStore('ownReport', () => {
                 headers['Content-Type'] = 'multipart/form-data';
             }
             
-            const res = await api.put(`/reports/${id}`, payload, { headers });
+            const res = await api.put(`/reports/${safeId}`, payload, { headers });
             toast.showToast('Report updated successfully', 'success');
             await getOwnReports();
             return res.data;
         } catch (error) {
-            console.error('Failed to update report:', error);
             toast.showToast('Failed to update report', 'error');
             return null;
         } finally {
@@ -157,13 +155,13 @@ export const useOwnReportstore = defineStore('ownReport', () => {
 
     const deleteReport = async (id) => {
         try {
+            const safeId = sanitizeId(id);
             isLoading.value = true;
-            const res = await api.delete(`/reports/${id}`);
+            await api.delete(`/reports/${safeId}`);
             toast.showToast('Report deleted successfully', 'success');
             await getOwnReports();
             return true;
         } catch (error) {
-            console.error('Failed to delete report:', error);
             toast.showToast('Failed to delete report', 'error');
             return false;
         } finally {
@@ -172,8 +170,7 @@ export const useOwnReportstore = defineStore('ownReport', () => {
     };
 
     const setupSocketListeners = () => {
-        // Mock socket listener setup
-        console.log('Socket listeners set up for own reports');
+        // Socket listeners configured server-side via auth token
     };
 
     return {

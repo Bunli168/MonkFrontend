@@ -54,10 +54,10 @@ async function refreshAccessToken() {
     if (newAccessToken) {
         Cookies.set('accessToken', newAccessToken, {
             secure: window.location.protocol === 'https:',
-            sameSite: 'Lax',
-            expires: 7
+            sameSite: 'Strict',
+            expires: 1
         });
-        sessionStorage.setItem('accessToken', newAccessToken);
+        // ✅ Do NOT store in sessionStorage — it is readable by JS (XSS risk)
 
         try {
             const authStore = useAuthStore();
@@ -76,11 +76,12 @@ function handleRefreshFailure() {
     } catch {
         Cookies.remove('accessToken', {
             secure: window.location.protocol === 'https:',
-            sameSite: 'Lax'
+            sameSite: 'Strict'
         });
-        sessionStorage.removeItem('accessToken');
-        localStorage.removeItem('otpSessionToken');
-        localStorage.removeItem('changePasswordToken');
+        // ✅ Match sessionStorage cleanup in auth.js clearAuth()
+        sessionStorage.removeItem('otpSessionToken');
+        sessionStorage.removeItem('mfaType');
+        sessionStorage.removeItem('changePasswordToken');
     }
     window.location.href = '/login';
 }
@@ -100,7 +101,8 @@ function shouldSkipAuth(url) {
 api.interceptors.request.use(async (req) => {
     if (shouldSkipAuth(req.url)) return req;
 
-    let token = Cookies.get('accessToken') || sessionStorage.getItem('accessToken');
+    // ✅ Token comes from cookie only — sessionStorage fallback removed (XSS risk)
+    let token = Cookies.get('accessToken');
 
     if (token && isTokenExpiringSoon(token, 15)) {
         if (!isRefreshing) {

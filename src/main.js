@@ -17,8 +17,23 @@ if (CSSPlugin) {
 
 const app = createApp(App);
 app.config.errorHandler = (err, instance, info) => {
-    console.error(err, info);
-    document.body.innerHTML = '<div style="color:red;padding:20px;z-index:9999;position:fixed;top:0;left:0;background:white;"><h1>Vue Error</h1><p>' + err.message + '</p><pre>' + err.stack + '</pre><p>Info: ' + info + '</p></div>';
+    // Do NOT log error details in production — esbuild drops console.* on build
+    console.error('[Vue Error]', info);
+
+    // Safe DOM construction — never use innerHTML with concatenated strings
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+        color: 'red', padding: '20px', zIndex: '9999',
+        position: 'fixed', top: '0', left: '0', background: 'white',
+        maxWidth: '100vw', overflowX: 'auto', fontFamily: 'monospace'
+    });
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Application Error';
+    const p = document.createElement('p');
+    p.textContent = err?.message || 'An unexpected error occurred.';
+    overlay.appendChild(h1);
+    overlay.appendChild(p);
+    document.body.replaceChildren(overlay);
 };
 
 app.config.globalProperties.$authImg = getAuthImageUrl;

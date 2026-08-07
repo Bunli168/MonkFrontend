@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "@/api/api";
 import { useToastStore } from "../toast";
+import { sanitizeId } from "@/utils/security";
 
 export const useReportStore = defineStore('report', () => {
     const reports = ref([]);
@@ -36,7 +37,6 @@ export const useReportStore = defineStore('report', () => {
             if (statusFilter.value) params.append('status', statusFilter.value);
 
             const res = await api.get(`/reports?${params.toString()}`);
-            console.log('getAllReports response:', res.data);
             
             if (options.append) {
                 reports.value = [...reports.value, ...res.data.data];
@@ -44,11 +44,9 @@ export const useReportStore = defineStore('report', () => {
                 reports.value = res.data.data;
             }
             
-            console.log('reportStore.reports after assignment:', reports.value);
             totalItems.value = res.data.pagination?.totalItems || 0;
             return res.data.data;
         } catch (error) {
-            console.error('Failed to fetch reports:', error);
             toast.showToast('Failed to fetch reports', 'error');
             return [];
         } finally {
@@ -58,12 +56,12 @@ export const useReportStore = defineStore('report', () => {
 
     const getReportById = async (id) => {
         try {
+            const safeId = sanitizeId(id);
             isLoading.value = true;
-            const res = await api.get(`/reports/${id}`);
+            const res = await api.get(`/reports/${safeId}`);
             report.value = res.data.data;
             return res.data.data;
         } catch (error) {
-            console.error('Failed to fetch report:', error);
             toast.showToast('Failed to fetch report', 'error');
             return null;
         } finally {
@@ -87,35 +85,30 @@ export const useReportStore = defineStore('report', () => {
             const res = await api.get('/reports/stats');
             statusStats.value = res.data.data || {};
             return statusStats.value;
-        } catch (error) {
-            console.error('Failed to fetch stats:', error);
+        } catch {
             return {};
         }
     };
 
     const updateReportStatus = async (reportId, newStatus) => {
         try {
-            const res = await api.patch(`/reports/${reportId}/status`, { status: newStatus });
+            const safeId = sanitizeId(reportId);
+            const res = await api.patch(`/reports/${safeId}/status`, { status: newStatus });
             toast.showToast('Status updated successfully', 'success');
-            // Optimistically update the list
             const index = reports.value.findIndex(r => r.id === reportId);
             if (index !== -1) reports.value[index].status = newStatus;
-            
             if (report.value && report.value.id === reportId) {
                 report.value.status = newStatus;
             }
-            
             return res.data;
         } catch (error) {
-            console.error('Failed to update status:', error);
             toast.showToast('Failed to update status', 'error');
             return false;
         }
     };
 
     const setupSocketListeners = () => {
-        // Mock socket listener setup
-        console.log('Socket listeners set up for reports');
+        // Socket listeners configured server-side via auth token
     };
 
     return {
