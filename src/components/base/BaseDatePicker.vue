@@ -25,6 +25,7 @@
             :selectionMode="selectionMode"
             :minDate="internalMinDate"
             :maxDate="internalMaxDate"
+            :disabledDates="internalDisabledDates"
             @blur="$emit('blur', $event)" 
             @focus="$emit('focus', $event)"
         />
@@ -110,6 +111,10 @@ const props = defineProps({
     readonlyInput: {
         type: Boolean,
         default: true
+    },
+    disabledDates: {
+        type: Array,
+        default: () => []
     }
 });
 
@@ -142,6 +147,11 @@ const internalMinDate = computed(() => {
 
 const internalMaxDate = computed(() => {
     return parseLocalDate(props.maxDate);
+});
+
+const internalDisabledDates = computed(() => {
+    if (!props.disabledDates || !Array.isArray(props.disabledDates)) return [];
+    return props.disabledDates.map(d => parseLocalDate(d)).filter(d => d !== null);
 });
 
 const internalValue = computed({

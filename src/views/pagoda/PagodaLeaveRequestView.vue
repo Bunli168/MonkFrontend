@@ -27,6 +27,7 @@
                                     v-model="formData.start_date" 
                                     required 
                                     :minDate="today"
+                                    :disabledDates="requestedDates"
                                 />
                             </div>
                             <div class="col-md-6">
@@ -35,6 +36,7 @@
                                     v-model="formData.end_date" 
                                     required 
                                     :minDate="formData.start_date || today"
+                                    :disabledDates="requestedDates"
                                 />
                             </div>
                             <div class="col-12">
@@ -194,6 +196,24 @@ const paginatedRequests = computed(() => {
     const start = (currentPage.value - 1) * perPage.value;
     const end = start + perPage.value;
     return myRequests.value.slice(start, end);
+});
+
+const requestedDates = computed(() => {
+    const dates = [];
+    myRequests.value.forEach(req => {
+        if (req.status === 'rejected') return;
+        if (isEditing.value && req.id === editId.value) return; // Don't disable dates for the current request being edited
+
+        const start = new Date(req.start_date);
+        const end = new Date(req.end_date);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            dates.push(`${y}-${m}-${day}`);
+        }
+    });
+    return dates;
 });
 
 const today = new Date().toISOString().split('T')[0];

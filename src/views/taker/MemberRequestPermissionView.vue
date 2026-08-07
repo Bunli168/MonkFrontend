@@ -91,7 +91,7 @@
                     <BaseActionMenu v-if="['pending', 'pending_mekudi', 'pending_superadmin'].includes(row.status) && getActionItems(row).length > 0" :items="getActionItems(row)" />
                     <span v-else class="text-muted small">
                         <template v-if="row.status === 'pending_superadmin'">
-                            <template v-if="authStore.isAdmin && !false">Pending Super Admin</template>
+                            <template v-if="authStore.isAdmin && !authStore.isSuperAdmin">Pending Super Admin</template>
                             <template v-else>Awaiting Final Approval</template>
                         </template>
                         <template v-else-if="row.status === 'approved' || row.status === 'rejected'">
@@ -106,12 +106,22 @@
             <BaseModal v-model="showModal" title="Request Permission" size="md">
                 <form @submit.prevent="submitRequest">
                     <div class="mb-3">
-                        <label class="form-label fw-medium text-dark">Start Date</label>
-                        <input type="date" class="form-control" v-model="formData.start_date" required :min="today" />
+                        <BaseDatePicker 
+                            label="Start Date" 
+                            v-model="formData.start_date" 
+                            required 
+                            :minDate="today"
+                            :disabledDates="requestedDates"
+                        />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-medium text-dark">End Date</label>
-                        <input type="date" class="form-control" v-model="formData.end_date" required :min="formData.start_date || today" />
+                        <BaseDatePicker 
+                            label="End Date" 
+                            v-model="formData.end_date" 
+                            required 
+                            :minDate="formData.start_date || today"
+                            :disabledDates="requestedDates"
+                        />
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-medium text-dark">Reason</label>
@@ -133,6 +143,49 @@
                     <BaseButton type="button" :variant="confirmAction === 'approved' ? 'primary' : 'danger'" :isLoading="isUpdatingStatus" @click="executeStatusUpdate">
                         Confirm
                     </BaseButton>
+                </div>
+            </BaseModal>
+
+            <!-- View Request Modal -->
+            <BaseModal v-model="showViewModal" title="Request Details" size="md">
+                <div v-if="selectedRequest">
+                    <div class="mb-3 d-flex align-items-center gap-3">
+                        <img v-if="selectedRequest.User?.UserProfile?.avatar_url" :src="`https://neakavorn.work.gd${selectedRequest.User.UserProfile.avatar_url}`" alt="Profile" class="rounded-circle object-fit-cover shadow-sm" style="width: 64px; height: 64px;" />
+                        <div v-else class="avatar-circle d-flex align-items-center justify-content-center rounded-circle overflow-hidden"
+                            style="width: 64px; height: 64px; background: color-mix(in srgb, var(--primary-color) 15%, transparent);">
+                            <User :size="32" style="color: var(--primary-color);" />
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ selectedRequest.User?.UserProfile?.first_name_kh }} {{ selectedRequest.User?.UserProfile?.last_name_kh }}</h5>
+                            <div class="text-muted" v-if="selectedRequest.User?.UserProfile?.kut_id">
+                                Kudi: {{ selectedRequest.User.UserProfile.Kut ? selectedRequest.User.UserProfile.Kut.name : selectedRequest.User.UserProfile.kut_id }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-medium text-dark">Date Range</label>
+                        <div>{{ formatDate(selectedRequest.start_date) }} to {{ formatDate(selectedRequest.end_date) }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-medium text-dark">Reason</label>
+                        <div class="p-3 bg-light rounded text-dark">{{ selectedRequest.reason || '—' }}</div>
+                    </div>
+                    
+                    <div class="mb-3" v-if="selectedRequest.image_url">
+                        <label class="form-label fw-medium text-dark mb-2">Attachment</label>
+                        <div>
+                            <img :src="`https://neakavorn.work.gd${selectedRequest.image_url}`" 
+                                 class="img-fluid rounded cursor-pointer shadow-sm" 
+                                 style="max-height: 200px; object-fit: contain;" 
+                                 @click="openImageModal(`https://neakavorn.work.gd${selectedRequest.image_url}`)"
+                                 alt="Attachment" />
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <BaseButton type="button" variant="outline" @click="showViewModal = false">Close</BaseButton>
                 </div>
             </BaseModal>
 
@@ -160,13 +213,14 @@ import { ref, computed, onMounted, watch } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
-import { CheckCircle, XCircle, User, Search, RefreshCcw } from '@lucide/vue';
+import { CheckCircle, XCircle, User, Search, RefreshCcw, Eye } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseFilter from '@/components/base/BaseFilter.vue';
 import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import TakerAbsentPermissionView from './TakerAbsentPermissionView.vue';
 
 const toast = useToastStore();
@@ -203,6 +257,14 @@ const showConfirmModal = ref(false);
 const isUpdatingStatus = ref(false);
 const confirmAction = ref('');
 const confirmId = ref(null);
+
+const showViewModal = ref(false);
+const selectedRequest = ref(null);
+
+const openViewModal = (row) => {
+    selectedRequest.value = row;
+    showViewModal.value = true;
+};
 
 // Image Viewer State
 const imageModalRef = ref(null);
@@ -261,6 +323,25 @@ const filteredRequests = computed(() => {
     return requests.value; // For Admins, backend filters
 });
 
+const requestedDates = computed(() => {
+    // Only for members who see their own requests here
+    if (authStore.isAdmin || authStore.isSuperAdmin || authStore.isAttendanceTaker) return [];
+    
+    const dates = [];
+    requests.value.forEach(req => {
+        if (req.status === 'rejected') return;
+        const start = new Date(req.start_date);
+        const end = new Date(req.end_date);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            dates.push(`${y}-${m}-${day}`);
+        }
+    });
+    return dates;
+});
+
 const currentPage = ref(1);
 const perPage = ref(10);
 
@@ -280,7 +361,7 @@ const formatStatus = (status) => {
     if (!status) return '';
     if (status === 'pending_mekudi' || status === 'pending') return 'Pending';
     if (status === 'pending_superadmin') {
-        if (authStore.isAdmin && !false) return 'Pending Super Admin';
+        if (authStore.isAdmin && !authStore.isSuperAdmin) return 'Pending Super Admin';
         return 'Pending';
     }
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -288,7 +369,7 @@ const formatStatus = (status) => {
 
 const getBadgeStatusColor = (status) => {
     if (!status) return '';
-    if (status === 'pending_superadmin' && authStore.isAdmin && !false) {
+    if (status === 'pending_superadmin' && authStore.isAdmin && !authStore.isSuperAdmin) {
         return 'PENDING';
     }
     if (status === 'pending_superadmin' || status === 'pending_mekudi' || status === 'pending') return 'PENDING';
@@ -355,8 +436,15 @@ const getActionItems = (row) => {
     const isAwaitingSuperAdmin = row.status === 'pending_superadmin';
     const isAwaitingAdmin = row.status === 'pending' || row.status === 'pending_mekudi';
 
+    const viewOption = {
+        label: 'View',
+        icon: Eye,
+        iconClass: 'text-info',
+        command: () => openViewModal(row)
+    };
+
     if (isAwaitingSuperAdmin) {
-        if (!false) return [];
+        if (!authStore.isSuperAdmin) return [];
         return [
             {
                 label: 'Approve Final',
@@ -369,7 +457,8 @@ const getActionItems = (row) => {
                 icon: XCircle,
                 iconClass: 'text-danger',
                 command: () => updateStatus(row.id, 'rejected')
-            }
+            },
+            viewOption
         ];
     }
 
@@ -387,7 +476,8 @@ const getActionItems = (row) => {
                 icon: XCircle,
                 iconClass: 'text-danger',
                 command: () => updateStatus(row.id, 'rejected')
-            }
+            },
+            viewOption
         ];
     }
 
