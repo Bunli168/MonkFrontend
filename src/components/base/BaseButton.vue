@@ -51,6 +51,7 @@ button.btn-primary {
     background-color: var(--primary-color) !important;
 }
 
+button.btn-outline,
 button.btn-outline-primary {
     background-color: transparent !important;
     border: var(--border-width) solid var(--border-clr);
@@ -58,6 +59,7 @@ button.btn-outline-primary {
     color: var(--text-base);
 }
 
+button:hover.btn-outline,
 button:hover.btn-outline-primary,
 button:hover.btn-badge {
     border-color: var(--primary-color);
