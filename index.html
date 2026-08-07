@@ -32,6 +32,35 @@
 	<meta name="msapplication-TileColor" content="#ffffff">
 	<meta name="msapplication-TileImage" content="/neakavorn-pagoda.png">
 	<meta name="theme-color" content="#ffffff">
+
+	<!-- ============================================================
+	     SECURITY HEADERS
+	     NOTE: These meta-tag equivalents are best-effort only.
+	     For full protection, configure these as HTTP response headers
+	     on your server/CDN (nginx, Firebase Hosting, Cloudflare, etc.)
+	     ============================================================ -->
+
+	<!-- Content Security Policy: restricts what resources the browser can load -->
+	<meta http-equiv="Content-Security-Policy"
+		content="
+			default-src 'self';
+			script-src 'self';
+			style-src 'self' 'unsafe-inline';
+			connect-src 'self' https://neakavorn.work.gd wss://neakavorn.work.gd;
+			img-src 'self' data: blob: https://neakavorn.work.gd;
+			font-src 'self' data:;
+			frame-src 'none';
+			frame-ancestors 'none';
+			base-uri 'self';
+			form-action 'self';
+			object-src 'none';
+		">
+
+	<!-- Prevents browsers from MIME-sniffing away from the declared content type -->
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+	<!-- Prevents the page from being embedded in iframes (clickjacking protection) -->
+	<meta http-equiv="X-Frame-Options" content="DENY">
 </head>
 
 <body>

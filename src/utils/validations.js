@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 
 const emailRule = z.string().min(1, 'Email is required').email('Invalid email address format');
-const passwordRule = z.string().min(6, 'Password must be at least 6 characters');
+const passwordRule = z.string().min(8, 'Password must be at least 8 characters');
 const safeString = () => z.string().trim().regex(/^[^<>]*$/, "Special characters are not allowed");
 const textRequired = (msg) => safeString().min(1, msg);
 const descString = () => z.string().regex(/^[a-zA-Z0-9 ]*$/, "Description must only contain letters, numbers, and spaces");

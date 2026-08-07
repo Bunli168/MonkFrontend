@@ -1,5 +1,6 @@
 import api from "@/api/api";
 import { handleApiError } from "@/utils/apiError";
+import { sanitizeId } from "@/utils/security";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useToastStore } from "../toast";
@@ -21,18 +22,6 @@ export const useUserStore = defineStore('user', () => {
 
     const roleStats = ref({ 'all': '...', 1: '...', 2: '...', 3: '...', 4: '...', 7: '...' });
 
-    const MOCK_USERS = [
-        { id: 1, email: 'admin@pagoda.com', name: 'Admin User', role: 'ADMIN', isActive: true, dob: '1980-01-01', gender: 'Male', pob: 'Phnom Penh', createdAt: '2026-07-01T10:00:00Z' },
-        { id: 2, email: 'teacher@pagoda.com', name: 'Monk User', role: 'MEKUDI', isActive: true, dob: '1990-05-15', gender: 'Female', pob: 'Siem Reap', createdAt: '2026-07-02T10:00:00Z' },
-        { id: 3, email: 'student1@pagoda.com', name: 'Student One', role: 'MONK', isActive: true, dob: '2005-08-20', gender: 'Male', pob: 'Battambang', createdAt: '2026-07-03T10:00:00Z' },
-        { id: 4, email: 'student2@pagoda.com', name: 'Student Two', role: 'MONK', isActive: false, dob: '2006-11-11', gender: 'Female', pob: 'Phnom Penh', createdAt: '2026-07-04T10:00:00Z' },
-    ];
-    const MOCK_ROLES = [
-        { id: 1, name: 'ADMIN' },
-        { id: 2, name: 'MEKUDI' },
-        { id: 3, name: 'MONK' }
-    ];
-
     const fetchRoleStats = async (forceRefresh = false, isActive = null) => {
         try {
             const params = {};
@@ -44,15 +33,15 @@ export const useUserStore = defineStore('user', () => {
             if (data) {
                 roleStats.value = {
                     'all': data.all || 0,
-                    1: data[1] || 0, // SuperAdmin
-                    2: data[2] || 0, // Admin
-                    3: data[3] || 0, // Monk
-                    4: data[4] || 0, // Student
-                    7: data[7] || 0  // Bhikkhu
+                    1: data[1] || 0,
+                    2: data[2] || 0,
+                    3: data[3] || 0,
+                    4: data[4] || 0,
+                    7: data[7] || 0
                 };
             }
-        } catch (error) {
-            console.error('Failed to fetch role stats', error);
+        } catch {
+            // Role stats are non-critical — fail silently
         }
     };
 
@@ -165,8 +154,15 @@ export const useUserStore = defineStore('user', () => {
     }
 
     const getUserById = async (id) => {
-        user.value = MOCK_USERS.find(u => u.id == id) || null;
-        return true;
+        try {
+            const safeId = sanitizeId(id);
+            const response = await api.get(`/users/${safeId}`);
+            user.value = response.data?.data || response.data;
+            return user.value;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return null;
+        }
     }
 
     const createUser = async (payload) => {
@@ -211,7 +207,6 @@ export const useUserStore = defineStore('user', () => {
                 });
 
                 if (exists) {
-                    console.log(`Skipping duplicate user: ${nameToCompare} with Chhaya ID: ${u.chhaya_number}`);
                     skipCount++;
                     continue;
                 }
@@ -222,10 +217,9 @@ export const useUserStore = defineStore('user', () => {
                 } catch (err) {
                     const errMsg = String(err?.response?.data?.message || '').toLowerCase();
                     if (errMsg.includes('unique') || errMsg.includes('already in use') || errMsg.includes('duplicate')) {
-                        console.log(`Skipping duplicate user: ${u.lastName} ${u.firstName}`);
                         skipCount++;
                     } else {
-                        throw err; // Re-throw other non-duplicate validation errors
+                        throw err;
                     }
                 }
             }
@@ -243,12 +237,21 @@ export const useUserStore = defineStore('user', () => {
     }
 
     const requestRegisterAdmin = async (token) => {
-        return true;
+        // ⚠️  SECURITY: This was a stub returning `true` — replaced with real API call.
+        //    A stub that always returns true is an RBAC bypass if any code relies on it.
+        try {
+            const response = await api.post('/users/register-admin', { token });
+            return response.data;
+        } catch (error) {
+            handleApiError(error, toastStore);
+            return false;
+        }
     }
 
     const updateUser = async (id, payload) => {
         try {
-            const response = await api.put(`/users/${id}`, payload);
+            const safeId = sanitizeId(id);
+            const response = await api.put(`/users/${safeId}`, payload);
             toastStore.showToast("User updated successfully", 'success');
             return response.data;
         } catch (error) {
@@ -259,7 +262,8 @@ export const useUserStore = defineStore('user', () => {
 
     const changeUserRole = async (id, roleId) => {
         try {
-            const response = await api.put(`/users/${id}/change-role`, { role_id: roleId });
+            const safeId = sanitizeId(id);
+            const response = await api.put(`/users/${safeId}/change-role`, { role_id: roleId });
             toastStore.showToast("User role updated successfully", 'success');
             return response.data;
         } catch (error) {
@@ -271,7 +275,8 @@ export const useUserStore = defineStore('user', () => {
 
     const resetUserPassword = async (id) => {
         try {
-            const response = await api.post(`/users/${id}/reset-password`);
+            const safeId = sanitizeId(id);
+            const response = await api.post(`/users/${safeId}/reset-password`);
             toastStore.showToast("Password reset to default successfully", 'success');
             return response.data;
         } catch (error) {
