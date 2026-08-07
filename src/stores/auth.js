@@ -9,7 +9,7 @@ import { socket } from "@/utils/socket";
 export const useAuthStore = defineStore('auth', () => {
     const toastStore = useToastStore();
 
-    const accessToken = ref(Cookies.get('accessToken') || null);
+    const accessToken = ref(Cookies.get('accessToken') || sessionStorage.getItem('accessToken') || null);
     const user = ref(null);
 
     // Always authenticated in mock mode
@@ -102,6 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
                 sameSite: 'Lax',
                 expires: 7
             });
+            sessionStorage.setItem('accessToken', access);
             socket.disconnect();
             socket.connect();
         }
@@ -320,6 +321,13 @@ export const useAuthStore = defineStore('auth', () => {
     };
 
     const logout = async (callApi = true) => {
+        if (callApi) {
+            try {
+                await api.post('/auth/logout');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
         clearAuth();
         return true;
     };
@@ -327,7 +335,11 @@ export const useAuthStore = defineStore('auth', () => {
     const clearAuth = () => {
         accessToken.value = null;
         user.value = null;
-        Cookies.remove('accessToken');
+        Cookies.remove('accessToken', {
+            secure: window.location.protocol === 'https:',
+            sameSite: 'Lax'
+        });
+        sessionStorage.removeItem('accessToken');
         localStorage.removeItem('otpSessionToken');
         localStorage.removeItem('changePasswordToken');
         socket.disconnect();

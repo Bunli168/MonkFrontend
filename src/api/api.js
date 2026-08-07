@@ -57,6 +57,7 @@ async function refreshAccessToken() {
             sameSite: 'Lax',
             expires: 7
         });
+        sessionStorage.setItem('accessToken', newAccessToken);
 
         try {
             const authStore = useAuthStore();
@@ -73,9 +74,13 @@ function handleRefreshFailure() {
         const authStore = useAuthStore();
         authStore.logout(false);
     } catch {
-        Cookies.remove('accessToken');
-        Cookies.remove('otpSessionToken');
-        Cookies.remove('changePasswordToken');
+        Cookies.remove('accessToken', {
+            secure: window.location.protocol === 'https:',
+            sameSite: 'Lax'
+        });
+        sessionStorage.removeItem('accessToken');
+        localStorage.removeItem('otpSessionToken');
+        localStorage.removeItem('changePasswordToken');
     }
     window.location.href = '/login';
 }
@@ -95,7 +100,7 @@ function shouldSkipAuth(url) {
 api.interceptors.request.use(async (req) => {
     if (shouldSkipAuth(req.url)) return req;
 
-    let token = Cookies.get('accessToken');
+    let token = Cookies.get('accessToken') || sessionStorage.getItem('accessToken');
 
     if (token && isTokenExpiringSoon(token, 15)) {
         if (!isRefreshing) {
