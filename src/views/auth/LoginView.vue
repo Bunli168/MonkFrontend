@@ -257,8 +257,8 @@
 
                 <div class="hero-body">
                     <h2 class="hero-title animate-slide-up delay-1">
-                        Empowering School Communities<br>
-                        <span>Digitally &amp; Efficiently</span>
+                        Empowering Neakavorn Communities<br>
+                        <span>Manage &amp; Efficiently</span>
                     </h2>
                     <p class="hero-desc animate-slide-up delay-1">
                         Access real-time dashboards, manage user registration, complete validation forms, and track survey results seamlessly.
@@ -298,7 +298,7 @@
                 <div class="hero-footer animate-slide-up delay-4">
                     <div class="stat-box">
                         <span class="stat-num">100+</span>
-                        <span class="stat-lbl">School Tnaks</span>
+                        <span class="stat-lbl">Memmber Neakavorn</span>
                     </div>
                     <div class="stat-box">
                         <span class="stat-num">99.9%</span>

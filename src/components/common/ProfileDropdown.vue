@@ -137,12 +137,13 @@ const openLogoutModal = (closeFn) => {
 
 const handleLogout = async () => {
     isLoggingOut.value = true;
-    const res = await authStore.logout();
-    if (res) {
+    try {
+        await authStore.logout();
+    } finally {
         showLogoutModal.value = false;
-        router.push({ name: 'Home' });
+        isLoggingOut.value = false;
+        router.push({ name: 'login' });
     }
-    isLoggingOut.value = false;
 };
 </script>
 
