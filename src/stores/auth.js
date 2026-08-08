@@ -105,6 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
             //    The frontend sets it here as a fallback only; remove once backend sets it.
             //    Cookie expires in 1 day — access tokens should be short-lived.
             Cookies.set('accessToken', access, {
+                path: '/',
                 secure: window.location.protocol === 'https:',
                 sameSite: 'Strict',
                 expires: 1
@@ -350,14 +351,19 @@ export const useAuthStore = defineStore('auth', () => {
         accessToken.value = null;
         user.value = null;
         Cookies.remove('accessToken', {
+            path: '/',
             secure: window.location.protocol === 'https:',
             sameSite: 'Strict'
         });
+        Cookies.remove('accessToken', { path: '/' });
+        Cookies.remove('accessToken');
         // ✅ Clear all session-scoped auth state
         sessionStorage.removeItem('otpSessionToken');
         sessionStorage.removeItem('mfaType');
         sessionStorage.removeItem('changePasswordToken');
-        socket.disconnect();
+        if (socket && typeof socket.disconnect === 'function') {
+            socket.disconnect();
+        }
     };
 
     const forgotPassword = async (payload) => {

@@ -53,6 +53,7 @@ async function refreshAccessToken() {
     const newAccessToken = data?.accessToken;
     if (newAccessToken) {
         Cookies.set('accessToken', newAccessToken, {
+            path: '/',
             secure: window.location.protocol === 'https:',
             sameSite: 'Strict',
             expires: 1
@@ -75,9 +76,12 @@ function handleRefreshFailure() {
         authStore.logout(false);
     } catch {
         Cookies.remove('accessToken', {
+            path: '/',
             secure: window.location.protocol === 'https:',
             sameSite: 'Strict'
         });
+        Cookies.remove('accessToken', { path: '/' });
+        Cookies.remove('accessToken');
         // ✅ Match sessionStorage cleanup in auth.js clearAuth()
         sessionStorage.removeItem('otpSessionToken');
         sessionStorage.removeItem('mfaType');
