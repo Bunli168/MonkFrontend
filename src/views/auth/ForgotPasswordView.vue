@@ -335,7 +335,7 @@
                             </div>
                             <div class="feature-info">
                                 <h4>ទំនាក់ទំនងមេកុដិ / Admin</h4>
-                                <p>ទាក់ទងមេកុដិ ឬ Admin ក្នុងវត្តរបស់អ្នកដើម្បីស្នើសុំលេខសម្ងាត់ថ្មី។</p>
+                                <p>ទាក់ទងមេកុដិរបស់អ្នកដើម្បីស្នើសុំ ពាក្យសម្ងាត់ដើមមកវិញ</p>
                             </div>
                         </div>
                         <div class="feature-item animate-slide-up delay-3">
@@ -362,7 +362,7 @@
                 <div class="hero-footer animate-slide-up delay-4">
                     <div class="stat-box">
                         <span class="stat-num">100+</span>
-                        <span class="stat-lbl">School Tnaks</span>
+                        <span class="stat-lbl">Neakavanorn Management</span>
                     </div>
                     <div class="stat-box">
                         <span class="stat-num">99.9%</span>

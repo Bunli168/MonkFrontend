@@ -297,7 +297,7 @@
                 <div class="hero-footer animate-slide-up delay-4">
                     <div class="stat-box">
                         <span class="stat-num">100+</span>
-                        <span class="stat-lbl">School Tnaks</span>
+                        <span class="stat-lbl">Neakavorn Managemant</span>
                     </div>
                     <div class="stat-box">
                         <span class="stat-num">99.9%</span>
