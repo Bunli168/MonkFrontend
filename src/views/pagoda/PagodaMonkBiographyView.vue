@@ -70,6 +70,8 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="mb-2 text-secondary">Preceptor Name: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.preceptor_name || 'N/A' }}</span></div>
+                                        <div v-if="!isSamanera" class="mb-2 text-secondary">First Assistant: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.first_assistant_name || 'N/A' }}</span></div>
+                                        <div v-if="!isSamanera" class="mb-2 text-secondary">Second Assistant: <span class="fw-medium" style="color: var(--text-heading-color);">{{ form.second_assistant_name || 'N/A' }}</span></div>
                                         <div class="mb-2 text-secondary">Ordained Date: <span class="fw-medium" style="color: var(--text-heading-color);">{{ formatDate(form.ordained_date) || 'N/A' }}</span></div>
                                     </div>
                                     <div class="col-sm-6">
@@ -571,7 +573,7 @@ const defaultForm = () => ({
 });
 
 const form = ref(defaultForm());
-const errors = ref({ phone_number: '', nationality: '', ordained_name: '' });
+const errors = ref({ phone_number: '', nationality: '', first_assistant_name: '', second_assistant_name: '', ordained_name: '' });
 
 const eduLevelOptions = [
     { value: 'បឋមសិក្សា (Primary School)', label: 'បឋមសិក្សា (Primary School)' },
@@ -646,6 +648,8 @@ const validateNoNumbers = (field, label) => {
     return true;
 };
 
+watch(() => form.value.first_assistant_name, () => validateNoNumbers('first_assistant_name', 'Name'));
+watch(() => form.value.second_assistant_name, () => validateNoNumbers('second_assistant_name', 'Name'));
 watch(() => form.value.ordained_name, () => validateNoNumbers('ordained_name', 'Name'));
 
 
@@ -846,6 +850,8 @@ const onParentsCommuneChange = async () => {
 
 const saveSurvey = async () => {
     if (!validatePhone() || !validateNationality() || 
+        !validateNoNumbers('first_assistant_name', 'Name') ||
+        !validateNoNumbers('second_assistant_name', 'Name') ||
         !validateNoNumbers('ordained_name', 'Name')) {
         toastStore.showToast('Please fix validation errors before saving', 'error');
         return;
