@@ -95,14 +95,6 @@
                                 <div class="text-muted">Preceptor (ព្រះឧបជ្ឈាយ៍):</div>
                                 <div class="fw-bold text-dark">{{ member.monkSurvey.preceptor_name }}</div>
                             </div>
-                            <div class="col-12 col-sm-6" v-if="member.monkSurvey.first_assistant_name">
-                                <div class="text-muted">1st Assistant (គ្រូសូត្រស្តាំ):</div>
-                                <div class="fw-bold text-dark">{{ member.monkSurvey.first_assistant_name }}</div>
-                            </div>
-                            <div class="col-12 col-sm-6" v-if="member.monkSurvey.second_assistant_name">
-                                <div class="text-muted">2nd Assistant (គ្រូសូត្រឆ្វេង):</div>
-                                <div class="fw-bold text-dark">{{ member.monkSurvey.second_assistant_name }}</div>
-                            </div>
                             <div class="col-12 col-sm-6" v-if="member.monkSurvey.ordained_date">
                                 <div class="text-muted">Ordained Date (ថ្ងៃបព្វជ្ជា/ឧបសម្បទា):</div>
                                 <div class="fw-bold text-dark">{{ formatDate(member.monkSurvey.ordained_date) }}</div>
