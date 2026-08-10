@@ -43,7 +43,7 @@
                         <div v-if="kudiDisplay" class="mt-3">
                             <div class="d-inline-block px-4 py-2.5 rounded-pill shadow-sm kudi-badge">
                                 <span class="fw-bold fs-6">
-                                    <i class="fas fa-home me-2 text-warning"></i>ស្នាក់នៅ៖ {{ kudiDisplay }}
+                                    <i class="fas fa-home me-2" style="color: #d97706;"></i>ស្នាក់នៅ៖ {{ kudiDisplay }}
                                 </span>
                             </div>
                         </div>
@@ -206,28 +206,28 @@ onMounted(() => {
 
 <style scoped>
 .public-profile-page {
-    background-color: var(--body-bg-color, #0f172a);
-    color: var(--text-color, #f8fafc);
+    background-color: var(--body-bg-color, #f8fafc);
+    color: var(--text-color, #1e293b);
 }
 
 .top-brand-badge {
-    background-color: var(--surface-card, #1e293b);
-    color: var(--text-color, #f8fafc);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    background-color: var(--surface-card, #ffffff);
+    color: var(--text-color, #1e293b);
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
 }
 
 .profile-card {
-    background-color: var(--surface-card, #1e293b);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08)) !important;
+    background-color: var(--surface-card, #ffffff);
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08)) !important;
 }
 
 .profile-title {
-    color: var(--text-heading-color, #ffffff);
+    color: var(--text-heading-color, #0f172a);
 }
 
 .role-badge {
-    background-color: rgba(2, 132, 199, 0.2);
-    color: #38bdf8;
+    background-color: rgba(2, 132, 199, 0.12);
+    color: #0284c7;
     font-size: 0.85rem;
 }
 
@@ -238,30 +238,82 @@ onMounted(() => {
 }
 
 .section-title-edu {
-    color: #38bdf8;
+    color: #0284c7;
 }
 
 .section-title-ord {
-    color: #fbbf24;
+    color: #b45309;
 }
 
 .section-title-gen {
-    color: #a855f7;
+    color: #64748b;
 }
 
 .field-label {
-    color: #94a3b8;
+    color: var(--text-muted-color, #64748b);
     font-weight: 500;
 }
 
 .info-value {
-    color: #ffffff;
+    color: var(--text-color, #0f172a);
 }
 
-/* Light Theme Overrides */
-@media (prefers-color-scheme: light) {
-    .public-profile-page:not(.dark-mode) {
-        background-color: #f8fafc;
-    }
+/* Explicit Dark Theme Support */
+:global(.dark-theme) .public-profile-page,
+:global([data-theme="dark"]) .public-profile-page,
+:global(body.dark) .public-profile-page {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+:global(.dark-theme) .top-brand-badge,
+:global([data-theme="dark"]) .top-brand-badge,
+:global(body.dark) .top-brand-badge {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:global(.dark-theme) .profile-card,
+:global([data-theme="dark"]) .profile-card,
+:global(body.dark) .profile-card {
+    background-color: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:global(.dark-theme) .profile-title,
+:global([data-theme="dark"]) .profile-title,
+:global(body.dark) .profile-title {
+    color: #ffffff !important;
+}
+
+:global(.dark-theme) .field-label,
+:global([data-theme="dark"]) .field-label,
+:global(body.dark) .field-label {
+    color: #94a3b8 !important;
+}
+
+:global(.dark-theme) .info-value,
+:global([data-theme="dark"]) .info-value,
+:global(body.dark) .info-value {
+    color: #ffffff !important;
+}
+
+:global(.dark-theme) .section-title-edu,
+:global([data-theme="dark"]) .section-title-edu,
+:global(body.dark) .section-title-edu {
+    color: #38bdf8 !important;
+}
+
+:global(.dark-theme) .section-title-ord,
+:global([data-theme="dark"]) .section-title-ord,
+:global(body.dark) .section-title-ord {
+    color: #fbbf24 !important;
+}
+
+:global(.dark-theme) .section-title-gen,
+:global([data-theme="dark"]) .section-title-gen,
+:global(body.dark) .section-title-gen {
+    color: #cbd5e1 !important;
 }
 </style>
