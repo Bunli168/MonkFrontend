@@ -350,17 +350,20 @@ export const useAuthStore = defineStore('auth', () => {
     const clearAuth = () => {
         accessToken.value = null;
         user.value = null;
-        Cookies.remove('accessToken', {
-            path: '/',
-            secure: window.location.protocol === 'https:',
-            sameSite: 'Strict'
+
+        // Exhaustive cookie removal for accessToken and refreshToken
+        ['accessToken', 'refreshToken'].forEach(cookieName => {
+            Cookies.remove(cookieName, { path: '/', secure: true, sameSite: 'None' });
+            Cookies.remove(cookieName, { path: '/', secure: true, sameSite: 'Strict' });
+            Cookies.remove(cookieName, { path: '/', secure: true, sameSite: 'Lax' });
+            Cookies.remove(cookieName, { path: '/', secure: false, sameSite: 'Lax' });
+            Cookies.remove(cookieName, { path: '/' });
+            Cookies.remove(cookieName);
         });
-        Cookies.remove('accessToken', { path: '/' });
-        Cookies.remove('accessToken');
-        // ✅ Clear all session-scoped auth state
-        sessionStorage.removeItem('otpSessionToken');
-        sessionStorage.removeItem('mfaType');
-        sessionStorage.removeItem('changePasswordToken');
+
+        // ✅ Wipe all auth tokens in session/local storage
+        sessionStorage.clear();
+        
         if (socket && typeof socket.disconnect === 'function') {
             socket.disconnect();
         }
