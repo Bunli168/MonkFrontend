@@ -1,11 +1,13 @@
 <template>
     <router-view />
     <BaseToast />
+    <ConfirmDialog />
 </template>
 
 <script setup>
 import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import ConfirmDialog from 'primevue/confirmdialog';
 import { initDynamicFavicon } from '@/utils/dynamicFavicon';
 
 const route = useRoute();
