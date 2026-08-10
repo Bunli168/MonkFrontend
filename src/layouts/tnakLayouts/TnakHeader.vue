@@ -65,7 +65,7 @@
 import { useAuthStore } from '@/stores/auth';
 import { useSystemStore } from '@/stores/system';
 import { useRouter, useRoute } from 'vue-router';
-import { LayoutDashboard, DoorOpen, FileText, Menu, ClipboardList, X, Bookmark, Users, Calendar, QrCode } from '@lucide/vue';
+import { LayoutDashboard, DoorOpen, FileText, Menu, ClipboardList, X, Bookmark, Users, Calendar, QrCode, UserX } from '@lucide/vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import Logo from '@/components/Logo.vue';
 import ProfileDropdown from '@/components/common/ProfileDropdown.vue';
@@ -90,7 +90,8 @@ const headerPaths = computed(() => {
         return [
             { label: 'Take Attendance', path: 'taker-attendance', icon: ClipboardList },
             { label: 'Absences', path: 'taker-absent-permission', icon: FileText },
-            { label: '3+ Absences', path: 'taker-warnings', icon: FileText }
+            { label: '3+ Absences', path: 'taker-warnings', icon: FileText },
+            { label: 'Unassigned', path: 'taker-unassigned', icon: UserX }
         ];
     }
 
@@ -124,6 +125,7 @@ const headerPaths = computed(() => {
     if (authStore.isAttendanceTaker || authStore.isAdmin) {
         paths.push({ label: 'Absences', path: 'taker-absent-permission', icon: FileText });
         paths.push({ label: '3+ Absences', path: 'taker-warnings', icon: FileText });
+        paths.push({ label: 'Unassigned', path: 'taker-unassigned', icon: UserX });
     }
     
     if (false) {

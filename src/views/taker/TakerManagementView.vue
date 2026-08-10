@@ -71,7 +71,7 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const activeTab = ref('request-permission');
+const activeTab = ref('my-leave-request');
 const pendingCount = ref(0);
 
 const fetchPendingCount = async () => {

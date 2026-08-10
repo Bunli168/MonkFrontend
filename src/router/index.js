@@ -183,6 +183,12 @@ const routes = [
 				meta: { title: '3+ Absences Warning', roles: ['ATTENDANCETAKER'] }
 			},
 			{
+				path: 'taker/unassigned',
+				name: 'taker-unassigned',
+				component: () => import('@/views/taker/TakerUnassignedView.vue'),
+				meta: { title: 'Unassigned Members', roles: ['ATTENDANCETAKER'] }
+			},
+			{
 				path: 'taker/management',
 				name: 'taker-management',
 				component: () => import('@/views/taker/TakerManagementView.vue'),
@@ -306,6 +312,12 @@ const routes = [
 				name: 'dashboard-taker-warnings',
 				component: () => import('@/views/taker/TakerWarningView.vue'),
 				meta: { title: '3+ Absences Warning', roles: ['SuperAdmin', 'ADMIN'] }
+			},
+			{
+				path: 'taker/unassigned',
+				name: 'dashboard-taker-unassigned',
+				component: () => import('@/views/taker/TakerUnassignedView.vue'),
+				meta: { title: 'Unassigned Members', roles: ['SuperAdmin', 'ADMIN'] }
 			}
 			// ✅ Removed duplicate 'dashboard-taker-management' route (was defined twice,
 			//    causing undefined Vue Router behavior). The canonical definition is above at line ~241.

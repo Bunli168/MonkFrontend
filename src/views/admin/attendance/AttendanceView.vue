@@ -11,6 +11,7 @@
                 </option>
             </select>
         </div>
+
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2" style="background-color: var(--surface-ground);">
             <div>
                 <TabList>
@@ -21,12 +22,25 @@
                         </div>
                     </Tab>
 
+                    <Tab value="unassigned">
+                        <div class="d-flex align-items-center gap-2">
+                            <UserX :size="16" class="text-danger" />
+                            <span :class="{'d-none d-md-inline': activeTab !== 'unassigned'}">Unassigned Members</span>
+                            <span
+                                v-if="unassignedMonksCount > 0"
+                                class="badge rounded-pill ms-1"
+                                style="background: #f59e0b; color: #fff; font-size: 0.68rem; padding: 2px 7px; line-height: 1.5;"
+                            >{{ unassignedMonksCount }}</span>
+                        </div>
+                    </Tab>
+
                     <Tab value="report">
                         <div class="d-flex align-items-center gap-2">
                             <History :size="16" class="text-info" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
                         </div>
                     </Tab>
+
                     <Tab value="leave">
                         <div class="d-flex align-items-center gap-2">
                             <MailOpen :size="16" class="text-warning" />
@@ -38,6 +52,7 @@
                             >{{ leaveViewRef.pendingCount }}</span>
                         </div>
                     </Tab>
+
                     <Tab value="takers">
                         <div class="d-flex align-items-center gap-2">
                             <UsersRound :size="16" class="text-success" />
@@ -48,24 +63,25 @@
             </div>
 
             <TabPanels class="p-0 bg-transparent">
+                <!-- Tab 1: Master Attendance -->
                 <TabPanel value="attendance">
                     <!-- Filters Section -->
                     <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body bg-white rounded-3">
-                            <div class="row g-3">
-                                <div class="col-md-3">
+                        <div class="card-body bg-white rounded-3 p-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-12 col-sm-6 col-md-3">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Date</label>
                                     <input type="date" v-model="selectedDate" class="form-control" @change="fetchMonks">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-sm-6 col-md-4">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Monk</label>
                                     <div class="position-relative">
                                         <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
                                         <input type="text" class="form-control ps-5" placeholder="Name or phone..." v-model="searchQuery">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
                                     <select v-model="selectedRowFilter" class="form-select">
                                         <option value="">All Rows</option>
                                         <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
@@ -73,19 +89,14 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Status</label>
-                                    <select v-model="selectedStatusFilter" class="form-select">
-                                        <option value="">All Statuses</option>
-                                        <option value="present">Present</option>
-                                        <option value="absent">Absent</option>
-                                        <option value="permission">On Leave</option>
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
+                                    <select v-model="selectedKudiFilter" class="form-select">
+                                        <option value="">All Kudis</option>
+                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
+                                            {{ kudi.name || `Kudi ${kudi.id}` }}
+                                        </option>
                                     </select>
-                                </div>
-                                <div class="col-md-12 d-flex justify-content-end mt-3" v-if="!false">
-                                    <BaseButton @click="saveAttendance" variant="primary" :isLoading="isSaving" class="px-4 fw-bold shadow-sm rounded-pill">
-                                        <i class="fas fa-save me-2"></i> Save Changes
-                                    </BaseButton>
                                 </div>
                             </div>
                         </div>
@@ -104,18 +115,26 @@
                                 v-model:per-page="perPage"
                             >
                                 <template #name="{ data: monk }">
-                                    <div class="d-flex align-items-center gap-3 cursor-pointer" @click="cycleStatus(monk)">
-                                        <div class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-gradient text-white" 
+                                    <div class="d-flex align-items-center gap-3 cursor-pointer" @click="viewMonkProfile(monk)">
+                                        <div v-if="monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url" 
+                                             class="avatar rounded-circle overflow-hidden shadow-sm flex-shrink-0" 
+                                             style="width: 40px; height: 40px; border: 2px solid var(--primary-color);">
+                                            <img :src="`https://neakavorn.work.gd${monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url}`" 
+                                                 class="w-100 h-100 object-fit-cover" />
+                                        </div>
+                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-gradient text-white flex-shrink-0" 
                                              :class="getStatusColor(monk.attendance?.status)"
                                              style="width: 40px; height: 40px; font-size: 1.1rem;">
                                             {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
                                         </div>
-                                        <span class="fw-bold text-dark">{{ monk.fullName }}</span>
+                                        <span class="fw-bold text-dark text-decoration-underline-hover">{{ monk.fullName }}</span>
                                     </div>
                                 </template>
 
                                 <template #kudi="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.kudiNumber || '-' }}</span>
+                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
+                                        {{ monk.kudiNumber || 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #phone="{ data: monk }">
@@ -123,27 +142,29 @@
                                 </template>
 
                                 <template #row_number="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.rowNumber || '-' }}</span>
+                                    <span :class="monk.rowNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
+                                        {{ monk.rowNumber ? 'Row ' + monk.rowNumber : 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #seat_number="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.seatNumber || '-' }}</span>
+                                    <span :class="monk.seatNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
+                                        {{ monk.seatNumber ? 'Seat ' + monk.seatNumber : 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #absents="{ data: monk }">
                                     <div class="d-flex justify-content-center w-100">
-                                        <span class="fw-bold text-danger" style="font-size: 1rem;">
+                                        <span class="fw-bold" :class="(monk.netAbsents || 0) >= 9 ? 'text-danger' : 'text-secondary'" style="font-size: 1rem;">
                                             {{ monk.netAbsents || 0 }}
                                         </span>
                                     </div>
                                 </template>
-                                
-
 
                                 <template #role="{ data: monk }">
                                     <span class="badge rounded-pill border"
-                                          :class="monk.role.toLowerCase().includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
-                                        {{ monk.role }}
+                                          :class="(monk.role || '').toLowerCase().includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
+                                        {{ monk.role || 'Member' }}
                                     </span>
                                 </template>
 
@@ -161,41 +182,158 @@
                                 </template>
 
                                 <template #notes="{ data: monk }">
-                                    <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Add note..." v-model="monk.attendanceNotes">
+                                    <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Add note..." v-model="monk.attendanceNotes" @change="saveAttendance">
+                                </template>
+
+                                <template #actions="{ data: monk }">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" @click.stop="viewMonkProfile(monk)" title="View Profile">
+                                            <Eye :size="15" class="text-primary" />
+                                        </button>
+                                    </div>
                                 </template>
                             </BaseTable>
                         </div>
                     </div>
                 </TabPanel>
 
+                <!-- Tab 2: Dedicated Unassigned Members Tab -->
+                <TabPanel value="unassigned">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body bg-white rounded-3 p-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-12 col-md-7 col-lg-8">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Unassigned Member</label>
+                                    <div class="position-relative">
+                                        <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                                        <input type="text" class="form-control ps-5" placeholder="Search by name or phone…" v-model="unassignedSearchQuery">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-5 col-lg-4">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
+                                    <select v-model="unassignedKudiFilter" class="form-select">
+                                        <option value="">All Kudis</option>
+                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
+                                            {{ kudi.name || `Kudi ${kudi.id}` }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Report Tab -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0">
+                            <BaseTable 
+                                :columns="unassignedColDefs" 
+                                :rows="paginatedUnassignedMonks" 
+                                :loading="isLoadingMonks"
+                                :show-index="true"
+                                :total-records="filteredUnassignedMonks.length"
+                                v-model:page="unassignedPage"
+                                v-model:per-page="perPage"
+                            >
+                                <template #name="{ data: monk }">
+                                    <div class="d-flex align-items-center gap-3 cursor-pointer" @click="viewMonkProfile(monk)">
+                                        <div v-if="monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url" 
+                                             class="avatar rounded-circle overflow-hidden shadow-sm flex-shrink-0" 
+                                             style="width: 40px; height: 40px; border: 2px solid var(--primary-color);">
+                                            <img :src="`https://neakavorn.work.gd${monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url}`" 
+                                                 class="w-100 h-100 object-fit-cover" />
+                                        </div>
+                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-warning text-white flex-shrink-0" 
+                                             style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                            {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
+                                        </div>
+                                        <div class="d-flex flex-column min-w-0">
+                                            <span class="fw-bold text-dark text-decoration-underline-hover text-truncate">{{ monk.fullName }}</span>
+                                            <span v-if="monk.email" class="text-muted small text-truncate" style="font-size: 0.75rem;">{{ monk.email }}</span>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template #kudi="{ data: monk }">
+                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
+                                        {{ monk.kudiNumber || 'Unassigned' }}
+                                    </span>
+                                </template>
+
+                                <template #phone="{ data: monk }">
+                                    <span class="text-muted">{{ monk.phone || monk.chhaya_number || 'N/A' }}</span>
+                                </template>
+
+                                <template #row_number>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                        Unassigned
+                                    </span>
+                                </template>
+
+                                <template #seat_number>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                        Unassigned
+                                    </span>
+                                </template>
+
+                                <template #absents="{ data: monk }">
+                                    <div class="d-flex justify-content-center w-100">
+                                        <span class="fw-bold text-secondary" style="font-size: 1rem;">
+                                            {{ monk.netAbsents || 0 }}
+                                        </span>
+                                    </div>
+                                </template>
+
+                                <template #role="{ data: monk }">
+                                    <span class="badge rounded-pill border bg-secondary bg-opacity-10 text-secondary border-secondary">
+                                        {{ monk.role || 'Member' }}
+                                    </span>
+                                </template>
+
+                                <template #actions="{ data: monk }">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" @click.stop="viewMonkProfile(monk)" title="View Profile">
+                                            <Eye :size="15" class="text-primary" />
+                                        </button>
+                                    </div>
+                                </template>
+                            </BaseTable>
+                        </div>
+                    </div>
+                </TabPanel>
+
+                <!-- Tab 3: Report Tab -->
                 <TabPanel value="report">
                     <AdminFineReportView v-if="activeTab === 'report'" :isComponent="true" :seasonId="selectedSeasonId" />
                 </TabPanel>
 
-                <!-- Leave Requests Tab -->
+                <!-- Tab 4: Leave Requests Tab -->
                 <TabPanel value="leave">
                     <AdminLeaveRequestsView ref="leaveViewRef" v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
                 </TabPanel>
 
-                <!-- Takers Tab -->
+                <!-- Tab 5: Takers Tab -->
                 <TabPanel value="takers">
                     <AdminTakersTableView v-if="activeTab === 'takers'" />
                 </TabPanel>
             </TabPanels>
         </Tabs>
+
+        <!-- User Detail Drawer -->
+        <BaseDrawer v-model="showUserDetail" title="Member Profile Details" width="30rem">
+            <UserDetailView v-if="showUserDetail" :user="userDetail" />
+        </BaseDrawer>
     </div>
 </template>
 
 <script setup>
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 import { ref, computed, watch, onMounted } from 'vue';
-import { CalendarCheck, History, MailOpen, UsersRound, Search, Save, Check, X, BedDouble } from '@lucide/vue';
+import { CalendarCheck, History, MailOpen, UsersRound, Search, Save, Check, X, BedDouble, UserX, Eye } from '@lucide/vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseTable from '@/components/base/BaseTable.vue';
+import BaseDrawer from '@/components/base/BaseDrawer.vue';
+import UserDetailView from '@/views/admin/users/UserDetailView.vue';
 import AdminFineReportView from '@/views/admin/fines/AdminFineReportView.vue';
 import AdminLeaveRequestsView from './AdminLeaveRequestsView.vue';
 import AdminTakersTableView from './AdminTakersTableView.vue';
@@ -205,8 +343,42 @@ const toast = useToastStore();
 const authStore = useAuthStore();
 const leaveViewRef = ref(null);
 
-// State
-// Helper to get local date string YYYY-MM-DD
+const showUserDetail = ref(false);
+const userDetail = ref(null);
+
+const viewMonkProfile = (monk) => {
+    const profile = monk.profile || monk.UserProfile || {};
+    userDetail.value = {
+        ...monk,
+        id: monk.id,
+        first_name: monk.first_name || monk.fullName || '',
+        last_name: monk.last_name || '',
+        email: monk.email || '',
+        avatar_url: profile.avatar_url || monk.avatar_url,
+        role: monk.role,
+        isActive: true,
+        UserProfile: {
+            ...profile,
+            avatar_url: profile.avatar_url || monk.avatar_url,
+            phone_number: profile.phone_number || monk.phone || monk.chhaya_number,
+            Kut: profile.Kut || null,
+            kut_id: profile.kut_id || null,
+            gender: profile.gender || null,
+            date_of_birth: profile.date_of_birth || profile.dateOfBirth || null,
+            chhaya_number: profile.chhaya_number || monk.chhaya_number || null,
+            first_name_kh: profile.first_name_kh || null,
+            last_name_kh: profile.last_name_kh || null,
+            first_name_en: profile.first_name_en || null,
+            last_name_en: profile.last_name_en || null,
+        },
+        profile: {
+            ...profile,
+            avatar_url: profile.avatar_url || monk.avatar_url,
+        }
+    };
+    showUserDetail.value = true;
+};
+
 const getLocalDateString = () => {
     const today = new Date();
     const offset = today.getTimezoneOffset();
@@ -216,25 +388,36 @@ const getLocalDateString = () => {
 
 const activeTab = ref('attendance');
 const page = ref(1);
+const unassignedPage = ref(1);
 const perPage = ref(10);
 const selectedDate = ref(getLocalDateString());
 const searchQuery = ref('');
 const selectedRowFilter = ref('');
+const selectedKudiFilter = ref('');
 const selectedStatusFilter = ref('');
 
-// Reset page on filters change
+const unassignedSearchQuery = ref('');
+const unassignedKudiFilter = ref('');
+
 const resetPage = () => {
     page.value = 1;
 };
 
 watch(searchQuery, resetPage);
 watch(selectedRowFilter, resetPage);
+watch(selectedKudiFilter, resetPage);
 watch(selectedStatusFilter, resetPage);
 watch(selectedDate, resetPage);
 
+const resetUnassignedPage = () => {
+    unassignedPage.value = 1;
+};
+watch(unassignedSearchQuery, resetUnassignedPage);
+watch(unassignedKudiFilter, resetUnassignedPage);
+
 const monks = ref([]);
 const seatingRows = ref([]);
-
+const kudiList = ref([]);
 const seasons = ref([]);
 const selectedSeasonId = ref(null);
 
@@ -248,49 +431,138 @@ const paginatedMonks = computed(() => {
 });
 
 const colDefs = computed(() => {
-    const cols = [
+    return [
         { field: 'name', header: 'Monk Name' },
         { field: 'role', header: 'Role' },
         { field: 'kudi', header: 'Kudi', class: 'text-center' },
         { field: 'phone', header: 'Phone' },
         { field: 'row_number', header: 'Row' },
         { field: 'seat_number', header: 'Seat' },
-        { field: 'absents', header: 'Absents', class: 'text-center' }
+        { field: 'absents', header: 'Absents', class: 'text-center' },
+        { field: 'actions', header: 'Actions', class: 'text-center' }
     ];
-    
-    return cols;
 });
+
+const unassignedColDefs = computed(() => {
+    return [
+        { field: 'name', header: 'Monk Name' },
+        { field: 'role', header: 'Role' },
+        { field: 'kudi', header: 'Kudi', class: 'text-center' },
+        { field: 'phone', header: 'Phone' },
+        { field: 'row_number', header: 'Row' },
+        { field: 'seat_number', header: 'Seat' },
+        { field: 'absents', header: 'Absents', class: 'text-center' },
+        { field: 'actions', header: 'Actions', class: 'text-center' }
+    ];
+});
+
+const matchKudiExact = (monkKudiRaw, filterValRaw) => {
+    if (!filterValRaw) return true;
+    if (filterValRaw === 'unassigned') {
+        return !monkKudiRaw || monkKudiRaw === '-' || monkKudiRaw === 'Unassigned';
+    }
+    if (!monkKudiRaw) return false;
+
+    const monkStr = monkKudiRaw.toString().trim();
+    const filterStr = filterValRaw.toString().trim();
+
+    if (monkStr.toLowerCase() === filterStr.toLowerCase()) return true;
+
+    const extractDigits = (s) => {
+        const khmerNums = ['០','១','២','៣','៤','៥','៦','៧','៨','៩'];
+        let res = s;
+        khmerNums.forEach((kh, i) => {
+            res = res.replaceAll(kh, i.toString());
+        });
+        const match = res.match(/\d+/);
+        return match ? parseInt(match[0], 10) : null;
+    };
+
+    const monkNum = extractDigits(monkStr);
+    const filterNum = extractDigits(filterStr);
+
+    if (monkNum !== null && filterNum !== null) {
+        return monkNum === filterNum;
+    }
+
+    return monkStr.toLowerCase() === filterStr.toLowerCase();
+};
 
 const filteredMonks = computed(() => {
     return monks.value.filter(monk => {
-        // Filter by Role: only show Monk, Bhikkhu, and Mekudi (Admin)
-        const roleStr = (monk.role || '').toLowerCase();
-        const isTargetRole = ['monk', 'bhikkhu', 'mekudi', 'admin'].some(r => roleStr === r || (roleStr.includes(r) && !roleStr.includes('super')));
-        if (!isTargetRole) {
-            return false;
-        }
-
-        // Filter: only show monks with netAbsents >= 9
+        // Show ONLY monks with netAbsents >= 9 in Master Attendance
         if ((monk.netAbsents || 0) < 9) {
             return false;
         }
 
         // Search filter
-        const query = searchQuery.value.toLowerCase();
+        const query = searchQuery.value.toLowerCase().trim();
         const matchesSearch = !query || 
             (monk.fullName && monk.fullName.toLowerCase().includes(query)) ||
             (monk.phone && monk.phone.includes(query)) ||
             (monk.chhaya_number && monk.chhaya_number.includes(query));
             
         // Row filter
-        const matchesRow = !selectedRowFilter.value || monk.rowNumber === selectedRowFilter.value;
+        let matchesRow = true;
+        if (selectedRowFilter.value) {
+            matchesRow = monk.rowNumber === selectedRowFilter.value || monk.rowNumber?.toString() === selectedRowFilter.value.toString();
+        }
+
+        // Kudi filter
+        const monkKudi = monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id;
+        const matchesKudi = matchKudiExact(monkKudi, selectedKudiFilter.value);
         
         // Status filter
         const status = monk.attendance?.status || 'present';
         const matchesStatus = !selectedStatusFilter.value || status === selectedStatusFilter.value;
         
-        return matchesSearch && matchesRow && matchesStatus;
+        return matchesSearch && matchesRow && matchesKudi && matchesStatus;
     });
+});
+
+// Dedicated Unassigned Monks computed list (excluding SuperAdmin and Attendance Takers)
+const allUnassignedMonks = computed(() => {
+    return monks.value.filter(monk => {
+        // Exclude SuperAdmin and Attendance Takers
+        const roleStr = (monk.role || monk.UserProfile?.role || monk.profile?.role || '').toString().toLowerCase();
+        if (
+            roleStr.includes('superadmin') || 
+            roleStr.includes('super admin') || 
+            roleStr.includes('super_admin') ||
+            roleStr.includes('taker') ||
+            roleStr.includes('attendance_taker') ||
+            roleStr.includes('attendance taker')
+        ) {
+            return false;
+        }
+
+        return !monk.rowNumber || monk.rowNumber === '-' || monk.rowNumber === null;
+    });
+});
+
+const unassignedMonksCount = computed(() => {
+    return allUnassignedMonks.value.length;
+});
+
+const filteredUnassignedMonks = computed(() => {
+    return allUnassignedMonks.value.filter(monk => {
+        const query = unassignedSearchQuery.value.toLowerCase().trim();
+        const matchesSearch = !query || 
+            (monk.fullName && monk.fullName.toLowerCase().includes(query)) ||
+            (monk.phone && monk.phone.includes(query)) ||
+            (monk.chhaya_number && monk.chhaya_number.includes(query));
+
+        const monkKudi = monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id;
+        const matchesKudi = matchKudiExact(monkKudi, unassignedKudiFilter.value);
+
+        return matchesSearch && matchesKudi;
+    });
+});
+
+const paginatedUnassignedMonks = computed(() => {
+    const start = (unassignedPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return filteredUnassignedMonks.value.slice(start, end);
 });
 
 const getStatusColor = (status) => {
@@ -299,12 +571,13 @@ const getStatusColor = (status) => {
     return 'bg-success';
 };
 
-const setStatus = (monk, status) => {
+const setStatus = async (monk, status) => {
     if (!monk.attendance) {
         monk.attendance = { status, notes: monk.attendanceNotes || '' };
     } else {
         monk.attendance.status = status;
     }
+    await saveAttendance();
 };
 
 const cycleStatus = (monk) => {
@@ -324,6 +597,35 @@ const fetchSeatingRows = async () => {
         seatingRows.value = response.data?.data || response.data || [];
     } catch (error) {
         console.error('Failed to fetch seating rows:', error);
+    }
+};
+
+const sortKudisNumerically = (list) => {
+    return list.slice().sort((a, b) => {
+        const extractNum = (item) => {
+            const val = (item.name || item.id || '').toString();
+            const khmerNums = ['០','១','២','៣','៤','៥','<ctrl42>','៧','៨','៩'];
+            let res = val;
+            khmerNums.forEach((kh, i) => {
+                res = res.replaceAll(kh, i.toString());
+            });
+            const match = res.match(/\d+/);
+            return match ? parseInt(match[0], 10) : 999999;
+        };
+        const numA = extractNum(a);
+        const numB = extractNum(b);
+        if (numA !== numB) return numA - numB;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+};
+
+const fetchKudis = async () => {
+    try {
+        const response = await api.get('/kuts');
+        const raw = response.data?.data || response.data || [];
+        kudiList.value = sortKudisNumerically(raw);
+    } catch (error) {
+        console.error('Failed to fetch kuts:', error);
     }
 };
 
@@ -400,6 +702,7 @@ const saveAttendance = async () => {
 onMounted(async () => {
     await fetchSeasons();
     await fetchSeatingRows();
+    await fetchKudis();
     fetchMonks();
 });
 </script>
@@ -422,5 +725,8 @@ onMounted(async () => {
 .btn-check:checked + .btn-outline-warning {
     background-color: var(--bs-warning);
     color: var(--bs-dark);
+}
+.text-decoration-underline-hover:hover {
+    text-decoration: underline !important;
 }
 </style>
