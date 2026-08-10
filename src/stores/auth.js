@@ -357,6 +357,11 @@ export const useAuthStore = defineStore('auth', () => {
         });
         Cookies.remove('accessToken', { path: '/' });
         Cookies.remove('accessToken');
+
+        // Also remove refreshToken cookie client side if non-httpOnly fallback
+        Cookies.remove('refreshToken', { path: '/' });
+        Cookies.remove('refreshToken');
+
         // ✅ Clear all session-scoped auth state
         sessionStorage.removeItem('otpSessionToken');
         sessionStorage.removeItem('mfaType');
