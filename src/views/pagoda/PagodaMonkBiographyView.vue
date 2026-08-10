@@ -305,6 +305,18 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { QrCode, Download } from '@lucide/vue';
 import QrcodeVue from 'qrcode.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
+import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
+import { useUserStore } from '@/stores/users/user';
+import { useToastStore } from '@/stores/toast';
+import { useAuthStore } from '@/stores/auth';
+import { formatDate } from '@/utils/dateFormat';
+import { useLocation } from '@/composables/useLocation';
+import { getVerifyTokenSync } from '@/utils/verifyHash';
+import api from '@/api/api';
 
 const props = defineProps({
     title: {
@@ -495,38 +507,16 @@ const downloadPersonalQr = () => {
     link.href = canvas.toDataURL('image/png');
     link.click();
 };
-import { useUserStore } from '@/stores/users/user';
-import { useToastStore } from '@/stores/toast';
-import { formatDate } from '@/utils/dateFormat';
-import api from '@/api/api';
-import BaseInput from '@/components/base/BaseInput.vue';
-import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
-import BaseSelect from '@/components/base/BaseSelect.vue';
-import BaseButton from '@/components/base/BaseButton.vue';
-import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
-
-import { getVerifyToken } from '@/utils/verifyHash';
-
 const showPersonalQrModal = ref(false);
 const qrContainerRef = ref(null);
-const verifyToken = ref('');
-
-watch(() => (props.userId || authStore.user?.id), async (newId) => {
-    if (newId) {
-        verifyToken.value = await getVerifyToken(newId);
-    }
-}, { immediate: true });
 
 const userQrDataString = computed(() => {
     const userId = props.userId || authStore.user?.id;
     if (!userId) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const token = verifyToken.value || userId;
+    const token = getVerifyTokenSync(userId);
     return `${origin}/verify-profile/${token}`;
 });
-
-
-import { useLocation } from '@/composables/useLocation';
 
 const authStore  = useAuthStore();
 const userStore   = useUserStore();
