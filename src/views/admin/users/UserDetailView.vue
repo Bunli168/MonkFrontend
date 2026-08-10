@@ -193,62 +193,61 @@ const downloadQrCode = () => {
     const qrCanvas = qrContainerRef.value.querySelector('canvas');
     if (!qrCanvas) return;
 
-    // Standard Portrait ID Card canvas dimensions: 600px x 900px
+    // Expand canvas width to 700px to ensure full titles fit without clipping
     const canvas = document.createElement('canvas');
-    const width = 600;
-    const height = 900;
+    const width = 700;
+    const height = 950;
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // 1. Solid Clean Dark Background (#0f172a)
+    // 1. Background
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Outer Card Frame & Top Gold Accent Ribbon
+    // 2. Outer Border & Top Gold Ribbon
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 4;
-    ctx.strokeRect(16, 16, width - 32, height - 32);
+    ctx.strokeRect(20, 20, width - 40, height - 40);
 
     ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(16, 16, width - 32, 10);
+    ctx.fillRect(20, 20, width - 40, 10);
 
-    // 3. Pagoda Header (Top Header Section)
+    // 3. Pagoda Header (Center Aligned)
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+    ctx.font = 'bold 24px "Khmer OS Muol Light", "Kantumruy Pro", "Noto Sans Khmer", system-ui, sans-serif';
     ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 55);
 
     ctx.fillStyle = '#38bdf8';
-    ctx.font = '600 13px system-ui, -apple-system, sans-serif';
-    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 90);
+    ctx.font = '600 14px system-ui, -apple-system, sans-serif';
+    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 95);
 
     // Gold Divider Line
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(60, 118);
-    ctx.lineTo(width - 60, 118);
+    ctx.moveTo(60, 125);
+    ctx.lineTo(width - 60, 125);
     ctx.stroke();
 
-    // 4. Monk Name & Role Section
+    // 4. Monk Name & Role
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
-    ctx.fillText(displayName.value, width / 2, 145);
+    ctx.font = 'bold 30px "Kantumruy Pro", "Noto Sans Khmer", system-ui, sans-serif';
+    ctx.fillText(displayName.value, width / 2, 155);
 
     const roleName = (displayRole.value || 'Monk').toUpperCase();
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '600 15px system-ui, -apple-system, sans-serif';
-    ctx.fillText(roleName, width / 2, 185);
+    ctx.font = '600 16px system-ui, -apple-system, sans-serif';
+    ctx.fillText(roleName, width / 2, 198);
 
-    // 5. Large Centered QR Code Container (340px x 340px)
-    const qrBoxSize = 340;
+    // 5. Large Centered QR Code Box (350px x 350px)
+    const qrBoxSize = 350;
     const qrBoxX = (width - qrBoxSize) / 2;
-    const qrBoxY = 225;
+    const qrBoxY = 240;
 
-    // White Card Frame for QR Code
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 20);
@@ -257,29 +256,28 @@ const downloadQrCode = () => {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw QR Code centered inside White Frame
-    const qrImageSize = 300;
+    const qrImageSize = 310;
     const qrImgX = qrBoxX + (qrBoxSize - qrImageSize) / 2;
     const qrImgY = qrBoxY + (qrBoxSize - qrImageSize) / 2;
     ctx.drawImage(qrCanvas, qrImgX, qrImgY, qrImageSize, qrImageSize);
 
-    // 6. Kudi & Phone Container Box
-    const infoWidth = width - 80;
+    // 6. Kudi & Phone Details Box
+    const infoWidth = width - 100;
     const infoX = (width - infoWidth) / 2;
-    const infoY = 600;
+    const infoY = 625;
 
     const phoneVal = user.value?.UserProfile?.phone_number || user.value?.profile?.phone || surveyData.value?.phone_number || '';
     const ordainedNameVal = surveyData.value?.ordained_name || '';
-    const kudiVal = kudiName.value !== 'N/A' ? kudiName.value : '';
+    const rawKudi = kudiName.value !== 'N/A' ? kudiName.value : '';
+    const kudiVal = rawKudi ? (rawKudi.toLowerCase().includes('kudi') || rawKudi.includes('កុដិ') ? rawKudi : `Kudi ${rawKudi}`) : '';
 
-    // Collect valid text lines to display
     const textLines = [];
-    if (kudiVal) textLines.push({ text: `កុដិស្នាក់នៅ / KUDI: ${kudiVal}`, color: '#fbbf24', font: 'bold 22px system-ui, -apple-system, sans-serif' });
-    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 16px system-ui, -apple-system, sans-serif' });
-    if (ordainedNameVal) textLines.push({ text: `Ordained Name: ${ordainedNameVal}`, color: '#cbd5e1', font: '15px system-ui, -apple-system, sans-serif' });
+    if (kudiVal) textLines.push({ text: `កុដិស្នាក់នៅ / ${kudiVal}`, color: '#fbbf24', font: 'bold 22px "Khmer OS Battambang", "Kantumruy Pro", system-ui, sans-serif' });
+    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 17px system-ui, -apple-system, sans-serif' });
+    if (ordainedNameVal) textLines.push({ text: `Ordained Name: ${ordainedNameVal}`, color: '#cbd5e1', font: '15px "Khmer OS Battambang", system-ui, sans-serif' });
 
     if (textLines.length > 0) {
-        const infoHeight = textLines.length * 40 + 20;
+        const infoHeight = textLines.length * 44 + 20;
         ctx.fillStyle = '#1e293b';
         ctx.beginPath();
         ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
@@ -295,18 +293,18 @@ const downloadQrCode = () => {
             ctx.fillStyle = item.color;
             ctx.font = item.font;
             ctx.fillText(item.text, width / 2, lineY);
-            lineY += 40;
+            lineY += 44;
         });
     }
 
-    // 7. Footer Notice
+    // 7. Footer
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#64748b';
     ctx.font = '13px system-ui, -apple-system, sans-serif';
     ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 45);
 
-    // Download PNG File
+    // Download PNG
     const link = document.createElement('a');
     link.download = `ID_CARD_QR_${displayName.value.replace(/\s+/g, '_')}.png`;
     link.href = canvas.toDataURL('image/png');
