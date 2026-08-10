@@ -56,8 +56,6 @@ const userStore = useUserStore();
 const kuts = ref([]);
 const kutsOptions = computed(() => kuts.value.map(k => ({ label: k.name, value: k.id })));
 
-const { value: kut_id } = useField('kut_id');
-
 const fetchKuts = async () => {
     try {
         const response = await api.get('/kuts');
@@ -187,6 +185,7 @@ const { value: dob } = useField('dob');
 const { value: gender } = useField('gender');
 const { value: pob } = useField('pob');
 const { value: roleId } = useField('roleId');
+const { value: kut_id } = useField('kut_id');
 const { value: seating_row_id } = useField('seating_row_id');
 const { value: seat_number } = useField('seat_number');
 
