@@ -378,37 +378,31 @@ const fetchMonkSurvey = async (userId) => {
     }
 };
 
-watch(() => props.user?.id, (newId) => {
-    if (newId) fetchMonkSurvey(newId);
+watch(() => props.user?.id, async (newId) => {
+    if (newId) {
+        fetchMonkSurvey(newId);
+        verifyToken.value = await getVerifyToken(newId);
+    }
 }, { immediate: true });
 
 const displayName = computed(() => {
     if (!props.user) return '';
     const profile = props.user.UserProfile || props.user.profile;
-    if (profile) {
-        const khName = `${profile.last_name_kh || ''} ${profile.first_name_kh || ''}`.trim();
-        if (khName) return khName;
-        const enName = `${profile.first_name_en || ''} ${profile.last_name_en || ''}`.trim();
-        if (enName) return enName;
-    }
-    if (props.user.firstName || props.user.lastName) {
-        return `${props.user.lastName || ''} ${props.user.firstName || ''}`.trim();
-    }
-    return props.user.email || '';
+    const nameKh = (profile?.first_name_kh || profile?.last_name_kh) ? `${profile?.first_name_kh || ''} ${profile?.last_name_kh || ''}`.trim() : '';
+    const nameEn = (profile?.first_name_en || profile?.last_name_en) ? `${profile?.first_name_en || ''} ${profile?.last_name_en || ''}`.trim() : '';
+    return nameKh || nameEn || props.user.name || 'User';
 });
 
 const displayRole = computed(() => {
-    if (!props.user) return '';
-    return props.user.Role?.name || props.user.role?.name || '';
+    return props.user?.Role?.name || props.user?.role?.name || props.user?.role || 'Member';
 });
 
 const kudiName = computed(() => {
     if (!props.user) return 'N/A';
     const profile = props.user.UserProfile || props.user.profile;
-    if (profile?.Kut?.name) return profile.Kut.name;
-    if (profile?.kut?.name) return profile.kut.name;
-    if (profile?.kut_id) return `Kudi ${profile.kut_id}`;
     if (surveyData.value?.kudi_number) return surveyData.value.kudi_number;
+    if (profile?.Kut?.name) return profile.Kut.name;
+    if (profile?.kut_id) return `Kudi ${profile.kut_id}`;
     return 'N/A';
 });
 
@@ -425,7 +419,8 @@ const qrDataString = computed(() => {
     const userId = props.user?.id;
     if (!userId) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/verify-profile/${userId}`;
+    const token = verifyToken.value || userId;
+    return `${origin}/verify-profile/${token}`;
 });
 
 const getBirthAddressField = (user, field) => {
