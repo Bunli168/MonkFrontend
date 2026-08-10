@@ -515,18 +515,10 @@ const showPersonalQrModal = ref(false);
 const qrContainerRef = ref(null);
 
 const userQrDataString = computed(() => {
-    const dataObj = {
-        id: props.userId || authStore.user?.id,
-        type: 'user_personal_profile',
-        name: form.value.surname_name || authStore.user?.name || '',
-        phone: form.value.phone_number || authStore.user?.profile?.phone || '',
-        kudi: form.value.kudi_number || authStore.user?.profile?.kut?.name || `Kudi ${authStore.user?.profile?.kut_id || ''}`,
-        ordained_name: form.value.ordained_name || '',
-        preceptor_name: form.value.preceptor_name || '',
-        ordained_date: form.value.ordained_date || '',
-        ordination_wat: form.value.ordination_wat || ''
-    };
-    return JSON.stringify(dataObj);
+    const userId = props.userId || authStore.user?.id;
+    if (!userId) return '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/verify-profile/${userId}`;
 });
 
 
