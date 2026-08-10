@@ -165,6 +165,7 @@ const dynamicSchema = computed(() => creationMode.value === 'email' ? userSchema
 
 const { validate, setValues, errors, resetForm } = useForm({
     validationSchema: dynamicSchema,
+    validateOnMount: false,
     initialValues: {
         email: "",
         firstName: "",
