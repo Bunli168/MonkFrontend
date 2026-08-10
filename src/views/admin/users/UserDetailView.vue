@@ -142,7 +142,7 @@
             <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">{{ displayName }}</h5>
             <div class="text-primary fw-medium small mb-3">{{ displayRole }}</div>
 
-            <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-3">
+            <div ref="qrContainerRef" class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-3">
                 <QrcodeVue :value="qrDataString" :size="200" level="H" />
             </div>
 
@@ -153,9 +153,15 @@
                 <div><strong>Ordained Date:</strong> {{ formatDate(surveyData?.ordained_date) || 'N/A' }}</div>
             </div>
 
-            <BaseButton variant="primary" class="w-100" @click="showQrModal = false">
-                Close
-            </BaseButton>
+            <div class="d-flex gap-2">
+                <BaseButton variant="outline-primary" class="flex-grow-1 d-flex align-items-center justify-content-center gap-1" @click="downloadQrCode">
+                    <Download :size="16" />
+                    <span>Download QR</span>
+                </BaseButton>
+                <BaseButton variant="secondary" class="flex-grow-1" @click="showQrModal = false">
+                    Close
+                </BaseButton>
+            </div>
         </div>
     </BaseModal>
 </template>
@@ -164,7 +170,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { formatDate } from '@/utils/dateFormat.js';
 import { getAuthImageUrl } from '@/utils/imageUrl.js';
-import { BookOpen, QrCode } from '@lucide/vue';
+import { BookOpen, QrCode, Download } from '@lucide/vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import QrcodeVue from 'qrcode.vue';
@@ -179,7 +185,19 @@ const props = defineProps({
 });
 
 const showQrModal = ref(false);
+const qrContainerRef = ref(null);
 const surveyData = ref(null);
+
+const downloadQrCode = () => {
+    if (!qrContainerRef.value) return;
+    const canvas = qrContainerRef.value.querySelector('canvas');
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.download = `QR_${displayName.value.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+};
 
 const fetchMonkSurvey = async (userId) => {
     if (!userId) return;
