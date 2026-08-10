@@ -176,7 +176,13 @@ const fetchVerificationData = async () => {
 
     try {
         isLoading.value = true;
-        const res = await api.get(`/users/public-verify/${userId}`);
+        let res;
+        try {
+            res = await api.get(`/auth/verify-member/${userId}`);
+        } catch (err) {
+            res = await api.get(`/users/public-verify/${userId}`);
+        }
+
         if (res.data?.success) {
             member.value = res.data.data;
         } else {
