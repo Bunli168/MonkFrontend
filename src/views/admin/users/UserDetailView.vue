@@ -174,6 +174,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import QrcodeVue from 'qrcode.vue';
 import api from '@/api/api';
+import { getVerifyTokenSync } from '@/utils/verifyHash';
 
 const props = defineProps({
     user: {
@@ -381,7 +382,6 @@ const fetchMonkSurvey = async (userId) => {
 watch(() => props.user?.id, async (newId) => {
     if (newId) {
         fetchMonkSurvey(newId);
-        verifyToken.value = await getVerifyToken(newId);
     }
 }, { immediate: true });
 
@@ -419,7 +419,7 @@ const qrDataString = computed(() => {
     const userId = props.user?.id;
     if (!userId) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const token = verifyToken.value || userId;
+    const token = getVerifyTokenSync(userId);
     return `${origin}/verify-profile/${token}`;
 });
 
