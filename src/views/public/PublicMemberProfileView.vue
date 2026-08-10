@@ -2,19 +2,6 @@
     <div class="min-vh-100 py-4 px-3" style="background-color: var(--body-bg-color, #f8fafc);">
         <div class="container" style="max-width: 650px;">
 
-            <!-- Header Branding Card -->
-            <div class="text-center p-4 rounded-4 shadow-sm mb-4 bg-white border-0">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle p-3 mb-2 shadow-sm" style="width: 75px; height: 75px; background-color: #fef3c7; color: #d97706;">
-                    <i class="fas fa-landmark fa-2x"></i>
-                </div>
-                <h3 class="fw-bold mb-1" style="color: #78350f; font-family: 'Hanuman', 'Khmer OS Battambang', serif;">វត្តនាគវ័ន</h3>
-                <div class="fw-bold fs-6 mb-2" style="color: #0284c7;">ប័ណ្ណសម្គាល់ខ្លួនសមាជិក • ផ្ទៀងផ្ទាត់ផ្លូវការ</div>
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill small fw-bold" style="background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Official Verification Card</span>
-                </div>
-            </div>
-
             <!-- Loading State -->
             <div v-if="isLoading" class="text-center py-5 card border-0 shadow-sm p-4 rounded-4 bg-white">
                 <div class="spinner-border text-warning" role="status"></div>
@@ -33,14 +20,6 @@
             <!-- Profile Content -->
             <div v-else-if="member" class="d-flex flex-column gap-4">
 
-                <!-- Read Only Notice Banner -->
-                <div class="p-3 rounded-3 shadow-sm d-flex align-items-center gap-3" style="background-color: #f0f9ff; color: #0369a1; border-left: 4px solid #0284c7;">
-                    <i class="fas fa-shield-alt fa-lg flex-shrink-0"></i>
-                    <div class="small fw-semibold">
-                        ព័ត៌មាននេះសម្រាប់តែការពិនិត្យផ្ទៀងផ្ទាត់ផ្លូវការប៉ុណ្ណោះ (View-Only Record)
-                    </div>
-                </div>
-
                 <!-- Main Identity Card -->
                 <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                     <div class="card-body p-4 text-center">
@@ -52,7 +31,7 @@
                         
                         <!-- High-Contrast Kudi Residence Badge -->
                         <div v-if="kudiDisplay" class="mt-3">
-                            <div class="d-inline-block px-4 py-2 rounded-pill shadow-sm" style="background-color: #fffbebf; border: 2px solid #f59e0b; color: #78350f;">
+                            <div class="d-inline-block px-4 py-2 rounded-pill shadow-sm" style="background-color: #fffbeb; border: 2px solid #f59e0b; color: #78350f;">
                                 <span class="fw-bold fs-6">
                                     <i class="fas fa-home me-2" style="color: #d97706;"></i>ស្នាក់នៅ៖ {{ kudiDisplay }}
                                 </span>
