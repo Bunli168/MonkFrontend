@@ -422,19 +422,10 @@ const avatarUrl = computed(() => {
 });
 
 const qrDataString = computed(() => {
-    const profile = props.user?.UserProfile || props.user?.profile;
-    const dataObj = {
-        id: props.user?.id,
-        type: 'user_personal_profile',
-        name: displayName.value,
-        phone: profile?.phone_number || profile?.phone || surveyData.value?.phone_number || '',
-        kudi: kudiName.value,
-        ordained_name: surveyData.value?.ordained_name || '',
-        preceptor_name: surveyData.value?.preceptor_name || '',
-        ordained_date: surveyData.value?.ordained_date || '',
-        ordination_wat: surveyData.value?.ordination_wat || profile?.from_wat || ''
-    };
-    return JSON.stringify(dataObj);
+    const userId = props.user?.id;
+    if (!userId) return '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/verify-profile/${userId}`;
 });
 
 const getBirthAddressField = (user, field) => {

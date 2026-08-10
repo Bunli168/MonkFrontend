@@ -14,6 +14,12 @@ const routes = [
 		meta: { public: true, title: 'Leave Request' }
 	},
 	{
+		path: '/verify-profile/:id',
+		name: 'verify-profile',
+		component: () => import('@/views/public/PublicMemberProfileView.vue'),
+		meta: { public: true, title: 'Member Profile Verification / ផ្ទៀងផ្ទាត់ប័ណ្ណសម្គាល់ខ្លួន' }
+	},
+	{
 		path: '/login',
 		name: 'login',
 		component: () => import('@/views/auth/LoginView.vue'),
