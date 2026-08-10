@@ -51,7 +51,9 @@ export const userSchemas = {
         roleId: z.any().refine(val => val !== '' && val !== null && val !== undefined, {
             message: 'Please select a valid role'
         }),
-        kut_id: z.any().optional().nullable()
+        kut_id: z.any().refine(val => val !== '' && val !== null && val !== undefined, {
+            message: 'Please select a Kudi'
+        })
     })),
     createAuto: toTypedSchema(z.object({
         firstName: z.string().trim().min(2, 'First name must be at least 2 characters').max(30, 'First name cannot exceed 30 characters').regex(/^[a-zA-Z\s]*$/, 'First name must contain only letters'),
@@ -59,7 +61,9 @@ export const userSchemas = {
         roleId: z.any().refine(val => val !== '' && val !== null && val !== undefined, {
             message: 'Please select a valid role'
         }),
-        kut_id: z.any().optional().nullable()
+        kut_id: z.any().refine(val => val !== '' && val !== null && val !== undefined, {
+            message: 'Please select a Kudi'
+        })
     }))
 };
 

@@ -15,7 +15,7 @@
             </div>
             <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
-                    label="Kudi" placeholder="Select Kudi (Optional)" :error="errors.kut_id" />
+                    label="Kudi *" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
 
         </div>
@@ -23,19 +23,19 @@
         <div v-else>
             <div class="row g-3 mb-3">
                 <div class="col-sm-6 mb-3 mb-sm-0">
-                    <BaseInput type="text" placeholder="Bunli" label="First Name" v-model="firstName" :maxlength="30" :error="errors.firstName" required />
+                    <BaseInput type="text" placeholder="Bunli" label="First Name *" v-model="firstName" :maxlength="30" :error="errors.firstName" required />
                 </div>
                 <div class="col-sm-6">
-                    <BaseInput type="text" placeholder="Phi" label="Last Name" v-model="lastName" :maxlength="30" :error="errors.lastName" required />
+                    <BaseInput type="text" placeholder="Phi" label="Last Name *" v-model="lastName" :maxlength="30" :error="errors.lastName" required />
                 </div>
             </div>
             <div class="mb-3">
                 <BaseSelect v-model="roleId" :options="autoRoles"
-                    label="User Role" placeholder="Select Role" required :error="errors.roleId" />
+                    label="User Role *" placeholder="Select Role" required :error="errors.roleId" />
             </div>
             <div class="mb-3" v-if="authStore.isSuperAdmin">
                 <BaseSelect v-model="kut_id" :options="kutsOptions"
-                    label="Kudi" placeholder="Select Kudi (Optional)" :error="errors.kut_id" />
+                    label="Kudi *" placeholder="Select Kudi" required :error="errors.kut_id" />
             </div>
 
         </div>
@@ -173,7 +173,7 @@ const { validate, setValues, errors, resetForm } = useForm({
         gender: "Male",
         pob: "",
         roleId: 3,
-        kut_id: authStore.user?.profile?.kut_id || 1,
+        kut_id: null,
         seating_row_id: null,
         seat_number: null
     }
@@ -199,7 +199,7 @@ watch(creationMode, (newMode) => {
             gender: "Male",
             pob: "",
             roleId: newMode === 'auto' ? 3 : 3,
-            kut_id: authStore.user?.profile?.kut_id || 1,
+            kut_id: null,
             seating_row_id: null,
             seat_number: null
         }
