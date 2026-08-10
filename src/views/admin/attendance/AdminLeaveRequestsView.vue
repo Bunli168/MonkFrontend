@@ -1,9 +1,34 @@
 <template>
     <div class="card border-0" style="background-color: var(--surface-ground);">
         <!-- Filters Bar -->
-        <div class="mb-3 d-flex align-items-center gap-2 w-100">
-            <div class="flex-grow-1" style="min-width: 0;">
-                <BaseFilter v-model="statusFilter" :options="filterOptions" />
+        <div class="card border-0 shadow-sm rounded-4 mb-3" style="background-color: var(--surface-card);">
+            <div class="card-body p-3">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Status</label>
+                        <BaseFilter v-model="statusFilter" :options="filterOptions" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
+                        <select v-model="selectedRowFilter" class="form-select">
+                            <option value="">All Rows (គ្រប់ជួរ)</option>
+                            <option value="unassigned">⚠️ Unassigned Row (មិនទាន់មានជួរ)</option>
+                            <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
+                                Row {{ row.row_num }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
+                        <select v-model="selectedKudiFilter" class="form-select">
+                            <option value="">All Kudis (គ្រប់កុដិ)</option>
+                            <option value="unassigned">⚠️ Unassigned Kudi (មិនទាន់មានកុដិ)</option>
+                            <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name">
+                                {{ kudi.name || `Kudi ${kudi.id}` }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -28,10 +53,12 @@
                     </div>
                     <div class="min-w-0">
                         <div class="fw-medium" style="color: var(--text-heading-color);">
-                            {{ row.User?.UserProfile?.first_name_kh }} {{ row.User?.UserProfile?.last_name_kh }}
+                            {{ row.User?.UserProfile?.first_name_kh || row.User?.email }} {{ row.User?.UserProfile?.last_name_kh || '' }}
                         </div>
-                        <div class="text-muted small" v-if="row.User?.UserProfile?.kut_id">
-                            Kudi: {{ row.User.UserProfile.Kut ? row.User.UserProfile.Kut.name : row.User.UserProfile.kut_id }}
+                        <div class="d-flex align-items-center gap-2 mt-0.5" style="font-size: 0.75rem;" v-if="row.User?.UserProfile?.kut_id || row.User?.UserProfile?.Kut?.name">
+                            <span class="text-muted">
+                                Kudi: {{ row.User.UserProfile.Kut ? row.User.UserProfile.Kut.name : row.User.UserProfile.kut_id }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -101,17 +128,6 @@ import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-
-const toast = useToastStore();
-const isLoading = ref(false);
-const requests = ref([]);
-const statusFilter = ref('');
-
-const showConfirmModal = ref(false);
-const isUpdatingStatus = ref(false);
-const confirmAction = ref('');
-const confirmId = ref(null);
-
 import { useAuthStore } from '@/stores/auth';
 
 const props = defineProps({
@@ -121,7 +137,21 @@ const props = defineProps({
     }
 });
 
+const toast = useToastStore();
 const authStore = useAuthStore();
+const isLoading = ref(false);
+const requests = ref([]);
+const seatingRows = ref([]);
+const kudiList = ref([]);
+const statusFilter = ref('');
+const selectedRowFilter = ref('');
+const selectedKudiFilter = ref('');
+
+const showConfirmModal = ref(false);
+const isUpdatingStatus = ref(false);
+const confirmAction = ref('');
+const confirmId = ref(null);
+
 const filterOptions = computed(() => {
     const pendingValue = authStore.isSuperAdmin ? 'pending_superadmin' : 'pending';
     return [
@@ -143,8 +173,65 @@ const colDefs = computed(() => {
     ];
 });
 
+const matchKudiExact = (monkKudiRaw, filterValRaw) => {
+    if (!filterValRaw) return true;
+    if (filterValRaw === 'unassigned') {
+        return !monkKudiRaw || monkKudiRaw === '-' || monkKudiRaw === 'Unassigned';
+    }
+    if (!monkKudiRaw) return false;
+
+    const monkStr = monkKudiRaw.toString().trim();
+    const filterStr = filterValRaw.toString().trim();
+
+    if (monkStr.toLowerCase() === filterStr.toLowerCase()) return true;
+
+    const extractDigits = (s) => {
+        const khmerNums = ['<ctrl42>','១','២','៣','៤','៥','៦','៧','៨','៩'];
+        let res = s;
+        khmerNums.forEach((kh, i) => {
+            res = res.replaceAll(kh, i.toString());
+        });
+        const match = res.match(/\d+/);
+        return match ? parseInt(match[0], 10) : null;
+    };
+
+    const monkNum = extractDigits(monkStr);
+    const filterNum = extractDigits(filterStr);
+
+    if (monkNum !== null && filterNum !== null) {
+        return monkNum === filterNum;
+    }
+
+    return monkStr.toLowerCase() === filterStr.toLowerCase();
+};
+
 const filteredRequests = computed(() => {
-    return requests.value;
+    return requests.value.filter(row => {
+        // Status filter
+        let matchesStatus = true;
+        if (statusFilter.value) {
+            if (statusFilter.value === 'pending') {
+                matchesStatus = row.status === 'pending' || row.status === 'pending_mekudi';
+            } else {
+                matchesStatus = row.status === statusFilter.value;
+            }
+        }
+
+        // Row filter
+        let matchesRow = true;
+        const monkRow = row.User?.UserProfile?.SeatingRow?.row_num || row.User?.UserProfile?.seating_row_id;
+        if (selectedRowFilter.value === 'unassigned') {
+            matchesRow = !monkRow;
+        } else if (selectedRowFilter.value) {
+            matchesRow = monkRow === selectedRowFilter.value || monkRow?.toString() === selectedRowFilter.value.toString();
+        }
+
+        // Kudi filter
+        const monkKudi = row.User?.UserProfile?.Kut?.name || row.User?.UserProfile?.kut_id;
+        const matchesKudi = matchKudiExact(monkKudi, selectedKudiFilter.value);
+
+        return matchesStatus && matchesRow && matchesKudi;
+    });
 });
 
 const pendingCount = computed(() => {
@@ -179,106 +266,126 @@ const formatStatus = (status) => {
 };
 
 const getBadgeStatusColor = (status) => {
-    if (!status) return '';
-    if (status === 'pending_superadmin' && !authStore.isSuperAdmin) {
-        return 'PENDING';
-    }
-    if (status === 'pending_mekudi' || status === 'pending') return 'PENDING';
-    return status.toUpperCase();
+    if (!status) return 'secondary';
+    if (status === 'approved') return 'success';
+    if (status === 'rejected') return 'danger';
+    if (status.includes('pending')) return 'warning';
+    return 'info';
 };
-
-const fetchRequests = async () => {
-    isLoading.value = true;
-    try {
-        const params = { status: statusFilter.value };
-        if (props.seasonId) {
-            params.retreat_event_id = props.seasonId;
-        }
-        const response = await api.get('/leave-requests', { params });
-        requests.value = response.data || [];
-    } catch (error) {
-        console.error('Failed to load leave requests:', error);
-        toast.showToast('Failed to load requests', 'error');
-    } finally {
-        isLoading.value = false;
-    }
-};
-
-watch([statusFilter, () => props.seasonId], () => {
-    currentPage.value = 1;
-    fetchRequests();
-});
 
 const getActionItems = (row) => {
-    const isAwaitingSuperAdmin = row.status === 'pending_superadmin';
-    const isAwaitingAdmin = row.status === 'pending' || row.status === 'pending_mekudi';
-
-    if (isAwaitingSuperAdmin) {
-        if (!authStore.isSuperAdmin) return [];
-        return [
-            {
-                label: 'Approve Final',
-                icon: CheckCircle,
-                iconClass: 'text-success',
-                command: () => updateStatus(row.id, 'approved')
-            },
-            {
-                label: 'Reject',
-                icon: XCircle,
-                iconClass: 'text-danger',
-                command: () => updateStatus(row.id, 'rejected')
-            }
-        ];
+    const items = [];
+    const canApprove = (authStore.isMekudi && (row.status === 'pending' || row.status === 'pending_mekudi')) ||
+                       (authStore.isSuperAdmin && (row.status === 'pending' || row.status === 'pending_superadmin' || row.status === 'pending_mekudi'));
+    if (canApprove) {
+        items.push({
+            label: 'Approve Request',
+            icon: CheckCircle,
+            command: () => openConfirmModal(row.id, 'approved')
+        });
+        items.push({
+            label: 'Reject Request',
+            icon: XCircle,
+            command: () => openConfirmModal(row.id, 'rejected')
+        });
     }
-
-    if (isAwaitingAdmin) {
-        if (!authStore.isAdmin) return [];
-        return [
-            {
-                label: 'Approve',
-                icon: CheckCircle,
-                iconClass: 'text-success',
-                command: () => updateStatus(row.id, 'approved')
-            },
-            {
-                label: 'Reject',
-                icon: XCircle,
-                iconClass: 'text-danger',
-                command: () => updateStatus(row.id, 'rejected')
-            }
-        ];
-    }
-
-    return [];
+    return items;
 };
 
-const updateStatus = (id, status) => {
+const openConfirmModal = (id, action) => {
     confirmId.value = id;
-    confirmAction.value = status;
+    confirmAction.value = action;
     showConfirmModal.value = true;
 };
 
 const executeStatusUpdate = async () => {
+    if (!confirmId.value || !confirmAction.value) return;
     isUpdatingStatus.value = true;
     try {
         await api.put(`/leave-requests/${confirmId.value}/status`, { status: confirmAction.value });
-        toast.showToast(`Request ${confirmAction.value} successfully`, 'success');
+        toast.showToast(`Leave request ${confirmAction.value} successfully`, 'success');
         showConfirmModal.value = false;
         fetchRequests();
-    } catch (error) {
-        console.error(`Failed to ${confirmAction.value} request:`, error);
-        toast.showToast(error.response?.data?.message || `Failed to ${confirmAction.value} request`, 'error');
+    } catch (e) {
+        console.error('Failed to update leave request status:', e);
+        toast.showToast(e.response?.data?.message || 'Failed to update status', 'error');
     } finally {
         isUpdatingStatus.value = false;
     }
 };
 
-onMounted(() => {
+const fetchSeatingRows = async () => {
+    try {
+        const res = await api.get('/seating-rows');
+        seatingRows.value = res.data?.data || res.data || [];
+    } catch (e) {
+        console.error('Failed to fetch seating rows:', e);
+    }
+};
+
+const sortKudisNumerically = (list) => {
+    return list.slice().sort((a, b) => {
+        const extractNum = (item) => {
+            const val = (item.name || item.id || '').toString();
+            const khmerNums = ['<ctrl42>','១','២','៣','៤','៥','៦','៧','៨','៩'];
+            let res = val;
+            khmerNums.forEach((kh, i) => {
+                res = res.replaceAll(kh, i.toString());
+            });
+            const match = res.match(/\d+/);
+            return match ? parseInt(match[0], 10) : 999999;
+        };
+        const numA = extractNum(a);
+        const numB = extractNum(b);
+        if (numA !== numB) return numA - numB;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+};
+
+const fetchKudis = async () => {
+    try {
+        const res = await api.get('/kuts');
+        const raw = res.data?.data || res.data || [];
+        kudiList.value = sortKudisNumerically(raw);
+    } catch (e) {
+        console.error('Failed to fetch kuts:', e);
+    }
+};
+
+const fetchRequests = async () => {
+    isLoading.value = true;
+    try {
+        const params = {};
+        if (props.seasonId) {
+            params.retreat_event_id = props.seasonId;
+        }
+        const res = await api.get('/leave-requests', { params });
+        requests.value = res.data?.data || res.data || [];
+    } catch (e) {
+        console.error('Failed to fetch leave requests:', e);
+        toast.showToast('Failed to load leave requests', 'error');
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+watch(() => props.seasonId, () => {
     fetchRequests();
 });
 
-defineExpose({ pendingCount });
+onMounted(async () => {
+    await fetchSeatingRows();
+    await fetchKudis();
+    fetchRequests();
+});
+
+defineExpose({
+    pendingCount
+});
 </script>
 
 <style scoped>
+.min-w-0 {
+    min-width: 0;
+}
 </style>

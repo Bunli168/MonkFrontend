@@ -11,6 +11,7 @@
                 </option>
             </select>
         </div>
+
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2" style="background-color: var(--surface-ground);">
             <div>
                 <TabList>
@@ -21,12 +22,25 @@
                         </div>
                     </Tab>
 
+                    <Tab value="unassigned">
+                        <div class="d-flex align-items-center gap-2">
+                            <UserX :size="16" class="text-danger" />
+                            <span :class="{'d-none d-md-inline': activeTab !== 'unassigned'}">Unassigned Members</span>
+                            <span
+                                v-if="unassignedMonksCount > 0"
+                                class="badge rounded-pill ms-1"
+                                style="background: #f59e0b; color: #fff; font-size: 0.68rem; padding: 2px 7px; line-height: 1.5;"
+                            >{{ unassignedMonksCount }}</span>
+                        </div>
+                    </Tab>
+
                     <Tab value="report">
                         <div class="d-flex align-items-center gap-2">
                             <History :size="16" class="text-info" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
                         </div>
                     </Tab>
+
                     <Tab value="leave">
                         <div class="d-flex align-items-center gap-2">
                             <MailOpen :size="16" class="text-warning" />
@@ -38,6 +52,7 @@
                             >{{ leaveViewRef.pendingCount }}</span>
                         </div>
                     </Tab>
+
                     <Tab value="takers">
                         <div class="d-flex align-items-center gap-2">
                             <UsersRound :size="16" class="text-success" />
@@ -48,43 +63,42 @@
             </div>
 
             <TabPanels class="p-0 bg-transparent">
+                <!-- Tab 1: Master Attendance -->
                 <TabPanel value="attendance">
                     <!-- Filters Section -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body bg-white rounded-3">
                             <div class="row g-3 align-items-end">
-                                <div class="col-md-2">
+                                <div class="col-6 col-md-4 col-lg-2">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Date</label>
                                     <input type="date" v-model="selectedDate" class="form-control" @change="fetchMonks">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-4 col-lg-3">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Monk</label>
                                     <div class="position-relative">
                                         <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
                                         <input type="text" class="form-control ps-5" placeholder="Name or phone..." v-model="searchQuery">
                                     </div>
                                 </div>
-                                <div class="col-md-2.5">
+                                <div class="col-6 col-md-4 col-lg-2">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
                                     <select v-model="selectedRowFilter" class="form-select">
                                         <option value="">All Rows (គ្រប់ជួរ)</option>
-                                        <option value="unassigned">⚠️ Unassigned Row (មិនទាន់មានជួរ)</option>
                                         <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
                                             Row {{ row.row_num }}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2.5">
+                                <div class="col-6 col-md-4 col-lg-3">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
                                     <select v-model="selectedKudiFilter" class="form-select">
                                         <option value="">All Kudis (គ្រប់កុដិ)</option>
-                                        <option value="unassigned">⚠️ Unassigned Kudi (មិនទាន់មានកុដិ)</option>
                                         <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
                                             {{ kudi.name || `Kudi ${kudi.id}` }}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-6 col-md-4 col-lg-2">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Status</label>
                                     <select v-model="selectedStatusFilter" class="form-select">
                                         <option value="">All Statuses</option>
@@ -121,12 +135,7 @@
                                              style="width: 40px; height: 40px; font-size: 1.1rem;">
                                             {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
                                         </div>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-bold text-dark">{{ monk.fullName }}</span>
-                                            <span v-if="!monk.rowNumber" class="badge bg-warning-subtle text-warning border border-warning-subtle text-start mt-0.5" style="font-size: 0.7rem; width: fit-content;">
-                                                Unassigned Row & Seat
-                                            </span>
-                                        </div>
+                                        <span class="fw-bold text-dark">{{ monk.fullName }}</span>
                                     </div>
                                 </template>
 
@@ -188,17 +197,103 @@
                     </div>
                 </TabPanel>
 
-                <!-- Report Tab -->
+                <!-- Tab 2: Dedicated Unassigned Members Tab -->
+                <TabPanel value="unassigned">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body bg-white rounded-3">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Unassigned Member</label>
+                                    <div class="position-relative">
+                                        <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                                        <input type="text" class="form-control ps-5" placeholder="Search by name or phone…" v-model="unassignedSearchQuery">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
+                                    <select v-model="unassignedKudiFilter" class="form-select">
+                                        <option value="">All Kudis (គ្រប់កុដិ)</option>
+                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
+                                            {{ kudi.name || `Kudi ${kudi.id}` }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0">
+                            <BaseTable 
+                                :columns="colDefs" 
+                                :rows="paginatedUnassignedMonks" 
+                                :loading="isLoadingMonks"
+                                :show-index="true"
+                                :total-records="filteredUnassignedMonks.length"
+                                v-model:page="unassignedPage"
+                                v-model:per-page="perPage"
+                            >
+                                <template #name="{ data: monk }">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-warning text-white" 
+                                             style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                            {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
+                                        </div>
+                                        <span class="fw-bold text-dark">{{ monk.fullName }}</span>
+                                    </div>
+                                </template>
+
+                                <template #kudi="{ data: monk }">
+                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
+                                        {{ monk.kudiNumber || 'Unassigned' }}
+                                    </span>
+                                </template>
+
+                                <template #phone="{ data: monk }">
+                                    <span class="text-muted">{{ monk.phone || monk.chhaya_number || 'N/A' }}</span>
+                                </template>
+
+                                <template #row_number>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                        Unassigned
+                                    </span>
+                                </template>
+
+                                <template #seat_number>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                        Unassigned
+                                    </span>
+                                </template>
+
+                                <template #absents="{ data: monk }">
+                                    <div class="d-flex justify-content-center w-100">
+                                        <span class="fw-bold text-secondary" style="font-size: 1rem;">
+                                            {{ monk.netAbsents || 0 }}
+                                        </span>
+                                    </div>
+                                </template>
+
+                                <template #role="{ data: monk }">
+                                    <span class="badge rounded-pill border bg-secondary bg-opacity-10 text-secondary border-secondary">
+                                        {{ monk.role || 'Member' }}
+                                    </span>
+                                </template>
+                            </BaseTable>
+                        </div>
+                    </div>
+                </TabPanel>
+
+                <!-- Tab 3: Report Tab -->
                 <TabPanel value="report">
                     <AdminFineReportView v-if="activeTab === 'report'" :isComponent="true" :seasonId="selectedSeasonId" />
                 </TabPanel>
 
-                <!-- Leave Requests Tab -->
+                <!-- Tab 4: Leave Requests Tab -->
                 <TabPanel value="leave">
                     <AdminLeaveRequestsView ref="leaveViewRef" v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
                 </TabPanel>
 
-                <!-- Takers Tab -->
+                <!-- Tab 5: Takers Tab -->
                 <TabPanel value="takers">
                     <AdminTakersTableView v-if="activeTab === 'takers'" />
                 </TabPanel>
@@ -210,7 +305,7 @@
 <script setup>
 import { Tab, TabList, TabPanels, TabPanel, Tabs } from 'primevue';
 import { ref, computed, watch, onMounted } from 'vue';
-import { CalendarCheck, History, MailOpen, UsersRound, Search, Save, Check, X, BedDouble } from '@lucide/vue';
+import { CalendarCheck, History, MailOpen, UsersRound, Search, Save, Check, X, BedDouble, UserX } from '@lucide/vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import BaseButton from '@/components/base/BaseButton.vue';
@@ -233,12 +328,16 @@ const getLocalDateString = () => {
 
 const activeTab = ref('attendance');
 const page = ref(1);
+const unassignedPage = ref(1);
 const perPage = ref(10);
 const selectedDate = ref(getLocalDateString());
 const searchQuery = ref('');
 const selectedRowFilter = ref('');
 const selectedKudiFilter = ref('');
 const selectedStatusFilter = ref('');
+
+const unassignedSearchQuery = ref('');
+const unassignedKudiFilter = ref('');
 
 const resetPage = () => {
     page.value = 1;
@@ -277,8 +376,45 @@ const colDefs = computed(() => {
     ];
 });
 
+const matchKudiExact = (monkKudiRaw, filterValRaw) => {
+    if (!filterValRaw) return true;
+    if (filterValRaw === 'unassigned') {
+        return !monkKudiRaw || monkKudiRaw === '-' || monkKudiRaw === 'Unassigned';
+    }
+    if (!monkKudiRaw) return false;
+
+    const monkStr = monkKudiRaw.toString().trim();
+    const filterStr = filterValRaw.toString().trim();
+
+    if (monkStr.toLowerCase() === filterStr.toLowerCase()) return true;
+
+    const extractDigits = (s) => {
+        const khmerNums = ['០','១','២','៣','៤','៥','៦','៧','៨','៩'];
+        let res = s;
+        khmerNums.forEach((kh, i) => {
+            res = res.replaceAll(kh, i.toString());
+        });
+        const match = res.match(/\d+/);
+        return match ? parseInt(match[0], 10) : null;
+    };
+
+    const monkNum = extractDigits(monkStr);
+    const filterNum = extractDigits(filterStr);
+
+    if (monkNum !== null && filterNum !== null) {
+        return monkNum === filterNum;
+    }
+
+    return monkStr.toLowerCase() === filterStr.toLowerCase();
+};
+
 const filteredMonks = computed(() => {
     return monks.value.filter(monk => {
+        // Show ONLY monks with netAbsents >= 9 in Master Attendance
+        if ((monk.netAbsents || 0) < 9) {
+            return false;
+        }
+
         // Search filter
         const query = searchQuery.value.toLowerCase().trim();
         const matchesSearch = !query || 
@@ -288,21 +424,13 @@ const filteredMonks = computed(() => {
             
         // Row filter
         let matchesRow = true;
-        if (selectedRowFilter.value === 'unassigned') {
-            matchesRow = !monk.rowNumber || monk.rowNumber === '-' || monk.rowNumber === null;
-        } else if (selectedRowFilter.value) {
+        if (selectedRowFilter.value) {
             matchesRow = monk.rowNumber === selectedRowFilter.value || monk.rowNumber?.toString() === selectedRowFilter.value.toString();
         }
 
         // Kudi filter
-        let matchesKudi = true;
-        if (selectedKudiFilter.value === 'unassigned') {
-            matchesKudi = !monk.kudiNumber && !monk.profile?.kut_id && !monk.profile?.Kut?.name;
-        } else if (selectedKudiFilter.value) {
-            const filterVal = selectedKudiFilter.value.toString().toLowerCase();
-            const monkKudi = (monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id || '').toString().toLowerCase();
-            matchesKudi = monkKudi.includes(filterVal) || filterVal.includes(monkKudi);
-        }
+        const monkKudi = monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id;
+        const matchesKudi = matchKudiExact(monkKudi, selectedKudiFilter.value);
         
         // Status filter
         const status = monk.attendance?.status || 'present';
@@ -310,6 +438,36 @@ const filteredMonks = computed(() => {
         
         return matchesSearch && matchesRow && matchesKudi && matchesStatus;
     });
+});
+
+// Dedicated Unassigned Monks computed list
+const allUnassignedMonks = computed(() => {
+    return monks.value.filter(monk => !monk.rowNumber || monk.rowNumber === '-' || monk.rowNumber === null);
+});
+
+const unassignedMonksCount = computed(() => {
+    return allUnassignedMonks.value.length;
+});
+
+const filteredUnassignedMonks = computed(() => {
+    return allUnassignedMonks.value.filter(monk => {
+        const query = unassignedSearchQuery.value.toLowerCase().trim();
+        const matchesSearch = !query || 
+            (monk.fullName && monk.fullName.toLowerCase().includes(query)) ||
+            (monk.phone && monk.phone.includes(query)) ||
+            (monk.chhaya_number && monk.chhaya_number.includes(query));
+
+        const monkKudi = monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id;
+        const matchesKudi = matchKudiExact(monkKudi, unassignedKudiFilter.value);
+
+        return matchesSearch && matchesKudi;
+    });
+});
+
+const paginatedUnassignedMonks = computed(() => {
+    const start = (unassignedPage.value - 1) * perPage.value;
+    const end = start + perPage.value;
+    return filteredUnassignedMonks.value.slice(start, end);
 });
 
 const getStatusColor = (status) => {
@@ -346,10 +504,30 @@ const fetchSeatingRows = async () => {
     }
 };
 
+const sortKudisNumerically = (list) => {
+    return list.slice().sort((a, b) => {
+        const extractNum = (item) => {
+            const val = (item.name || item.id || '').toString();
+            const khmerNums = ['០','១','២','៣','៤','៥','៦','៧','៨','៩'];
+            let res = val;
+            khmerNums.forEach((kh, i) => {
+                res = res.replaceAll(kh, i.toString());
+            });
+            const match = res.match(/\d+/);
+            return match ? parseInt(match[0], 10) : 999999;
+        };
+        const numA = extractNum(a);
+        const numB = extractNum(b);
+        if (numA !== numB) return numA - numB;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+};
+
 const fetchKudis = async () => {
     try {
         const response = await api.get('/kuts');
-        kudiList.value = response.data?.data || response.data || [];
+        const raw = response.data?.data || response.data || [];
+        kudiList.value = sortKudisNumerically(raw);
     } catch (error) {
         console.error('Failed to fetch kuts:', error);
     }
