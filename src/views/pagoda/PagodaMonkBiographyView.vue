@@ -505,14 +505,24 @@ import BaseSelect from '@/components/base/BaseSelect.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
 
+import { getVerifyToken } from '@/utils/verifyHash';
+
 const showPersonalQrModal = ref(false);
 const qrContainerRef = ref(null);
+const verifyToken = ref('');
+
+watch(() => (props.userId || authStore.user?.id), async (newId) => {
+    if (newId) {
+        verifyToken.value = await getVerifyToken(newId);
+    }
+}, { immediate: true });
 
 const userQrDataString = computed(() => {
     const userId = props.userId || authStore.user?.id;
     if (!userId) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/verify-profile/${userId}`;
+    const token = verifyToken.value || userId;
+    return `${origin}/verify-profile/${token}`;
 });
 
 
