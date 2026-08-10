@@ -343,7 +343,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-import { useAuthStore } from '@/stores/auth';
 const downloadPersonalQr = () => {
     if (!qrContainerRef.value) return;
     const qrCanvas = qrContainerRef.value.querySelector('canvas');
