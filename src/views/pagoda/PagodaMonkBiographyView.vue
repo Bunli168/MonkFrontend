@@ -441,43 +441,43 @@ const downloadPersonalQr = () => {
     ctx.drawImage(qrCanvas, qrImgX, qrImgY, qrImageSize, qrImageSize);
 
     // 6. Kudi & Phone Container Box
-    const infoY = 610;
     const infoWidth = width - 80;
-    const infoHeight = 180;
     const infoX = (width - infoWidth) / 2;
+    const infoY = 610;
 
-    ctx.fillStyle = '#1e293b';
-    ctx.beginPath();
-    ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
-    ctx.fill();
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Kudi Highlight Title
-    const kudiVal = form.value.kudi_number || authStore.user?.profile?.kut?.name || `Kudi ${authStore.user?.profile?.kut_id || 'N/A'}`;
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.fillText(`កុដិស្នាក់នៅ / KUDI: ${kudiVal}`, width / 2, infoY + 50);
-
-    // Phone / Contact Info
-    const phoneVal = form.value.phone_number || authStore.user?.profile?.phone || 'N/A';
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = '600 17px system-ui, -apple-system, sans-serif';
-    ctx.fillText(`Phone: ${phoneVal}`, width / 2, infoY + 95);
-
-    // Ordained Name if available
+    const phoneVal = form.value.phone_number || authStore.user?.profile?.phone || '';
     const ordainedNameVal = form.value.ordained_name || '';
-    if (ordainedNameVal) {
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '15px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`Ordained Name: ${ordainedNameVal}`, width / 2, infoY + 135);
+    const rawKudi = form.value.kudi_number || authStore.user?.profile?.kut?.name || (authStore.user?.profile?.kut_id ? `Kudi ${authStore.user.profile.kut_id}` : '');
+    const kudiVal = rawKudi !== 'N/A' ? rawKudi : '';
+
+    const textLines = [];
+    if (kudiVal) textLines.push({ text: `កុដិស្នាក់នៅ / KUDI: ${kudiVal}`, color: '#fbbf24', font: 'bold 22px system-ui, -apple-system, sans-serif' });
+    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 17px system-ui, -apple-system, sans-serif' });
+    if (ordainedNameVal) textLines.push({ text: `Ordained Name: ${ordainedNameVal}`, color: '#cbd5e1', font: '15px system-ui, -apple-system, sans-serif' });
+
+    if (textLines.length > 0) {
+        const infoHeight = textLines.length * 42 + 25;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
+        ctx.fill();
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        let lineY = infoY + 38;
+        textLines.forEach(item => {
+            ctx.fillStyle = item.color;
+            ctx.font = item.font;
+            ctx.fillText(item.text, width / 2, lineY);
+            lineY += 40;
+        });
     }
 
     // 7. Footer Notice
     ctx.fillStyle = '#64748b';
     ctx.font = '13px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 40);
+    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 35);
 
     // Download PNG File
     const link = document.createElement('a');
