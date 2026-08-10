@@ -173,7 +173,7 @@ const { validate, setValues, errors, resetForm } = useForm({
         gender: "Male",
         pob: "",
         roleId: 3,
-        kut_id: null,
+        kut_id: 1,
         seating_row_id: null,
         seat_number: null
     }
@@ -199,7 +199,7 @@ watch(creationMode, (newMode) => {
             gender: "Male",
             pob: "",
             roleId: newMode === 'auto' ? 3 : 3,
-            kut_id: null,
+            kut_id: 1,
             seating_row_id: null,
             seat_number: null
         }
