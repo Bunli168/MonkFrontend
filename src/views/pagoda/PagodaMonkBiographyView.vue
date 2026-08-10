@@ -25,6 +25,10 @@
                         <div class="text-secondary" style="font-size: 0.95rem;">Ordained Name: <span class="text-primary">{{ form.ordained_name || '-' }}</span></div>
                     </div>
                     <div class="d-flex gap-2 w-100 w-sm-auto mt-2 mt-sm-0">
+                        <BaseButton variant="outline-primary" @click="showPersonalQrModal = true" class="w-100 w-sm-auto d-flex align-items-center gap-1">
+                            <QrCode :size="16" />
+                            <span>My QR Code / កូដ QR</span>
+                        </BaseButton>
                         <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: var(--text-heading-color); border-color: var(--border-color);" class="w-100 w-sm-auto">
                             Edit / កែសម្រួល
                         </BaseButton>
@@ -271,11 +275,43 @@
             </div>
 
         </div>
+
+        <!-- Personal QR Modal -->
+        <BaseModal v-model="showPersonalQrModal" title="My Personal QR Code / កូដ QR បុគ្គល" size="sm">
+            <div class="text-center p-3">
+                <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">{{ form.surname_name || authStore.user?.name || 'My Profile' }}</h5>
+                <div class="text-primary fw-medium small mb-3">{{ form.ordained_name ? `Ordained: ${form.ordained_name}` : 'Monk / សង្ឃ' }}</div>
+
+                <div ref="qrContainerRef" class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-3">
+                    <QrcodeVue :value="userQrDataString" :size="200" level="H" />
+                </div>
+
+                <div class="p-3 rounded-3 text-start small mb-3" style="background-color: var(--surface-ground); border: 1px solid var(--border-color);">
+                    <div class="mb-1"><strong>Phone:</strong> {{ form.phone_number || authStore.user?.profile?.phone || 'N/A' }}</div>
+                    <div class="mb-1"><strong>Kudi:</strong> {{ form.kudi_number || (authStore.user?.profile?.kut?.name ? authStore.user.profile.kut.name : `Kudi ${authStore.user?.profile?.kut_id || 'N/A'}`) }}</div>
+                    <div class="mb-1"><strong>Preceptor:</strong> {{ form.preceptor_name || 'N/A' }}</div>
+                    <div><strong>Ordained Date:</strong> {{ formatDate(form.ordained_date) || 'N/A' }}</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <BaseButton variant="outline-primary" class="flex-grow-1 d-flex align-items-center justify-content-center gap-1" @click="downloadPersonalQr">
+                        <Download :size="16" />
+                        <span>Download QR</span>
+                    </BaseButton>
+                    <BaseButton variant="secondary" class="flex-grow-1" @click="showPersonalQrModal = false">
+                        Close
+                    </BaseButton>
+                </div>
+            </div>
+        </BaseModal>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { QrCode, Download } from '@lucide/vue';
+import QrcodeVue from 'qrcode.vue';
+import BaseModal from '@/components/base/BaseModal.vue';
 
 const props = defineProps({
     title: {
@@ -312,6 +348,36 @@ import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseSelect from '@/components/base/BaseSelect.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseAvatarUpload from '@/components/base/BaseAvatarUpload.vue';
+
+const showPersonalQrModal = ref(false);
+const qrContainerRef = ref(null);
+
+const userQrDataString = computed(() => {
+    const dataObj = {
+        id: props.userId || authStore.user?.id,
+        type: 'user_personal_profile',
+        name: form.value.surname_name || authStore.user?.name || '',
+        phone: form.value.phone_number || authStore.user?.profile?.phone || '',
+        kudi: form.value.kudi_number || authStore.user?.profile?.kut?.name || `Kudi ${authStore.user?.profile?.kut_id || ''}`,
+        ordained_name: form.value.ordained_name || '',
+        preceptor_name: form.value.preceptor_name || '',
+        ordained_date: form.value.ordained_date || '',
+        ordination_wat: form.value.ordination_wat || ''
+    };
+    return JSON.stringify(dataObj);
+});
+
+const downloadPersonalQr = () => {
+    if (!qrContainerRef.value) return;
+    const canvas = qrContainerRef.value.querySelector('canvas');
+    if (!canvas) return;
+
+    const fileName = (form.value.surname_name || authStore.user?.name || 'Personal_QR').replace(/\s+/g, '_');
+    const link = document.createElement('a');
+    link.download = `QR_${fileName}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+};
 import { useLocation } from '@/composables/useLocation';
 
 const authStore  = useAuthStore();
