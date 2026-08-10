@@ -378,7 +378,7 @@ const handleValidSubmit = async (values) => {
                 : (authStore.isAdmin || authStore.isSuperAdmin) 
                     ? '/dashboard' 
                     : authStore.isAttendanceTaker 
-                        ? '/pagoda/taker/management' 
+                        ? '/pagoda/taker/attendance' 
                         : '/pagoda';
             window.location.href = target;
         }

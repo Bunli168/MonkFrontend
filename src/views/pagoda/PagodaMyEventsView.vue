@@ -45,6 +45,7 @@
 						</div>
 					</template>
 		</BaseTable>
+		<ConfirmDialog />
 	</div>
 </template>
 
@@ -56,6 +57,7 @@ import { useToastStore } from '@/stores/toast';
 import BaseTable from '@/components/base/BaseTable.vue';
 import Tag from 'primevue/tag';
 import Button from 'primevue/button';
+import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
 
 

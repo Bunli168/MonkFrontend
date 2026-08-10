@@ -10,6 +10,12 @@
                             <span :class="{'d-none d-md-inline': activeTab !== 'take-attendance'}">Take Attendance</span>
                         </div>
                     </Tab>
+                     <Tab value="my-leave-request" v-if="!authStore.isAttendanceTaker">
+                        <div class="d-flex align-items-center gap-2">
+                            <FileText style="color: var(--info-color);" :size="16" />
+                            <span :class="{'d-none d-md-inline': activeTab !== 'my-leave-request'}">My Leave Request</span>
+                        </div>
+                    </Tab>
                     <Tab value="request-permission" v-if="authStore.isAdmin || authStore.isSuperAdmin">
                         <div class="d-flex align-items-center gap-2">
                             <ClipboardList style="color: var(--primary-color);" :size="16" />
@@ -17,12 +23,7 @@
                             <span v-if="pendingCount > 0" class="badge bg-danger rounded-pill">{{ pendingCount }}</span>
                         </div>
                     </Tab>
-                    <Tab value="my-leave-request">
-                        <div class="d-flex align-items-center gap-2">
-                            <FileText style="color: var(--info-color);" :size="16" />
-                            <span :class="{'d-none d-md-inline': activeTab !== 'my-leave-request'}">My Leave Request</span>
-                        </div>
-                    </Tab>
+                   
 
                     <Tab value="manage-rows" v-if="false">
                         <div class="d-flex align-items-center gap-2">
@@ -39,7 +40,7 @@
                 <TabPanel value="request-permission" v-if="authStore.isAdmin || authStore.isSuperAdmin">
                     <MemberRequestPermissionView v-if="activeTab === 'request-permission'" :pending-count="pendingCount" @refresh-pending-count="fetchPendingCount" />
                 </TabPanel>
-                <TabPanel value="my-leave-request">
+                <TabPanel value="my-leave-request" v-if="!authStore.isAttendanceTaker">
                     <PagodaLeaveRequestView v-if="activeTab === 'my-leave-request'" />
                 </TabPanel>
 

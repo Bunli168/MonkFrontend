@@ -383,7 +383,11 @@ router.beforeEach(async (to, from) => {
 	const requiredRoles = to.meta.roles
 
 	if (requiredRoles && !authStore.hasRole(requiredRoles)) {
-		const target = authStore.isSuperAdmin || authStore.isAdmin ? 'dashboard' : 'pagoda-overview'
+		const target = authStore.isSuperAdmin || authStore.isAdmin 
+			? 'dashboard' 
+			: authStore.isAttendanceTaker 
+				? 'taker-attendance' 
+				: 'pagoda-overview'
 		if (to.name !== target) {
 			return { name: target }
 		}

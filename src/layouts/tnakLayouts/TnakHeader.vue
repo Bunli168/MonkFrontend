@@ -79,7 +79,7 @@ const route = useRoute();
 
 const goHome = () => {
     if (authStore.userRole?.toUpperCase() === 'ATTENDANCETAKER') {
-        router.push({ name: 'taker-management' });
+        router.push({ name: 'taker-attendance' });
     } else {
         router.push({ name: 'pagoda-overview' });
     }

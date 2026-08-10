@@ -128,13 +128,14 @@
                             <div class="text-end">
                                 <span class="badge border px-2 py-1" :class="[
                                     monk.attendance?.status === 'permission' ? 'bg-warning text-dark border-warning' :
-                                    monk.attendanceNotes === 'Scanned QR' ? 'bg-success text-white border-success' :
+                                    (monk.attendanceNotes === 'Scanned QR' || monk.attendance?.status === 'present') ? 'bg-success text-white border-success' :
                                     (monk.attendance?.status === 'absent' || selectedAbsentMonks.some(m => m.id === monk.id)) ? 'bg-danger text-white border-danger' :
                                     'bg-light text-success border-success'
                                 ]">
                                     <i v-if="monk.attendanceNotes === 'Scanned QR'" class="fas fa-qrcode me-1"></i>
                                     {{ monk.attendance?.status === 'permission' ? 'Leave' :
                                        monk.attendanceNotes === 'Scanned QR' ? 'Scanned' :
+                                       monk.attendance?.status === 'present' ? 'Present' :
                                        (monk.attendance?.status === 'absent' || selectedAbsentMonks.some(m => m.id === monk.id)) ? 'Absent' :
                                        'Present'
                                     }}
@@ -148,7 +149,7 @@
                     <div class="d-md-none p-2 p-sm-3 d-flex flex-column gap-2" style="background-color: var(--body-bg-color);">
                         <div v-for="monk in activeRowMonks" :key="monk.id"
                              class="notification-card bg-white p-3 d-flex align-items-center gap-3 position-relative"
-                             :class="{ 'is-absent': selectedAbsentMonks.some(m => m.id === monk.id) || monk.attendance?.status === 'absent' }"
+                             :class="{ 'is-absent': (selectedAbsentMonks.some(m => m.id === monk.id) || monk.attendance?.status === 'absent') && monk.attendance?.status !== 'present' && monk.attendanceNotes !== 'Scanned QR' }"
                              @click="toggleSelection(monk)">
                             
                             <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm overflow-hidden" 
@@ -171,7 +172,10 @@
                             
                             <div class="d-flex align-items-center ms-2">
                                 <div v-if="monk.attendance?.status === 'permission'" class="badge bg-warning text-dark px-2 py-1">Leave</div>
-                                <div v-else-if="monk.attendanceNotes === 'Scanned QR'" class="badge bg-success px-2 py-1"><i class="fas fa-qrcode me-1"></i> Scanned</div>
+                                <div v-else-if="monk.attendanceNotes === 'Scanned QR' || monk.attendance?.status === 'present'" class="badge bg-success px-2 py-1">
+                                    <i v-if="monk.attendanceNotes === 'Scanned QR'" class="fas fa-qrcode me-1"></i>
+                                    {{ monk.attendanceNotes === 'Scanned QR' ? 'Scanned' : 'Present' }}
+                                </div>
                                 <div v-else class="form-check m-0 custom-check">
                                     <input class="form-check-input" type="checkbox" style="width: 1.5rem; height: 1.5rem; cursor: pointer;"
                                            :checked="selectedAbsentMonks.some(m => m.id === monk.id)"
@@ -216,7 +220,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
@@ -225,7 +229,7 @@ import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDatePicker from '@/components/base/BaseDatePicker.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import QrcodeVue from 'qrcode.vue';
-import { io } from 'socket.io-client';
+import { socket } from '@/utils/socket';
 
 const toast = useToastStore();
 const authStore = useAuthStore();
@@ -314,6 +318,7 @@ const toggleSelection = (monk) => {
 
 watch(() => activeRowMonks.value, (newMonks) => {
     isSyncingSelection = true;
+    // Only select monks whose attendance is explicitly saved as 'absent' in the database
     selectedAbsentMonks.value = newMonks.filter(m => m.attendance?.status === 'absent');
     setTimeout(() => isSyncingSelection = false, 0);
 }, { immediate: true });
@@ -326,13 +331,11 @@ watch(() => selectedAbsentMonks.value, (newSelection) => {
         isSyncingSelection = true;
         selectedAbsentMonks.value = newSelection.filter(s => s.attendance?.status !== 'permission' && s.attendanceNotes !== 'Scanned QR');
         setTimeout(() => isSyncingSelection = false, 0);
-        return; // The watch will re-trigger with the clean selection
+        return;
     }
 
     activeRowMonks.value.forEach(monk => {
-        // Do not override if the monk has an approved leave or scanned QR
         if (monk.attendance?.status === 'permission' || monk.attendanceNotes === 'Scanned QR') return;
-        
         const isSelected = newSelection.some(s => s.id === monk.id);
         setStatus(monk, isSelected ? 'absent' : 'present');
     });
@@ -358,11 +361,19 @@ const fetchData = async () => {
 
         const rawMonks = monksRes.data?.data || monksRes.data || [];
         
-        allMonks.value = rawMonks.map(monk => ({
-            ...monk,
-            attendance: monk.attendance || { status: 'present', isSubmitted: false },
-            attendanceNotes: monk.attendance?.notes || '',
-        }));
+        allMonks.value = rawMonks.map(monk => {
+            const hasAtt = !!monk.attendance;
+            const attStatus = hasAtt ? monk.attendance.status : 'absent';
+            const attNotes = monk.attendance?.notes || '';
+            return {
+                ...monk,
+                attendanceNotes: attNotes,
+                attendance: {
+                    status: attNotes === 'Scanned QR' ? 'present' : attStatus,
+                    isSubmitted: hasAtt
+                }
+            };
+        });
         
         if (activeRow.value) {
             const stillExists = seatingRows.value.find(r => r.id === activeRow.value.id);
@@ -391,15 +402,27 @@ const confirmAttendance = async () => {
     
     isSaving.value = true;
     try {
-        const attendances = activeRowMonks.value.map(monk => ({
-            user_id: monk.id,
-            kut_id: monk.kut_id || monk.profile?.kut_id || null,
-            date: selectedDate.value,
-            status: monk.attendance?.status || 'present',
-            notes: monk.attendanceNotes || null,
-            seating_row_id: activeRow.value.id,
-            seat_number: monk.seatNumber
-        }));
+        const attendances = activeRowMonks.value.map(monk => {
+            let finalStatus = monk.attendance?.status || 'present';
+            let finalNotes = monk.attendanceNotes || null;
+
+            if (monk.attendanceNotes === 'Scanned QR') {
+                finalStatus = 'present';
+                finalNotes = 'Scanned QR';
+            } else if (monk.attendance?.status === 'permission') {
+                finalStatus = 'permission';
+            }
+
+            return {
+                user_id: monk.id,
+                kut_id: monk.kut_id || monk.profile?.kut_id || null,
+                date: selectedDate.value,
+                status: finalStatus,
+                notes: finalNotes,
+                seating_row_id: activeRow.value.id,
+                seat_number: monk.seatNumber
+            };
+        });
         
         await api.post('/attendances/bulk', { attendances });
         toast.showToast('Attendance confirmed successfully', 'success');
@@ -435,9 +458,13 @@ const checkQRSession = async () => {
 const startQRSession = async () => {
     if (!activeRow.value) return;
     try {
+        const dateStr = typeof selectedDate.value === 'string' 
+            ? selectedDate.value 
+            : new Date(selectedDate.value).toISOString().split('T')[0];
+
         const res = await api.post('/attendances/session/toggle', { 
             seating_row_id: activeRow.value.id, 
-            date: selectedDate.value, 
+            date: dateStr, 
             action: 'start',
             duration_minutes: 1440 // Never expires essentially
         });
@@ -448,7 +475,9 @@ const startQRSession = async () => {
             toast.showToast('QR Session started', 'success');
         }
     } catch (e) {
-        toast.showToast('Failed to start QR session', 'error');
+        console.error('Start QR Session Error:', e);
+        const errMsg = e.response?.data?.message || e.message || 'Failed to start QR session';
+        toast.showToast(errMsg, 'error');
     }
 };
 
@@ -464,30 +493,8 @@ const stopQRSession = async () => {
         showQRModal.value = false;
         toast.showToast('QR Session stopped', 'info');
         
-        // Auto mark everyone who didn't scan and isn't on leave as absent
-        const unscannedMonks = activeRowMonks.value.filter(monk => 
-            monk.attendance?.status !== 'permission' && 
-            monk.attendanceNotes !== 'Scanned QR'
-        );
-        
-        // Add them to the absent selection and directly update their status
-        const existingAbsent = [...selectedAbsentMonks.value];
-        unscannedMonks.forEach(monk => {
-            if (monk.attendance) {
-                monk.attendance.status = 'absent';
-            } else {
-                monk.attendance = { status: 'absent' };
-            }
-            if (!existingAbsent.some(m => m.id === monk.id)) {
-                existingAbsent.push(monk);
-            }
-        });
-        selectedAbsentMonks.value = existingAbsent;
-        
-        await nextTick();
-        
-        // Auto update the attendance since session is over
-        await confirmAttendance();
+        // Refresh to show exact real-time attendance
+        await fetchData();
     } catch (e) {
         toast.showToast('Failed to stop QR session', 'error');
     }
@@ -498,18 +505,19 @@ const onModalClose = () => {
 };
 
 // Real-time socket updates for scanning
-let socket = null;
-
 onMounted(() => {
     fetchData();
-    socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
-        auth: { token: authStore.token }
-    });
     socket.on('attendance_updated', (data) => {
         if (String(data.seating_row_id) === String(activeRow.value?.id) && data.date === selectedDate.value) {
             fetchData();
         }
     });
+});
+
+onUnmounted(() => {
+    if (socket) {
+        socket.off('attendance_updated');
+    }
 });
 
 watch(activeRow, () => {
