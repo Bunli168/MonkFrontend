@@ -96,6 +96,7 @@ const SKIP_PATHS = [
     '/auth/refresh-token',
     '/auth/change-default-password',
     '/auth/logout',
+    '/auth/verify-member',
     '/users/public-verify'
 ];
 
