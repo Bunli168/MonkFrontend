@@ -74,14 +74,6 @@
                                             <strong>Preceptor / ព្រះឧបជ្ឈាយ៍:</strong> 
                                             <span class="text-body fw-medium ms-1">{{ surveyData?.preceptor_name || 'N/A' }}</span>
                                         </div>
-                                        <div class="col-12" v-if="surveyData?.first_assistant_name">
-                                            <strong>1st Assistant / គ្រូសូត្រស្តាំ:</strong> 
-                                            <span class="text-body fw-medium ms-1">{{ surveyData.first_assistant_name }}</span>
-                                        </div>
-                                        <div class="col-12" v-if="surveyData?.second_assistant_name">
-                                            <strong>2nd Assistant / គ្រូសូត្រឆ្វេង:</strong> 
-                                            <span class="text-body fw-medium ms-1">{{ surveyData.second_assistant_name }}</span>
-                                        </div>
                                         <div class="col-sm-6">
                                             <strong>Ordained Date:</strong> 
                                             <span class="text-body fw-medium ms-1">{{ formatDate(surveyData?.ordained_date) || 'N/A' }}</span>
