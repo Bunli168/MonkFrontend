@@ -6,7 +6,7 @@
 
         <div v-if="creationMode === 'email'">
             <div class="mb-3">
-                <BaseInput type="text" placeholder="example@gmail.com" :disabled="initialData ? true : false" label="Email *"
+                <BaseInput type="text" placeholder="example@gmail.com" :disabled="initialData ? true : false" label="Email"
                     v-model="email" :error="errors.email" required />
             </div>
             <div class="mb-3">
