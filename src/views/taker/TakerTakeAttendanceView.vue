@@ -257,6 +257,7 @@ const isLoadingRows = ref(false);
 const isLoadingMonks = ref(false);
 const isSaving = ref(false);
 
+
 const colDefs = computed(() => {
     return [
         { field: 'seatNumber', header: 'Seat', sortable: true, class: 'text-center', style: 'width: 80px;' },
@@ -269,6 +270,7 @@ const activeRowMonks = computed(() => {
     if (!activeRow.value) return [];
     return allMonks.value.filter(m => m.rowNumber === activeRow.value.row_num || m.seating_row_id === activeRow.value.id);
 });
+
 
 const getMonksCountByRow = (rowId) => {
     const row = seatingRows.value.find(r => r.id === rowId);

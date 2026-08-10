@@ -19,7 +19,7 @@
             <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: var(--surface-card);">
                 <div class="card-body p-3">
                     <div class="row g-3 align-items-center">
-                        <div class="col-md-4">
+                        <div class="col-md-5 col-lg-6">
                             <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search</label>
                             <div class="position-relative">
                                 <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
@@ -31,21 +31,21 @@
                                 />
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
+                        <div class="col-6 col-md-3 col-lg-3">
+                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
                             <select v-model="selectedRowFilter" class="form-select">
-                                <option value="">All Rows (គ្រប់ជួរ)</option>
-                                <option value="unassigned">⚠️ Unassigned Row (មិនទាន់មានជួរ)</option>
+                                <option value="">All Rows</option>
+                                <option value="unassigned">⚠️ Unassigned Row</option>
                                 <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
                                     Row {{ row.row_num }}
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
                             <select v-model="selectedKudiFilter" class="form-select">
-                                <option value="">All Kudis (គ្រប់កុដិ)</option>
-                                <option value="unassigned">⚠️ Unassigned Kudi (មិនទាន់មានកុដិ)</option>
+                                <option value="">All Kudis</option>
+                                <option value="unassigned">⚠️ Unassigned Kudi</option>
                                 <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name">
                                     {{ kudi.name || `Kudi ${kudi.id}` }}
                                 </option>

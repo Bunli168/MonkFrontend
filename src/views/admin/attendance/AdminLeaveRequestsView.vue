@@ -3,26 +3,60 @@
         <!-- Filters Bar -->
         <div class="card border-0 shadow-sm rounded-4 mb-3" style="background-color: var(--surface-card);">
             <div class="card-body p-3">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-4">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Status</label>
-                        <BaseFilter v-model="statusFilter" :options="filterOptions" />
+                <!-- Status Filter -->
+                <div class="mb-3 mb-md-0">
+                    <label class="form-label text-muted small fw-bold text-uppercase mb-1 d-block">Status</label>
+                    <div class="d-grid d-md-flex gap-1 p-1 rounded-3" style="grid-template-columns: 1fr 1fr; background: #f1f5f9;">
+                        <button 
+                            type="button" 
+                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 text-nowrap flex-fill flex-md-grow-0"
+                            :class="statusFilter === '' ? 'bg-white shadow-sm text-dark' : 'bg-transparent text-muted'"
+                            @click="statusFilter = ''">
+                            All
+                        </button>
+                        <button 
+                            type="button" 
+                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
+                            :class="statusFilter === 'approved' ? 'bg-white shadow-sm text-success' : 'bg-transparent text-muted'"
+                            @click="statusFilter = 'approved'">
+                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #22c55e;"></span>
+                            Approved
+                        </button>
+                        <button 
+                            type="button" 
+                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
+                            :class="statusFilter === (authStore.isSuperAdmin ? 'pending_superadmin' : 'pending') ? 'bg-white shadow-sm text-warning' : 'bg-transparent text-muted'"
+                            @click="statusFilter = authStore.isSuperAdmin ? 'pending_superadmin' : 'pending'">
+                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #f59e0b;"></span>
+                            Pending
+                        </button>
+                        <button 
+                            type="button" 
+                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
+                            :class="statusFilter === 'rejected' ? 'bg-white shadow-sm text-danger' : 'bg-transparent text-muted'"
+                            @click="statusFilter = 'rejected'">
+                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #ef4444;"></span>
+                            Rejected
+                        </button>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
-                        <select v-model="selectedRowFilter" class="form-select">
-                            <option value="">All Rows (គ្រប់ជួរ)</option>
-                            <option value="unassigned">⚠️ Unassigned Row (មិនទាន់មានជួរ)</option>
+                </div>
+                <!-- Row & Kudi Filters -->
+                <div class="d-flex gap-2 gap-md-3 mt-3">
+                    <div class="flex-fill" style="min-width: 0;">
+                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
+                        <select v-model="selectedRowFilter" class="form-select form-select-sm form-select-md-default">
+                            <option value="">All Rows</option>
+                            <option value="unassigned">⚠️ Unassigned</option>
                             <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
                                 Row {{ row.row_num }}
                             </option>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
-                        <select v-model="selectedKudiFilter" class="form-select">
-                            <option value="">All Kudis (គ្រប់កុដិ)</option>
-                            <option value="unassigned">⚠️ Unassigned Kudi (មិនទាន់មានកុដិ)</option>
+                    <div class="flex-fill" style="min-width: 0;">
+                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
+                        <select v-model="selectedKudiFilter" class="form-select form-select-sm form-select-md-default">
+                            <option value="">All Kudis</option>
+                            <option value="unassigned">⚠️ Unassigned</option>
                             <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name">
                                 {{ kudi.name || `Kudi ${kudi.id}` }}
                             </option>
