@@ -193,137 +193,113 @@ const downloadQrCode = () => {
     const qrCanvas = qrContainerRef.value.querySelector('canvas');
     if (!qrCanvas) return;
 
-    // Create styled card canvas (width: 500, height: 720)
+    // Standard Portrait ID Card canvas dimensions: 600px x 900px
     const canvas = document.createElement('canvas');
-    const width = 520;
-    const height = 740;
+    const width = 600;
+    const height = 900;
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Background Card with Gradient
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-    bgGradient.addColorStop(0, '#0f172a');
-    bgGradient.addColorStop(0.4, '#1e293b');
-    bgGradient.addColorStop(1, '#0f172a');
-    
-    // Rounded Card Corners
-    const r = 24;
-    ctx.beginPath();
-    ctx.moveTo(r, 0);
-    ctx.lineTo(width - r, 0);
-    ctx.quadraticCurveTo(width, 0, width, r);
-    ctx.lineTo(width, height - r);
-    ctx.quadraticCurveTo(width, height, width - r, height);
-    ctx.lineTo(r, height);
-    ctx.quadraticCurveTo(0, height, 0, height - r);
-    ctx.lineTo(0, r);
-    ctx.quadraticCurveTo(0, 0, r, 0);
-    ctx.closePath();
-    ctx.fillStyle = bgGradient;
-    ctx.fill();
+    // 1. Solid Clean Dark Background (#0f172a)
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, height);
 
-    // Gold Top Border Line
+    // 2. Outer Card Frame & Top Gold Accent Ribbon
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(16, 16, width - 32, height - 32);
+
     ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(0, 0, width, 6);
+    ctx.fillRect(16, 16, width - 32, 10);
 
-    // Header Title (Pagoda / Monk Identity Card)
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 22px "Khmer OS Muol Light", sans-serif, system-ui';
+    // 3. Pagoda Header (Top Header Section)
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 45);
+    ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 75);
 
     ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.fillText('PERSONAL MONK IDENTITY & ATTENDANCE CARD', width / 2, 70);
+    ctx.font = '600 14px system-ui, -apple-system, sans-serif';
+    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 105);
 
-    // Divider
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 1;
+    // Gold Divider Line
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(30, 85);
-    ctx.lineTo(width - 30, 85);
+    ctx.moveTo(60, 125);
+    ctx.lineTo(width - 60, 125);
     ctx.stroke();
 
-    // User Display Name
+    // 4. Monk Name & Role Section
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 26px sans-serif';
-    ctx.fillText(displayName.value, width / 2, 125);
+    ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
+    ctx.fillText(displayName.value, width / 2, 175);
 
-    // Role & Kudi Badge
-    const roleText = (displayRole.value || 'MONK').toUpperCase();
-    const kudiText = kudiName.value ? ` | ${kudiName.value}` : '';
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = '600 15px sans-serif';
-    ctx.fillText(`${roleText}${kudiText}`, width / 2, 150);
+    const roleName = (displayRole.value || 'Monk').toUpperCase();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 16px system-ui, -apple-system, sans-serif';
+    ctx.fillText(roleName, width / 2, 205);
 
-    // White QR Container Box with Shadow/Border
-    const qrBoxSize = 240;
+    // 5. Large Centered QR Code Container (330px x 330px)
+    const qrBoxSize = 340;
     const qrBoxX = (width - qrBoxSize) / 2;
-    const qrBoxY = 175;
-    
+    const qrBoxY = 240;
+
+    // White Card Frame for QR Code
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 16);
+    ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 20);
     ctx.fill();
-    ctx.strokeStyle = '#e2e8f0';
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw QR Code centered inside White Box
-    const qrImageSize = 210;
+    // Draw QR Code centered inside White Frame
+    const qrImageSize = 300;
     const qrImgX = qrBoxX + (qrBoxSize - qrImageSize) / 2;
     const qrImgY = qrBoxY + (qrBoxSize - qrImageSize) / 2;
     ctx.drawImage(qrCanvas, qrImgX, qrImgY, qrImageSize, qrImageSize);
 
-    // User Info Detail Card Container
-    const infoY = 440;
-    const infoWidth = width - 60;
-    const infoHeight = 220;
+    // 6. Kudi & Phone Container Box
+    const infoY = 610;
+    const infoWidth = width - 80;
+    const infoHeight = 180;
+    const infoX = (width - infoWidth) / 2;
+
     ctx.fillStyle = '#1e293b';
     ctx.beginPath();
-    ctx.roundRect(30, infoY, infoWidth, infoHeight, 14);
+    ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
     ctx.fill();
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Detail List inside Info Container
-    ctx.textAlign = 'left';
-    ctx.font = '14px sans-serif';
-    let currentY = infoY + 35;
+    // Kudi Highlight Title
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+    ctx.fillText(`កុដិស្នាក់នៅ / KUDI: ${kudiName.value}`, width / 2, infoY + 50);
 
+    // Phone / Contact Info
     const phoneVal = user.value?.UserProfile?.phone_number || user.value?.profile?.phone || surveyData.value?.phone_number || 'N/A';
-    const ordainedNameVal = surveyData.value?.ordained_name || 'N/A';
-    const preceptorVal = surveyData.value?.preceptor_name || 'N/A';
-    const ordainedDateVal = formatDate(surveyData.value?.ordained_date) || 'N/A';
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '600 17px system-ui, -apple-system, sans-serif';
+    ctx.fillText(`Phone: ${phoneVal}`, width / 2, infoY + 95);
 
-    const infoList = [
-        { label: 'Phone Number / ទូរស័ព្ទ', value: phoneVal },
-        { label: 'Ordained Name / ឈ្មោះបព្វជ្ជា', value: ordainedNameVal },
-        { label: 'Preceptor / ព្រះឧបជ្ឈាយ៍', value: preceptorVal },
-        { label: 'Ordained Date / ថ្ងៃសុំបព្វជ្ជា', value: ordainedDateVal }
-    ];
+    // Ordained Name if available
+    const ordainedNameVal = surveyData.value?.ordained_name || '';
+    if (ordainedNameVal) {
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '15px system-ui, -apple-system, sans-serif';
+        ctx.fillText(`Ordained Name: ${ordainedNameVal}`, width / 2, infoY + 135);
+    }
 
-    infoList.forEach(item => {
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText(item.label + ':', 45, currentY);
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText(item.value, 230, currentY);
-        ctx.font = '14px sans-serif';
-        currentY += 42;
-    });
-
-    // Footer Info
+    // 7. Footer Notice
     ctx.fillStyle = '#64748b';
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Scan this QR code for verification & attendance checking', width / 2, height - 35);
-    ctx.fillStyle = '#475569';
-    ctx.fillText('Official Pagoda Management System', width / 2, height - 18);
+    ctx.font = '13px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 40);
 
-    // Download trigger
+    // Download PNG File
     const link = document.createElement('a');
     link.download = `ID_CARD_QR_${displayName.value.replace(/\s+/g, '_')}.png`;
     link.href = canvas.toDataURL('image/png');
