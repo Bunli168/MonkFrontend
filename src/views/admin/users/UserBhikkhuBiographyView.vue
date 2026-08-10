@@ -193,8 +193,6 @@ const exportToCSV = async () => {
             'អ៊ីមែល (Email)',
             // Ordination
             'ព្រះឧបជ្ឈាយ៍ (Preceptor)',
-            'អ្នកជួយ១ (1st Assistant)',
-            'អ្នកជួយ២ (2nd Assistant)',
             'ថ្ងៃបួស (Ordained Date)',
             'វត្តបួស (Ordination Wat)',
             // Current Address
@@ -221,8 +219,6 @@ const exportToCSV = async () => {
                 profile.chhaya_number || '-',
                 survey.User?.email || '-',
                 survey.preceptor_name || '-',
-                survey.first_assistant_name || '-',
-                survey.second_assistant_name || '-',
                 ordDate,
                 survey.ordination_wat || '-',
                 survey.current_wat || '-',

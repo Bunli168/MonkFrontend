@@ -188,12 +188,6 @@
                             <div class="col-12">
                                 <BaseInput v-model="form.preceptor_name" label="នាមព្រះឧបជ្ឈាយ៍ (Preceptor Name)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3" />
                             </div>
-                            <div v-if="!isSamanera" class="col-12 col-md-6">
-                                <BaseInput v-model="form.first_assistant_name" label="នាមកម្មវាចាចារ្យ (First Assistant)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3 && !isSamanera" :error="errors.first_assistant_name" />
-                            </div>
-                            <div v-if="!isSamanera" class="col-12 col-md-6">
-                                <BaseInput v-model="form.second_assistant_name" label="នាមអនុស្សាវនាចារ្យ (Second Assistant)" placeholder="បញ្ញត្តិ នឹង នាម..." :required="currentStep === 3 && !isSamanera" :error="errors.second_assistant_name" />
-                            </div>
                         </div>
 
                         <div class="row g-4">
@@ -563,7 +557,7 @@ const defaultForm = () => ({
     pob_village: '', pob_commune: '', pob_district: '', pob_province: '',
     pob_village_id: null, pob_commune_id: null, pob_district_id: null, pob_province_id: null,
     
-    preceptor_name: '', first_assistant_name: '', second_assistant_name: '',
+    preceptor_name: '',
     ordained_name: '', ordained_date: null,
     
     ordination_wat: '', ordination_province_id: null, ordination_district_id: null, ordination_commune_id: null,
