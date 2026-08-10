@@ -52,8 +52,8 @@
                     <!-- Filters Section -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body bg-white rounded-3">
-                            <div class="row g-3">
-                                <div class="col-md-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-2">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Date</label>
                                     <input type="date" v-model="selectedDate" class="form-control" @change="fetchMonks">
                                 </div>
@@ -64,16 +64,27 @@
                                         <input type="text" class="form-control ps-5" placeholder="Name or phone..." v-model="searchQuery">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2.5">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Row</label>
                                     <select v-model="selectedRowFilter" class="form-select">
-                                        <option value="">All Rows</option>
+                                        <option value="">All Rows (គ្រប់ជួរ)</option>
+                                        <option value="unassigned">⚠️ Unassigned Row (មិនទាន់មានជួរ)</option>
                                         <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
                                             Row {{ row.row_num }}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2.5">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Filter by Kudi</label>
+                                    <select v-model="selectedKudiFilter" class="form-select">
+                                        <option value="">All Kudis (គ្រប់កុដិ)</option>
+                                        <option value="unassigned">⚠️ Unassigned Kudi (មិនទាន់មានកុដិ)</option>
+                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
+                                            {{ kudi.name || `Kudi ${kudi.id}` }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
                                     <label class="form-label text-muted small fw-bold text-uppercase mb-1">Status</label>
                                     <select v-model="selectedStatusFilter" class="form-select">
                                         <option value="">All Statuses</option>
@@ -82,7 +93,7 @@
                                         <option value="permission">On Leave</option>
                                     </select>
                                 </div>
-                                <div class="col-md-12 d-flex justify-content-end mt-3" v-if="!false">
+                                <div class="col-md-12 d-flex justify-content-end mt-3">
                                     <BaseButton @click="saveAttendance" variant="primary" :isLoading="isSaving" class="px-4 fw-bold shadow-sm rounded-pill">
                                         <i class="fas fa-save me-2"></i> Save Changes
                                     </BaseButton>
@@ -110,12 +121,19 @@
                                              style="width: 40px; height: 40px; font-size: 1.1rem;">
                                             {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
                                         </div>
-                                        <span class="fw-bold text-dark">{{ monk.fullName }}</span>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold text-dark">{{ monk.fullName }}</span>
+                                            <span v-if="!monk.rowNumber" class="badge bg-warning-subtle text-warning border border-warning-subtle text-start mt-0.5" style="font-size: 0.7rem; width: fit-content;">
+                                                Unassigned Row & Seat
+                                            </span>
+                                        </div>
                                     </div>
                                 </template>
 
                                 <template #kudi="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.kudiNumber || '-' }}</span>
+                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
+                                        {{ monk.kudiNumber || 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #phone="{ data: monk }">
@@ -123,27 +141,29 @@
                                 </template>
 
                                 <template #row_number="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.rowNumber || '-' }}</span>
+                                    <span :class="monk.rowNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
+                                        {{ monk.rowNumber ? 'Row ' + monk.rowNumber : 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #seat_number="{ data: monk }">
-                                    <span class="fw-medium">{{ monk.seatNumber || '-' }}</span>
+                                    <span :class="monk.seatNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
+                                        {{ monk.seatNumber ? 'Seat ' + monk.seatNumber : 'Unassigned' }}
+                                    </span>
                                 </template>
 
                                 <template #absents="{ data: monk }">
                                     <div class="d-flex justify-content-center w-100">
-                                        <span class="fw-bold text-danger" style="font-size: 1rem;">
+                                        <span class="fw-bold" :class="(monk.netAbsents || 0) >= 9 ? 'text-danger' : 'text-secondary'" style="font-size: 1rem;">
                                             {{ monk.netAbsents || 0 }}
                                         </span>
                                     </div>
                                 </template>
-                                
-
 
                                 <template #role="{ data: monk }">
                                     <span class="badge rounded-pill border"
-                                          :class="monk.role.toLowerCase().includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
-                                        {{ monk.role }}
+                                          :class="(monk.role || '').toLowerCase().includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
+                                        {{ monk.role || 'Member' }}
                                     </span>
                                 </template>
 
@@ -167,7 +187,6 @@
                         </div>
                     </div>
                 </TabPanel>
-
 
                 <!-- Report Tab -->
                 <TabPanel value="report">
@@ -205,8 +224,6 @@ const toast = useToastStore();
 const authStore = useAuthStore();
 const leaveViewRef = ref(null);
 
-// State
-// Helper to get local date string YYYY-MM-DD
 const getLocalDateString = () => {
     const today = new Date();
     const offset = today.getTimezoneOffset();
@@ -220,21 +237,22 @@ const perPage = ref(10);
 const selectedDate = ref(getLocalDateString());
 const searchQuery = ref('');
 const selectedRowFilter = ref('');
+const selectedKudiFilter = ref('');
 const selectedStatusFilter = ref('');
 
-// Reset page on filters change
 const resetPage = () => {
     page.value = 1;
 };
 
 watch(searchQuery, resetPage);
 watch(selectedRowFilter, resetPage);
+watch(selectedKudiFilter, resetPage);
 watch(selectedStatusFilter, resetPage);
 watch(selectedDate, resetPage);
 
 const monks = ref([]);
 const seatingRows = ref([]);
-
+const kudiList = ref([]);
 const seasons = ref([]);
 const selectedSeasonId = ref(null);
 
@@ -248,7 +266,7 @@ const paginatedMonks = computed(() => {
 });
 
 const colDefs = computed(() => {
-    const cols = [
+    return [
         { field: 'name', header: 'Monk Name' },
         { field: 'role', header: 'Role' },
         { field: 'kudi', header: 'Kudi', class: 'text-center' },
@@ -257,39 +275,40 @@ const colDefs = computed(() => {
         { field: 'seat_number', header: 'Seat' },
         { field: 'absents', header: 'Absents', class: 'text-center' }
     ];
-    
-    return cols;
 });
 
 const filteredMonks = computed(() => {
     return monks.value.filter(monk => {
-        // Filter by Role: only show Monk, Bhikkhu, and Mekudi (Admin)
-        const roleStr = (monk.role || '').toLowerCase();
-        const isTargetRole = ['monk', 'bhikkhu', 'mekudi', 'admin'].some(r => roleStr === r || (roleStr.includes(r) && !roleStr.includes('super')));
-        if (!isTargetRole) {
-            return false;
-        }
-
-        // Filter: only show monks with netAbsents >= 9
-        if ((monk.netAbsents || 0) < 9) {
-            return false;
-        }
-
         // Search filter
-        const query = searchQuery.value.toLowerCase();
+        const query = searchQuery.value.toLowerCase().trim();
         const matchesSearch = !query || 
             (monk.fullName && monk.fullName.toLowerCase().includes(query)) ||
             (monk.phone && monk.phone.includes(query)) ||
             (monk.chhaya_number && monk.chhaya_number.includes(query));
             
         // Row filter
-        const matchesRow = !selectedRowFilter.value || monk.rowNumber === selectedRowFilter.value;
+        let matchesRow = true;
+        if (selectedRowFilter.value === 'unassigned') {
+            matchesRow = !monk.rowNumber || monk.rowNumber === '-' || monk.rowNumber === null;
+        } else if (selectedRowFilter.value) {
+            matchesRow = monk.rowNumber === selectedRowFilter.value || monk.rowNumber?.toString() === selectedRowFilter.value.toString();
+        }
+
+        // Kudi filter
+        let matchesKudi = true;
+        if (selectedKudiFilter.value === 'unassigned') {
+            matchesKudi = !monk.kudiNumber && !monk.profile?.kut_id && !monk.profile?.Kut?.name;
+        } else if (selectedKudiFilter.value) {
+            const filterVal = selectedKudiFilter.value.toString().toLowerCase();
+            const monkKudi = (monk.kudiNumber || monk.profile?.Kut?.name || monk.profile?.kut_id || '').toString().toLowerCase();
+            matchesKudi = monkKudi.includes(filterVal) || filterVal.includes(monkKudi);
+        }
         
         // Status filter
         const status = monk.attendance?.status || 'present';
         const matchesStatus = !selectedStatusFilter.value || status === selectedStatusFilter.value;
         
-        return matchesSearch && matchesRow && matchesStatus;
+        return matchesSearch && matchesRow && matchesKudi && matchesStatus;
     });
 });
 
@@ -324,6 +343,15 @@ const fetchSeatingRows = async () => {
         seatingRows.value = response.data?.data || response.data || [];
     } catch (error) {
         console.error('Failed to fetch seating rows:', error);
+    }
+};
+
+const fetchKudis = async () => {
+    try {
+        const response = await api.get('/kuts');
+        kudiList.value = response.data?.data || response.data || [];
+    } catch (error) {
+        console.error('Failed to fetch kuts:', error);
     }
 };
 
@@ -400,6 +428,7 @@ const saveAttendance = async () => {
 onMounted(async () => {
     await fetchSeasons();
     await fetchSeatingRows();
+    await fetchKudis();
     fetchMonks();
 });
 </script>
