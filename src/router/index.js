@@ -336,6 +336,12 @@ router.beforeEach(async (to, from) => {
 	if (!(to.path.startsWith('/pagoda') && from.path.startsWith('/pagoda'))) {
 		NProgress.start()
 	}
+
+	// ✅ Allow public routes immediately without authentication checks or login redirects
+	if (to.meta.public || to.path.startsWith('/verify-profile')) {
+		return true;
+	}
+
 	const authStore = useAuthStore()
 
 	if (authStore.accessToken && !authStore.user) {

@@ -95,7 +95,8 @@ const SKIP_PATHS = [
     '/auth/verify-otp',
     '/auth/refresh-token',
     '/auth/change-default-password',
-    '/auth/logout'
+    '/auth/logout',
+    '/users/public-verify'
 ];
 
 function shouldSkipAuth(url) {
