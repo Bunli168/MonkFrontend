@@ -190,11 +190,142 @@ const surveyData = ref(null);
 
 const downloadQrCode = () => {
     if (!qrContainerRef.value) return;
-    const canvas = qrContainerRef.value.querySelector('canvas');
-    if (!canvas) return;
+    const qrCanvas = qrContainerRef.value.querySelector('canvas');
+    if (!qrCanvas) return;
 
+    // Create styled card canvas (width: 500, height: 720)
+    const canvas = document.createElement('canvas');
+    const width = 520;
+    const height = 740;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    // Background Card with Gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0f172a');
+    bgGradient.addColorStop(0.4, '#1e293b');
+    bgGradient.addColorStop(1, '#0f172a');
+    
+    // Rounded Card Corners
+    const r = 24;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(width - r, 0);
+    ctx.quadraticCurveTo(width, 0, width, r);
+    ctx.lineTo(width, height - r);
+    ctx.quadraticCurveTo(width, height, width - r, height);
+    ctx.lineTo(r, height);
+    ctx.quadraticCurveTo(0, height, 0, height - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fillStyle = bgGradient;
+    ctx.fill();
+
+    // Gold Top Border Line
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(0, 0, width, 6);
+
+    // Header Title (Pagoda / Monk Identity Card)
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 22px "Khmer OS Muol Light", sans-serif, system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 45);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.fillText('PERSONAL MONK IDENTITY & ATTENDANCE CARD', width / 2, 70);
+
+    // Divider
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(30, 85);
+    ctx.lineTo(width - 30, 85);
+    ctx.stroke();
+
+    // User Display Name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px sans-serif';
+    ctx.fillText(displayName.value, width / 2, 125);
+
+    // Role & Kudi Badge
+    const roleText = (displayRole.value || 'MONK').toUpperCase();
+    const kudiText = kudiName.value ? ` | ${kudiName.value}` : '';
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = '600 15px sans-serif';
+    ctx.fillText(`${roleText}${kudiText}`, width / 2, 150);
+
+    // White QR Container Box with Shadow/Border
+    const qrBoxSize = 240;
+    const qrBoxX = (width - qrBoxSize) / 2;
+    const qrBoxY = 175;
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw QR Code centered inside White Box
+    const qrImageSize = 210;
+    const qrImgX = qrBoxX + (qrBoxSize - qrImageSize) / 2;
+    const qrImgY = qrBoxY + (qrBoxSize - qrImageSize) / 2;
+    ctx.drawImage(qrCanvas, qrImgX, qrImgY, qrImageSize, qrImageSize);
+
+    // User Info Detail Card Container
+    const infoY = 440;
+    const infoWidth = width - 60;
+    const infoHeight = 220;
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.roundRect(30, infoY, infoWidth, infoHeight, 14);
+    ctx.fill();
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Detail List inside Info Container
+    ctx.textAlign = 'left';
+    ctx.font = '14px sans-serif';
+    let currentY = infoY + 35;
+
+    const phoneVal = user.value?.UserProfile?.phone_number || user.value?.profile?.phone || surveyData.value?.phone_number || 'N/A';
+    const ordainedNameVal = surveyData.value?.ordained_name || 'N/A';
+    const preceptorVal = surveyData.value?.preceptor_name || 'N/A';
+    const ordainedDateVal = formatDate(surveyData.value?.ordained_date) || 'N/A';
+
+    const infoList = [
+        { label: 'Phone Number / ទូរស័ព្ទ', value: phoneVal },
+        { label: 'Ordained Name / ឈ្មោះបព្វជ្ជា', value: ordainedNameVal },
+        { label: 'Preceptor / ព្រះឧបជ្ឈាយ៍', value: preceptorVal },
+        { label: 'Ordained Date / ថ្ងៃសុំបព្វជ្ជា', value: ordainedDateVal }
+    ];
+
+    infoList.forEach(item => {
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText(item.label + ':', 45, currentY);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(item.value, 230, currentY);
+        ctx.font = '14px sans-serif';
+        currentY += 42;
+    });
+
+    // Footer Info
+    ctx.fillStyle = '#64748b';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scan this QR code for verification & attendance checking', width / 2, height - 35);
+    ctx.fillStyle = '#475569';
+    ctx.fillText('Official Pagoda Management System', width / 2, height - 18);
+
+    // Download trigger
     const link = document.createElement('a');
-    link.download = `QR_${displayName.value.replace(/\s+/g, '_')}.png`;
+    link.download = `ID_CARD_QR_${displayName.value.replace(/\s+/g, '_')}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
 };
