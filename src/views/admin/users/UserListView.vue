@@ -546,12 +546,6 @@ const getActionItems = (data) => {
             command: () => onViewDetail(data),
         },
         {
-            label: 'Personal QR Code',
-            icon: QrCode,
-            command: () => onViewDetail(data),
-            iconClass: 'text-primary'
-        },
-        {
             label: data.isActive ? 'Deactivate User' : 'Activate User',
             icon: data.isActive ? X : Check,
             command: () => promptToggleStatus(data),
