@@ -146,11 +146,10 @@
                 <QrcodeVue :value="qrDataString" :size="200" level="H" />
             </div>
 
-            <div class="p-3 rounded-3 text-start small mb-3" style="background-color: var(--surface-ground); border: 1px solid var(--border-color);">
-                <div class="mb-1"><strong>Phone:</strong> {{ user?.UserProfile?.phone_number || user?.profile?.phone || surveyData?.phone_number || 'N/A' }}</div>
-                <div class="mb-1"><strong>Kudi:</strong> {{ kudiName }}</div>
-                <div class="mb-1"><strong>Preceptor:</strong> {{ surveyData?.preceptor_name || 'N/A' }}</div>
-                <div><strong>Ordained Date:</strong> {{ formatDate(surveyData?.ordained_date) || 'N/A' }}</div>
+            <div class="p-3 rounded-3 text-center small mb-3" style="background-color: var(--surface-ground); border: 1px solid var(--border-color);">
+                <div v-if="kudiName && kudiName !== 'N/A'" class="fw-bold text-warning mb-1">ស្នាក់នៅ៖ {{ kudiName }}</div>
+                <div v-if="user?.UserProfile?.phone_number || user?.profile?.phone || surveyData?.phone_number" class="mb-1"><strong>ទូរស័ព្ទ៖</strong> {{ user?.UserProfile?.phone_number || user?.profile?.phone || surveyData?.phone_number }}</div>
+                <div v-if="surveyData?.ordained_name"><strong>នាមបញ្ញត្តិ៖</strong> {{ surveyData.ordained_name }}</div>
             </div>
 
             <div class="d-flex gap-2">
@@ -193,128 +192,176 @@ const downloadQrCode = () => {
     const qrCanvas = qrContainerRef.value.querySelector('canvas');
     if (!qrCanvas) return;
 
-    // Expand canvas width to 700px to ensure full titles fit without clipping
+    const width = 540;
+    const fontFamily = '"Khmer OS Battambang", "Hanuman", "Noto Sans Khmer", sans-serif';
+
+    // 1. Prepare details first to calculate exact dynamic height without bottom space
+    const phoneVal = (user.value?.UserProfile?.phone_number || user.value?.profile?.phone || surveyData.value?.phone_number || '').trim();
+    const ordainedNameVal = (surveyData.value?.ordained_name || '').trim();
+    const rawKudi = (kudiName.value !== 'N/A' ? kudiName.value : '').trim();
+    let kudiVal = '';
+    if (rawKudi) {
+        const cleanKudiNum = rawKudi.replace(/kudi|កុដិ|លេខ\s*/gi, '').trim();
+        kudiVal = cleanKudiNum ? `កុដិលេខ ${cleanKudiNum}` : `កុដិ ${rawKudi}`;
+    }
+
+    const textLines = [];
+    if (kudiVal) textLines.push({ text: `ស្នាក់នៅ៖ ${kudiVal}`, color: '#b45309', font: `bold 19px ${fontFamily}` });
+    if (phoneVal) textLines.push({ text: `លេខទូរស័ព្ទ៖ ${phoneVal}`, color: '#334155', font: `bold 15px ${fontFamily}` });
+    if (ordainedNameVal) textLines.push({ text: `នាមបញ្ញត្តិ៖ ${ordainedNameVal}`, color: '#475569', font: `bold 14px ${fontFamily}` });
+
+    const roleStr = (displayRole.value || '').trim();
+    const qrBoxSize = 290;
+    const qrBoxY = roleStr ? 205 : 175;
+    const infoY = qrBoxY + qrBoxSize + 20;
+    const infoHeight = textLines.length > 0 ? (textLines.length * 36 + 14) : 0;
+    const footerY = infoY + (infoHeight > 0 ? infoHeight + 24 : 18);
+    const height = footerY + 36; // Exact dynamic card height!
+
     const canvas = document.createElement('canvas');
-    const width = 700;
-    const height = 950;
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // 1. Background
-    ctx.fillStyle = '#0f172a';
+    const drawCenteredText = (text, y, font, color, baseline = 'top') => {
+        const cleanText = (text || '').toString().replace(/\s+/g, ' ').trim();
+        if (!cleanText) return;
+        ctx.save();
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.textBaseline = baseline;
+        ctx.textAlign = 'center';
+        ctx.fillText(cleanText, width / 2, y);
+        ctx.restore();
+    };
+
+    // 2. Light White-Gray Theme Background
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#ffffff');
+    bgGradient.addColorStop(0.5, '#f8fafc');
+    bgGradient.addColorStop(1, '#f1f5f9');
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Outer Border & Top Gold Ribbon
-    ctx.strokeStyle = '#334155';
+    // 3. Outer Frame dynamically sized to fit height
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 4;
-    ctx.strokeRect(20, 20, width - 40, height - 40);
+    ctx.beginPath();
+    ctx.roundRect(12, 12, width - 24, height - 24, 20);
+    ctx.stroke();
 
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(20, 20, width - 40, 10);
-
-    // 3. Pagoda Header (2 Clean Centered Lines)
-    ctx.textBaseline = 'top';
-
-    ctx.font = 'bold 24px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText('វត្តនគរវន', width / 2, 50);
-
-    ctx.font = 'bold 18px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#cbd5e1';
-    ctx.fillText('WAT NEAKAVORN', width / 2, 85);
-
-    ctx.font = '600 13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 115);
-
-    // Gold Divider Line
-    ctx.strokeStyle = '#f59e0b';
+    ctx.strokeStyle = '#d97706';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(60, 142);
-    ctx.lineTo(width - 60, 142);
+    ctx.roundRect(18, 18, width - 36, height - 36, 16);
     ctx.stroke();
 
-    // 4. Monk Name & Role
-    ctx.font = 'bold 30px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(displayName.value, width / 2, 165);
+    // Top Gold Decorative Ribbon
+    const goldBarGrad = ctx.createLinearGradient(20, 0, width - 20, 0);
+    goldBarGrad.addColorStop(0, '#b45309');
+    goldBarGrad.addColorStop(0.5, '#f59e0b');
+    goldBarGrad.addColorStop(1, '#b45309');
+    ctx.fillStyle = goldBarGrad;
+    ctx.beginPath();
+    ctx.roundRect(22, 19, width - 44, 5, 2.5);
+    ctx.fill();
 
-    const roleName = (displayRole.value || 'Monk').toUpperCase();
-    ctx.font = '600 15px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(roleName, width / 2, 208);
+    // 4. Pagoda Header (Khmer Title)
+    drawCenteredText('វត្តនាគវ័ន', 38, `bold 28px ${fontFamily}`, '#b45309');
+    drawCenteredText('ប័ណ្ណសម្គាល់ខ្លួនសមាជិក', 78, `bold 14px ${fontFamily}`, '#0284c7');
 
-    // 5. Large Centered QR Code Box (350px x 350px)
-    const qrBoxSize = 350;
+    // Ornate Gold Line Divider
+    const divY = 108;
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(50, divY);
+    ctx.lineTo(width / 2 - 18, divY);
+    ctx.moveTo(width / 2 + 18, divY);
+    ctx.lineTo(width - 50, divY);
+    ctx.stroke();
+
+    // Diamond accent
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.moveTo(width / 2, divY - 5);
+    ctx.lineTo(width / 2 + 5, divY);
+    ctx.lineTo(width / 2, divY + 5);
+    ctx.lineTo(width / 2 - 5, divY);
+    ctx.closePath();
+    ctx.fill();
+
+    // 5. Member Name
+    const nameStr = (displayName.value || 'សមាជិក').trim();
+    drawCenteredText(nameStr, 126, `bold 26px ${fontFamily}`, '#0f172a');
+
+    // Role Pill Badge if present
+    if (roleStr) {
+        const roleWidth = Math.max(140, roleStr.length * 12);
+        const roleX = (width - roleWidth) / 2;
+        ctx.fillStyle = '#e0f2fe';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(roleX, 168, roleWidth, 24, 12);
+        ctx.fill();
+        ctx.stroke();
+        drawCenteredText(roleStr, 172, `bold 12px ${fontFamily}`, '#0369a1');
+    }
+
+    // 6. Centered White QR Code Box
     const qrBoxX = (width - qrBoxSize) / 2;
-    const qrBoxY = 245;
 
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetY = 4;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 20);
+    ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 18);
     ctx.fill();
+    ctx.restore();
+
     ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    const qrImageSize = 310;
+    const qrImageSize = 255;
     const qrImgX = qrBoxX + (qrBoxSize - qrImageSize) / 2;
     const qrImgY = qrBoxY + (qrBoxSize - qrImageSize) / 2;
     ctx.drawImage(qrCanvas, qrImgX, qrImgY, qrImageSize, qrImageSize);
 
-    // 6. Kudi & Phone Details Box
-    const infoWidth = width - 100;
-    const infoX = (width - infoWidth) / 2;
-    const infoY = 630;
-
-    const phoneVal = user.value?.UserProfile?.phone_number || user.value?.profile?.phone || surveyData.value?.phone_number || '';
-    const ordainedNameVal = surveyData.value?.ordained_name || '';
-    const rawKudi = kudiName.value !== 'N/A' ? kudiName.value : '';
-    const kudiVal = rawKudi ? (rawKudi.toLowerCase().includes('kudi') || rawKudi.includes('កុដិ') ? rawKudi : `Kudi ${rawKudi}`) : '';
-
-    const textLines = [];
-    if (kudiVal) textLines.push({ text: `កុដិស្នាក់នៅ / ${kudiVal}`, color: '#fbbf24', font: 'bold 22px sans-serif' });
-    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 17px sans-serif' });
-    if (ordainedNameVal) textLines.push({ text: `Ordained Name: ${ordainedNameVal}`, color: '#cbd5e1', font: '15px sans-serif' });
-
+    // 7. Info Box
     if (textLines.length > 0) {
-        const infoHeight = textLines.length * 44 + 20;
-        ctx.fillStyle = '#1e293b';
+        const infoWidth = 460;
+        const infoX = (width - infoWidth) / 2;
+
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
+        ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 14);
         ctx.fill();
-        ctx.strokeStyle = '#334155';
+        ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        let lineY = infoY + 22;
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.roundRect(infoX + 40, infoY, infoWidth - 80, 3, 1.5);
+        ctx.fill();
+
+        let lineY = infoY + 16;
         textLines.forEach(item => {
-            ctx.font = item.font;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = item.color;
-            ctx.fillText(item.text, width / 2, lineY);
-            lineY += 44;
+            drawCenteredText(item.text, lineY, item.font, item.color);
+            lineY += 36;
         });
     }
 
-    // 7. Footer
-    ctx.font = '13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 45);
+    // 8. Footer Notice positioned at dynamic bottom
+    drawCenteredText('ប្រព័ន្ធគ្រប់គ្រងវត្តនាគវ័ន • ស្កែនដើម្បីផ្ទៀងផ្ទាត់ទិន្នន័យ', footerY, `12px ${fontFamily}`, '#64748b');
 
-    // Download PNG
+    // Download PNG directly
     const link = document.createElement('a');
-    link.download = `ID_CARD_QR_${displayName.value.replace(/\s+/g, '_')}.png`;
+    link.download = `ID_CARD_QR_${nameStr.replace(/\s+/g, '_')}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
 };
