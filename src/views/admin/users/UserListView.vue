@@ -229,7 +229,7 @@ const emit = defineEmits(['new', 'edit', 'import', 'preview-bulk']);
 import { useUserStore } from '@/stores/users/user.js';
 import { onMounted, ref, computed, watch } from 'vue';
 import { formatDate } from '@/utils/dateFormat';
-import { BadgeCheck, Info, User, KeyRound, Search, FileDown, Check, X, BookOpen, GraduationCap } from '@lucide/vue';
+import { BadgeCheck, Info, User, KeyRound, Search, FileDown, Check, X, BookOpen, GraduationCap, QrCode } from '@lucide/vue';
 import UserDetailView from './UserDetailView.vue';
 import { useAuthStore } from '@/stores/auth.js';
 import { useToastStore } from '@/stores/toast.js';
@@ -544,6 +544,12 @@ const getActionItems = (data) => {
             label: 'View Details',
             icon: Info,
             command: () => onViewDetail(data),
+        },
+        {
+            label: 'Personal QR Code',
+            icon: QrCode,
+            command: () => onViewDetail(data),
+            iconClass: 'text-primary'
         },
         {
             label: data.isActive ? 'Deactivate User' : 'Activate User',
