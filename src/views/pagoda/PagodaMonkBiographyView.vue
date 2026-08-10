@@ -393,37 +393,39 @@ const downloadPersonalQr = () => {
     ctx.fillRect(16, 16, width - 32, 10);
 
     // 3. Pagoda Header (Top Header Section)
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 75);
+    ctx.textBaseline = 'top';
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+    ctx.fillText('វត្តនគរវន / NEAKAVORN PAGODA', width / 2, 55);
 
     ctx.fillStyle = '#38bdf8';
-    ctx.font = '600 14px system-ui, -apple-system, sans-serif';
-    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 105);
+    ctx.font = '600 13px system-ui, -apple-system, sans-serif';
+    ctx.fillText('OFFICIAL MEMBER IDENTITY CARD', width / 2, 90);
 
     // Gold Divider Line
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(60, 125);
-    ctx.lineTo(width - 60, 125);
+    ctx.moveTo(60, 118);
+    ctx.lineTo(width - 60, 118);
     ctx.stroke();
 
     // 4. Monk Name & Role Section
     const nameVal = form.value.surname_name || authStore.user?.name || 'Monk Member';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
-    ctx.fillText(nameVal, width / 2, 175);
+    ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
+    ctx.fillText(nameVal, width / 2, 145);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '600 16px system-ui, -apple-system, sans-serif';
-    ctx.fillText('MONK MEMBER', width / 2, 205);
+    ctx.font = '600 15px system-ui, -apple-system, sans-serif';
+    ctx.fillText('MONK MEMBER', width / 2, 185);
 
-    // 5. Large Centered QR Code Container (330px x 330px)
+    // 5. Large Centered QR Code Container (340px x 340px)
     const qrBoxSize = 340;
     const qrBoxX = (width - qrBoxSize) / 2;
-    const qrBoxY = 240;
+    const qrBoxY = 225;
 
     // White Card Frame for QR Code
     ctx.fillStyle = '#ffffff';
@@ -443,7 +445,7 @@ const downloadPersonalQr = () => {
     // 6. Kudi & Phone Container Box
     const infoWidth = width - 80;
     const infoX = (width - infoWidth) / 2;
-    const infoY = 610;
+    const infoY = 600;
 
     const phoneVal = form.value.phone_number || authStore.user?.profile?.phone || '';
     const ordainedNameVal = form.value.ordained_name || '';
@@ -452,11 +454,11 @@ const downloadPersonalQr = () => {
 
     const textLines = [];
     if (kudiVal) textLines.push({ text: `កុដិស្នាក់នៅ / KUDI: ${kudiVal}`, color: '#fbbf24', font: 'bold 22px system-ui, -apple-system, sans-serif' });
-    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 17px system-ui, -apple-system, sans-serif' });
+    if (phoneVal) textLines.push({ text: `Phone: ${phoneVal}`, color: '#f8fafc', font: '600 16px system-ui, -apple-system, sans-serif' });
     if (ordainedNameVal) textLines.push({ text: `Ordained Name: ${ordainedNameVal}`, color: '#cbd5e1', font: '15px system-ui, -apple-system, sans-serif' });
 
     if (textLines.length > 0) {
-        const infoHeight = textLines.length * 42 + 25;
+        const infoHeight = textLines.length * 40 + 20;
         ctx.fillStyle = '#1e293b';
         ctx.beginPath();
         ctx.roundRect(infoX, infoY, infoWidth, infoHeight, 18);
@@ -465,8 +467,10 @@ const downloadPersonalQr = () => {
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        let lineY = infoY + 38;
+        let lineY = infoY + 22;
         textLines.forEach(item => {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
             ctx.fillStyle = item.color;
             ctx.font = item.font;
             ctx.fillText(item.text, width / 2, lineY);
@@ -475,9 +479,11 @@ const downloadPersonalQr = () => {
     }
 
     // 7. Footer Notice
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
     ctx.fillStyle = '#64748b';
     ctx.font = '13px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 35);
+    ctx.fillText('Neakavorn Pagoda Management System • Scan for Verification', width / 2, height - 45);
 
     // Download PNG File
     const link = document.createElement('a');
