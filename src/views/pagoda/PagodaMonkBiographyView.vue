@@ -315,6 +315,7 @@ import { useToastStore } from '@/stores/toast';
 import { useAuthStore } from '@/stores/auth';
 import { formatDate } from '@/utils/dateFormat';
 import { useLocation } from '@/composables/useLocation';
+import { usePobLocation } from '@/composables/usePobLocation';
 import { getVerifyTokenSync } from '@/utils/verifyHash';
 import api from '@/api/api';
 
@@ -546,7 +547,7 @@ const getRoleTextKh = () => {
     return 'ភិក្ខុ';
 };
 
-const pobLoc = useLocation();
+const pobLoc = usePobLocation();
 const ordLoc = useLocation();
 const currLoc = useLocation();
 const parentsLoc = useLocation();
@@ -818,7 +819,7 @@ const handleNextOrSave = () => {
 
 const getLocationName = (list, code, type) => {
     if (!code) return '';
-    const item = list.find(l => l[`${type}_code`] === code);
+    const item = list.find(l => String(l[`${type}_code`]) === String(code));
     return item ? (item[`${type}_kh`] || item[`${type}_en`]) : code;
 };
 

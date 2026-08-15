@@ -1,0 +1,1454 @@
+{
+  "provinces": [
+    {
+      "code": "01",
+      "name_kh": "បន្ទាយមានជ័យ",
+      "name_en": "Banteay Meanchey",
+      "districts": [
+        {
+          "code": "0102",
+          "name_kh": "មង្គលបូរី",
+          "name_en": "Mongkol Borei"
+        },
+        {
+          "code": "0103",
+          "name_kh": "ភ្នំស្រុក",
+          "name_en": "Phnum Srok"
+        },
+        {
+          "code": "0104",
+          "name_kh": "ព្រះនេត្រព្រះ",
+          "name_en": "Preah Netr Preah"
+        },
+        {
+          "code": "0105",
+          "name_kh": "អូរជ្រៅ",
+          "name_en": "Ou Chrov"
+        },
+        {
+          "code": "0106",
+          "name_kh": "ក្រុងសិរីសោភ័ណ",
+          "name_en": "Krong Serei Saophoan"
+        },
+        {
+          "code": "0107",
+          "name_kh": "ថ្មពួក",
+          "name_en": "Thma Puok"
+        },
+        {
+          "code": "0108",
+          "name_kh": "ស្វាយចេក",
+          "name_en": "Svay Chek"
+        },
+        {
+          "code": "0109",
+          "name_kh": "ម៉ាឡៃ",
+          "name_en": "Malai"
+        },
+        {
+          "code": "0110",
+          "name_kh": "ក្រុងប៉ោយប៉ែត",
+          "name_en": "Krong Paoy Paet"
+        }
+      ]
+    },
+    {
+      "code": "02",
+      "name_kh": "បាត់ដំបង",
+      "name_en": "Battambang",
+      "districts": [
+        {
+          "code": "0201",
+          "name_kh": "បាណន់",
+          "name_en": "Banan"
+        },
+        {
+          "code": "0202",
+          "name_kh": "ថ្មគោល",
+          "name_en": "Thma Koul"
+        },
+        {
+          "code": "0203",
+          "name_kh": "ក្រុងបាត់ដំបង",
+          "name_en": "Krong Battambang"
+        },
+        {
+          "code": "0204",
+          "name_kh": "បវេល",
+          "name_en": "Bavel"
+        },
+        {
+          "code": "0205",
+          "name_kh": "ឯកភ្នំ",
+          "name_en": "Aek Phnum"
+        },
+        {
+          "code": "0206",
+          "name_kh": "មោងឫស្សី",
+          "name_en": "Moung Ruessei"
+        },
+        {
+          "code": "0207",
+          "name_kh": "រតនមណ្ឌល",
+          "name_en": "Rottanak Mondol"
+        },
+        {
+          "code": "0208",
+          "name_kh": "សង្កែ",
+          "name_en": "Sangkae"
+        },
+        {
+          "code": "0209",
+          "name_kh": "សំឡូត",
+          "name_en": "Samlout"
+        },
+        {
+          "code": "0210",
+          "name_kh": "សំពៅលូន",
+          "name_en": "Sampov Loun"
+        },
+        {
+          "code": "0211",
+          "name_kh": "ភ្នំព្រឹក",
+          "name_en": "Phnum Proek"
+        },
+        {
+          "code": "0212",
+          "name_kh": "កំរៀង",
+          "name_en": "Kamrieng"
+        },
+        {
+          "code": "0213",
+          "name_kh": "កោះក្រឡ",
+          "name_en": "Koas Krala"
+        },
+        {
+          "code": "0214",
+          "name_kh": "រុក្ខគិរី",
+          "name_en": "Rukh Kiri"
+        }
+      ]
+    },
+    {
+      "code": "03",
+      "name_kh": "កំពង់ចាម",
+      "name_en": "Kampong Cham",
+      "districts": [
+        {
+          "code": "0301",
+          "name_kh": "បាធាយ",
+          "name_en": "Batheay"
+        },
+        {
+          "code": "0302",
+          "name_kh": "ចំការលើ",
+          "name_en": "Chamkar Leu"
+        },
+        {
+          "code": "0303",
+          "name_kh": "ជើងព្រៃ",
+          "name_en": "Cheung Prey"
+        },
+        {
+          "code": "0305",
+          "name_kh": "ក្រុងកំពង់ចាម",
+          "name_en": "Krong Kampong Cham"
+        },
+        {
+          "code": "0306",
+          "name_kh": "កំពង់សៀម",
+          "name_en": "Kampong Siem"
+        },
+        {
+          "code": "0307",
+          "name_kh": "កងមាស",
+          "name_en": "Kang Meas"
+        },
+        {
+          "code": "0308",
+          "name_kh": "កោះសូទិន",
+          "name_en": "Koh Sotin"
+        },
+        {
+          "code": "0313",
+          "name_kh": "ព្រៃឈរ",
+          "name_en": "Prey Chhor"
+        },
+        {
+          "code": "0314",
+          "name_kh": "ស្រីសន្ធរ",
+          "name_en": "Srei Santhor"
+        }
+      ]
+    },
+    {
+      "code": "04",
+      "name_kh": "កំពង់ឆ្នាំង",
+      "name_en": "Kampong Chhnang",
+      "districts": [
+        {
+          "code": "0401",
+          "name_kh": "បរិបូណ៌",
+          "name_en": "Baribour"
+        },
+        {
+          "code": "0402",
+          "name_kh": "ជលគិរី",
+          "name_en": "Chol Kiri"
+        },
+        {
+          "code": "0403",
+          "name_kh": "ក្រុងកំពង់ឆ្នាំង",
+          "name_en": "Krong Kampong Chhnang"
+        },
+        {
+          "code": "0404",
+          "name_kh": "កំពង់លែង",
+          "name_en": "Kampong Leaeng"
+        },
+        {
+          "code": "0405",
+          "name_kh": "កំពង់ត្រឡាច",
+          "name_en": "Kampong Tralach"
+        },
+        {
+          "code": "0406",
+          "name_kh": "រលាប្អៀរ",
+          "name_en": "Rolea B'ier"
+        },
+        {
+          "code": "0407",
+          "name_kh": "សាមគ្គីមានជ័យ",
+          "name_en": "Sameakki Mean Chey"
+        },
+        {
+          "code": "0408",
+          "name_kh": "ទឹកផុស",
+          "name_en": "Tuek Phos"
+        }
+      ]
+    },
+    {
+      "code": "05",
+      "name_kh": "កំពង់ស្ពឺ",
+      "name_en": "Kampong Speu",
+      "districts": [
+        {
+          "code": "0501",
+          "name_kh": "បសេដ្ឋ",
+          "name_en": "Basedth"
+        },
+        {
+          "code": "0502",
+          "name_kh": "ក្រុងច្បារមន",
+          "name_en": "Krong Chbar Mon"
+        },
+        {
+          "code": "0503",
+          "name_kh": "គងពិសី",
+          "name_en": "Kong Pisei"
+        },
+        {
+          "code": "0504",
+          "name_kh": "ឱរ៉ាល់",
+          "name_en": "Aoral"
+        },
+        {
+          "code": "0505",
+          "name_kh": "ភ្នំស្រួច",
+          "name_en": "Phnum Sruoch"
+        },
+        {
+          "code": "0506",
+          "name_kh": "សំរោងទង",
+          "name_en": "Samraong Tong"
+        },
+        {
+          "code": "0507",
+          "name_kh": "ថ្ពង",
+          "name_en": "Thpong"
+        },
+        {
+          "code": "0508",
+          "name_kh": "ក្រុងឧដុង្គម៉ែជ័យ",
+          "name_en": "Krong Oudongk Me Chey"
+        },
+        {
+          "code": "0509",
+          "name_kh": "សាមគ្គីមុនីជ័យ",
+          "name_en": "Sameakki Muni Chey"
+        }
+      ]
+    },
+    {
+      "code": "06",
+      "name_kh": "កំពង់ធំ",
+      "name_en": "Kampong Thom",
+      "districts": [
+        {
+          "code": "0601",
+          "name_kh": "ស្រុកបារាយណ៍",
+          "name_en": "Baray",
+          "communes": [
+            {
+              "code": "060101",
+              "name_kh": "ឃុំអំពិល",
+              "name_en": "Bak Sna",
+              "villages": [
+                {
+                  "code": "06010101",
+                  "name_kh": "ភូមិអំពិល",
+                  "name_en": "Ampil"
+                }
+              ]
+            },
+            {
+              "code": "060104",
+              "name_kh": "ឃុំជ្រលង",
+              "name_en": "Chrolong",
+              "villages": [
+                {
+                  "code": "06010401",
+                  "name_kh": "ភូមិជ្រលង",
+                  "name_en": "Chrolong"
+                },
+                {
+                  "code": "06010402",
+                  "name_kh": "ភូមិកំពង់ជ្រៃ",
+                  "name_en": "Kampong Chrey"
+                },
+                {
+                  "code": "06010403",
+                  "name_kh": "ភូមិទួលពពេល",
+                  "name_en": "Tuol Popel"
+                },
+                {
+                  "code": "06010404",
+                  "name_kh": "ភូមិស្វាយទាប",
+                  "name_en": "Svay Teab"
+                },
+                {
+                  "code": "06010405",
+                  "name_kh": "ភូមិត្រពាំងជ្រៃ",
+                  "name_en": "Trapeang Chrey"
+                },
+                {
+                  "code": "06010406",
+                  "name_kh": "ភូមិពោធិ៍រោង",
+                  "name_en": "Pou Roung"
+                },
+                {
+                  "code": "06010407",
+                  "name_kh": "ភូមិត្រពាំងច្រនាង",
+                  "name_en": "Trapeang Chrnang"
+                },
+                {
+                  "code": "06010408",
+                  "name_kh": "ភូមិកោះបិណ្ឌ",
+                  "name_en": "Koh Bend"
+                }
+              ]
+            },
+            {
+              "code": "060102",
+              "name_kh": "ឃុំបល្ល័ង្ក",
+              "name_en": "Ballangk"
+            },
+            {
+              "code": "060103",
+              "name_kh": "ឃុំអណ្តូងពោធិ៍",
+              "name_en": "Andoung Pou"
+            },
+            {
+              "code": "060105",
+              "name_kh": "ឃុំច្រនាង",
+              "name_en": "Chrnang"
+            },
+            {
+              "code": "060106",
+              "name_kh": "ឃុំដូង",
+              "name_en": "Doung"
+            },
+            {
+              "code": "060107",
+              "name_kh": "ឃុំឈូកខ្សាច់",
+              "name_en": "Chhuk Khsach"
+            },
+            {
+              "code": "060108",
+              "name_kh": "ឃុំចុងដូង",
+              "name_en": "Chong Doung"
+            },
+            {
+              "code": "060109",
+              "name_kh": "ឃុំក្រវ៉ា",
+              "name_en": "Krava"
+            },
+            {
+              "code": "060110",
+              "name_kh": "ឃុំគគីរធំ",
+              "name_en": "Kokir Thum"
+            },
+            {
+              "code": "060111",
+              "name_kh": "ឃុំក្រយា",
+              "name_en": "Kraya"
+            },
+            {
+              "code": "060112",
+              "name_kh": "ឃុំមាសជ្រៃ",
+              "name_en": "Meas Chrey"
+            },
+            {
+              "code": "060113",
+              "name_kh": "ឃុំពង្រ",
+              "name_en": "Pongro"
+            },
+            {
+              "code": "060114",
+              "name_kh": "ឃុំសូភាស",
+              "name_en": "Soupheas"
+            },
+            {
+              "code": "060115",
+              "name_kh": "ឃុំសូយោង",
+              "name_en": "Sou Young"
+            },
+            {
+              "code": "060116",
+              "name_kh": "ឃុំស្រឡៅ",
+              "name_en": "Sralau"
+            },
+            {
+              "code": "060117",
+              "name_kh": "ឃុំស្វាយភ្លើង",
+              "name_en": "Svay Phleung"
+            },
+            {
+              "code": "060118",
+              "name_kh": "ឃុំត្នោតជុំ",
+              "name_en": "Tnaot Chum"
+            }
+          ]
+        },
+        {
+          "code": "0602",
+          "name_kh": "ក្រុងស្ទឹងសែន",
+          "name_en": "Krong Stueng Saen"
+        },
+        {
+          "code": "0603",
+          "name_kh": "កំពង់ស្វាយ",
+          "name_en": "Kampong Svay"
+        },
+        {
+          "code": "0604",
+          "name_kh": "កោះសន្តិភាព",
+          "name_en": "Koh Santepheap"
+        },
+        {
+          "code": "0605",
+          "name_kh": "ប្រាសាទបល្ល័ង្ក",
+          "name_en": "Prasat Ballangk"
+        },
+        {
+          "code": "0606",
+          "name_kh": "ប្រាសាទសំបូរ",
+          "name_en": "Prasat Sambour"
+        },
+        {
+          "code": "0607",
+          "name_kh": "សណ្តាន់",
+          "name_en": "Sandan"
+        },
+        {
+          "code": "0608",
+          "name_kh": "សន្ទុក",
+          "name_en": "Santuk"
+        },
+        {
+          "code": "0609",
+          "name_kh": "ស្ទោង",
+          "name_en": "Stoung"
+        },
+        {
+          "code": "0610",
+          "name_kh": "តាំងគោក",
+          "name_en": "Taing Kouk"
+        }
+      ]
+    },
+    {
+      "code": "07",
+      "name_kh": "កំពត",
+      "name_en": "Kampot",
+      "districts": [
+        {
+          "code": "0701",
+          "name_kh": "អង្គរជ័យ",
+          "name_en": "Angkor Chey"
+        },
+        {
+          "code": "0702",
+          "name_kh": "បន្ទាយមាស",
+          "name_en": "Banteay Meas"
+        },
+        {
+          "code": "0703",
+          "name_kh": "ឈូក",
+          "name_en": "Chhuk"
+        },
+        {
+          "code": "0704",
+          "name_kh": "ជុំគិរី",
+          "name_en": "Chum Kiri"
+        },
+        {
+          "code": "0705",
+          "name_kh": "ដងទង់",
+          "name_en": "Dang Tong"
+        },
+        {
+          "code": "0706",
+          "name_kh": "កំពង់ត្រាច",
+          "name_en": "Kampong Trach"
+        },
+        {
+          "code": "0707",
+          "name_kh": "ទឹកឈូ",
+          "name_en": "Tuek Chhou"
+        },
+        {
+          "code": "0708",
+          "name_kh": "ក្រុងកំពត",
+          "name_en": "Krong Kampot"
+        },
+        {
+          "code": "0709",
+          "name_kh": "ក្រុងបូកគោ",
+          "name_en": "Krong Bokor"
+        }
+      ]
+    },
+    {
+      "code": "08",
+      "name_kh": "កណ្តាល",
+      "name_en": "Kandal",
+      "districts": [
+        {
+          "code": "0801",
+          "name_kh": "កណ្តាលស្ទឹង",
+          "name_en": "Kandal Stueng"
+        },
+        {
+          "code": "0802",
+          "name_kh": "កៀនស្វាយ",
+          "name_en": "Kien Svay"
+        },
+        {
+          "code": "0803",
+          "name_kh": "ខ្សាច់កណ្តាល",
+          "name_en": "Khsach Kandal"
+        },
+        {
+          "code": "0804",
+          "name_kh": "កោះធំ",
+          "name_en": "Koh Thom"
+        },
+        {
+          "code": "0805",
+          "name_kh": "លើកដែក",
+          "name_en": "Leuk Daek"
+        },
+        {
+          "code": "0806",
+          "name_kh": "មុខកំពូល",
+          "name_en": "Mukh Kampuol"
+        },
+        {
+          "code": "0807",
+          "name_kh": "អង្គស្នួល",
+          "name_en": "Angk Snuol"
+        },
+        {
+          "code": "0808",
+          "name_kh": "ពញាឮ",
+          "name_en": "Ponhea Lueu"
+        },
+        {
+          "code": "0809",
+          "name_kh": "ស្អាង",
+          "name_en": "S’ang"
+        },
+        {
+          "code": "0810",
+          "name_kh": "ក្រុងតាខ្មៅ",
+          "name_en": "Krong Ta Khmau"
+        },
+        {
+          "code": "0811",
+          "name_kh": "ក្រុងអរិយក្សត្រ",
+          "name_en": "Krong Arey Ksat"
+        },
+        {
+          "code": "0812",
+          "name_kh": "ក្រុងសំពៅពូន",
+          "name_en": "Krong Sampov Poun"
+        }
+      ]
+    },
+    {
+      "code": "09",
+      "name_kh": "កោះកុង",
+      "name_en": "Koh Kong",
+      "districts": [
+        {
+          "code": "0901",
+          "name_kh": "បូទុមសាគរ",
+          "name_en": "Botum Sakor"
+        },
+        {
+          "code": "0902",
+          "name_kh": "គិរីសាគរ",
+          "name_en": "Kiri Sakor"
+        },
+        {
+          "code": "0903",
+          "name_kh": "កោះកុង",
+          "name_en": "Koh Kong"
+        },
+        {
+          "code": "0904",
+          "name_kh": "ក្រុងខេមរភូមិន្ទ",
+          "name_en": "Krong Khemarak Phoumin"
+        },
+        {
+          "code": "0905",
+          "name_kh": "មណ្ឌលសីមា",
+          "name_en": "Mondol Seima"
+        },
+        {
+          "code": "0906",
+          "name_kh": "ស្រែអំបិល",
+          "name_en": "Srae Ambel"
+        },
+        {
+          "code": "0907",
+          "name_kh": "ថ្មបាំង",
+          "name_en": "Thma Bang"
+        }
+      ]
+    },
+    {
+      "code": "10",
+      "name_kh": "ក្រចេះ",
+      "name_en": "Kratie",
+      "districts": [
+        {
+          "code": "1001",
+          "name_kh": "ឆ្លូង",
+          "name_en": "Chhloung"
+        },
+        {
+          "code": "1002",
+          "name_kh": "ក្រុងក្រចេះ",
+          "name_en": "Krong Kratie"
+        },
+        {
+          "code": "1003",
+          "name_kh": "ព្រែកប្រសព្វ",
+          "name_en": "Prek Prasab"
+        },
+        {
+          "code": "1004",
+          "name_kh": "សំបូរ",
+          "name_en": "Sambour"
+        },
+        {
+          "code": "1005",
+          "name_kh": "ស្នួល",
+          "name_en": "Snuol"
+        },
+        {
+          "code": "1006",
+          "name_kh": "ចិត្របុរី",
+          "name_en": "Chet Borei"
+        }
+      ]
+    },
+    {
+      "code": "11",
+      "name_kh": "មណ្ឌលគិរី",
+      "name_en": "Mondulkiri",
+      "districts": [
+        {
+          "code": "1101",
+          "name_kh": "កែវសីមា",
+          "name_en": "Kaev Seima"
+        },
+        {
+          "code": "1102",
+          "name_kh": "កោះញែក",
+          "name_en": "Koh Nheaek"
+        },
+        {
+          "code": "1103",
+          "name_kh": "អូររាំង",
+          "name_en": "Ou Reang"
+        },
+        {
+          "code": "1104",
+          "name_kh": "ពេជ្រាដា",
+          "name_en": "Pech Chreada"
+        },
+        {
+          "code": "1105",
+          "name_kh": "ក្រុងសែនមនោរម្យ",
+          "name_en": "Krong Saen Monourom"
+        }
+      ]
+    },
+    {
+      "code": "12",
+      "name_kh": "រាជធានីភ្នំពេញ",
+      "name_en": "Phnom Penh",
+      "districts": [
+        {
+          "code": "1201",
+          "name_kh": "ខណ្ឌចំការមន",
+          "name_en": "Chamkar Mon",
+          "communes": [
+            {
+              "code": "120101",
+              "name_kh": "សង្កាត់ទន្លេបាសាក់",
+              "name_en": "Tonle Bassac"
+            },
+            {
+              "code": "120102",
+              "name_kh": "សង្កាត់បឹងកេងកងទី១",
+              "name_en": "Boeung Keng Kang 1"
+            },
+            {
+              "code": "120103",
+              "name_kh": "សង្កាត់បឹងកេងកងទី២",
+              "name_en": "Boeung Keng Kang 2"
+            },
+            {
+              "code": "120104",
+              "name_kh": "សង្កាត់បឹងកេងកងទី៣",
+              "name_en": "Boeung Keng Kang 3"
+            },
+            {
+              "code": "120105",
+              "name_kh": "សង្កាត់បឹងត្របែក",
+              "name_en": "Boeung Trabaek"
+            },
+            {
+              "code": "120106",
+              "name_kh": "សង្កាត់ផ្សារដើមថ្កូវ",
+              "name_en": "Phsar Daeum Thkov"
+            },
+            {
+              "code": "120107",
+              "name_kh": "សង្កាត់ផ្សារដើមថ្កូវ",
+              "name_en": "Tuol Tumpung 1"
+            },
+            {
+              "code": "120108",
+              "name_kh": "សង្កាត់អូឡាំពិក",
+              "name_en": "Olympic"
+            },
+            {
+              "code": "120109",
+              "name_kh": "សង្កាត់ទួលស្វាយព្រៃទី១",
+              "name_en": "Tuol Svay Prey 1"
+            },
+            {
+              "code": "120110",
+              "name_kh": "សង្កាត់ទួលស្វាយព្រៃទី២",
+              "name_en": "Tuol Svay Prey 2"
+            },
+            {
+              "code": "120111",
+              "name_kh": "សង្កាត់ទំនប់ទឹក",
+              "name_en": "Tumnob Tuek"
+            },
+            {
+              "code": "120112",
+              "name_kh": "សង្កាត់ទួលទំពូងទី២",
+              "name_en": "Tuol Tumpung 2"
+            }
+          ]
+        },
+        {
+          "code": "1202",
+          "name_kh": "ខណ្ឌដូនពេញ",
+          "name_en": "Khan Doun Penh"
+        },
+        {
+          "code": "1203",
+          "name_kh": "ខណ្ឌ៧មករា",
+          "name_en": "Khan Prampir Meakkakra"
+        },
+        {
+          "code": "1204",
+          "name_kh": "ខណ្ឌទួលគោក",
+          "name_en": "Khan Tuol Kouk"
+        },
+        {
+          "code": "1205",
+          "name_kh": "ខណ្ឌដង្កោ",
+          "name_en": "Khan Dangkao"
+        },
+        {
+          "code": "1206",
+          "name_kh": "ខណ្ឌមានជ័យ",
+          "name_en": "Khan Mean Chey"
+        },
+        {
+          "code": "1207",
+          "name_kh": "ខណ្ឌឫស្សីកែវ",
+          "name_en": "Khan Ruessei Kaev"
+        },
+        {
+          "code": "1208",
+          "name_kh": "ខណ្ឌសែនសុខ",
+          "name_en": "Khan Saen Sokh"
+        },
+        {
+          "code": "1209",
+          "name_kh": "ខណ្ឌពោធិ៍សែនជ័យ",
+          "name_en": "Pur Senchey",
+          "communes": [
+            {
+              "code": "120901",
+              "name_kh": "សង្កាត់កំបូល",
+              "name_en": "Kamboul"
+            },
+            {
+              "code": "120902",
+              "name_kh": "សង្កាត់កន្ទោក",
+              "name_en": "Kantouk"
+            },
+            {
+              "code": "120903",
+              "name_kh": "សង្កាត់ចោមចៅទី១",
+              "name_en": "Chaom Chau 1"
+            },
+            {
+              "code": "120904",
+              "name_kh": "សង្កាត់ឱឡោក",
+              "name_en": "Ovlaok"
+            },
+            {
+              "code": "120905",
+              "name_kh": "សង្កាត់ស្នោរ",
+              "name_en": "Snaor"
+            },
+            {
+              "code": "120906",
+              "name_kh": "សង្កាត់ភ្លើងឆេះរទេះ",
+              "name_en": "Phleung Chheh Roteh"
+            },
+            {
+              "code": "120907",
+              "name_kh": "សង្កាត់បឹងធំ",
+              "name_en": "Boeung Thum"
+            }
+          ]
+        },
+        {
+          "code": "1210",
+          "name_kh": "ខណ្ឌជ្រោយចង្វារ",
+          "name_en": "Khan Chrouy Changvar"
+        },
+        {
+          "code": "1211",
+          "name_kh": "ខណ្ឌព្រែកព្នៅ",
+          "name_en": "Khan Praek Pnov"
+        },
+        {
+          "code": "1212",
+          "name_kh": "ខណ្ឌច្បារអំពៅ",
+          "name_en": "Khan Chbar Ampov"
+        },
+        {
+          "code": "1213",
+          "name_kh": "ខណ្ឌបឹងកេងកង",
+          "name_en": "Khan Boeng Keng Kang"
+        },
+        {
+          "code": "1214",
+          "name_kh": "ខណ្ឌកំបូល",
+          "name_en": "Khan Kamboul"
+        }
+      ]
+    },
+    {
+      "code": "13",
+      "name_kh": "ព្រះវិហារ",
+      "name_en": "Preah Vihear",
+      "districts": [
+        {
+          "code": "1301",
+          "name_kh": "ជ័យសែន",
+          "name_en": "Chey Saen"
+        },
+        {
+          "code": "1302",
+          "name_kh": "ឆែប",
+          "name_en": "Chhaeb"
+        },
+        {
+          "code": "1303",
+          "name_kh": "ជាំក្សាន្ត",
+          "name_en": "Choam Ksan"
+        },
+        {
+          "code": "1304",
+          "name_kh": "គូលែន",
+          "name_en": "Kuleaen"
+        },
+        {
+          "code": "1305",
+          "name_kh": "រវៀង",
+          "name_en": "Rovieng"
+        },
+        {
+          "code": "1306",
+          "name_kh": "សង្គមថ្មី",
+          "name_en": "Sangkum Thmei"
+        },
+        {
+          "code": "1307",
+          "name_kh": "ត្បែងមានជ័យ",
+          "name_en": "Tbaeng Mean Chey"
+        },
+        {
+          "code": "1308",
+          "name_kh": "ក្រុងព្រះវិហារ",
+          "name_en": "Krong Preah Vihear"
+        }
+      ]
+    },
+    {
+      "code": "14",
+      "name_kh": "ព្រៃវែង",
+      "name_en": "Prey Veng",
+      "districts": [
+        {
+          "code": "1401",
+          "name_kh": "បាភ្នំ",
+          "name_en": "Ba Phnum"
+        },
+        {
+          "code": "1402",
+          "name_kh": "កំចាយមារ",
+          "name_en": "Kamchay Mear"
+        },
+        {
+          "code": "1403",
+          "name_kh": "កំពង់ត្របែក",
+          "name_en": "Kampong Trabaek"
+        },
+        {
+          "code": "1404",
+          "name_kh": "កញ្ច្រៀច",
+          "name_en": "Kanhchriech"
+        },
+        {
+          "code": "1405",
+          "name_kh": "មេសាង",
+          "name_en": "Me Sang"
+        },
+        {
+          "code": "1406",
+          "name_kh": "ពាមជរ",
+          "name_en": "Peam Chor"
+        },
+        {
+          "code": "1407",
+          "name_kh": "ពាមរក៍",
+          "name_en": "Peam Ro"
+        },
+        {
+          "code": "1408",
+          "name_kh": "ពារាំង",
+          "name_en": "Pearang"
+        },
+        {
+          "code": "1409",
+          "name_kh": "ព្រះស្តេច",
+          "name_en": "Preah Sdach"
+        },
+        {
+          "code": "1410",
+          "name_kh": "ក្រុងព្រៃវែង",
+          "name_en": "Krong Prey Veng"
+        },
+        {
+          "code": "1411",
+          "name_kh": "ពោធិ៍រៀង",
+          "name_en": "Pou Rieng"
+        },
+        {
+          "code": "1412",
+          "name_kh": "ស៊ីធរកណ្តាល",
+          "name_en": "Sithor Kandal"
+        },
+        {
+          "code": "1413",
+          "name_kh": "ស្វាយអន្ធរ",
+          "name_en": "Svay Antor"
+        }
+      ]
+    },
+    {
+      "code": "15",
+      "name_kh": "ពោធិ៍សាត់",
+      "name_en": "Pursat",
+      "districts": [
+        {
+          "code": "1501",
+          "name_kh": "បាកាន",
+          "name_en": "Bakan"
+        },
+        {
+          "code": "1502",
+          "name_kh": "កណ្តៀង",
+          "name_en": "Kandieng"
+        },
+        {
+          "code": "1503",
+          "name_kh": "ក្រគរ",
+          "name_en": "Krakor"
+        },
+        {
+          "code": "1504",
+          "name_kh": "ភ្នំក្រវាញ",
+          "name_en": "Phnum Kravanh"
+        },
+        {
+          "code": "1505",
+          "name_kh": "ក្រុងពោធិ៍សាត់",
+          "name_en": "Krong Pursat"
+        },
+        {
+          "code": "1506",
+          "name_kh": "វាលវែង",
+          "name_en": "Veal Veaeng"
+        },
+        {
+          "code": "1507",
+          "name_kh": "តាលោសែនជ័យ",
+          "name_en": "Talo Senchey"
+        }
+      ]
+    },
+    {
+      "code": "16",
+      "name_kh": "រតនគិរី",
+      "name_en": "Ratanakiri",
+      "districts": [
+        {
+          "code": "1601",
+          "name_kh": "អណ្តូងមាស",
+          "name_en": "Andoung Meas"
+        },
+        {
+          "code": "1602",
+          "name_kh": "ក្រុងបានលុង",
+          "name_en": "Krong Ban Lung"
+        },
+        {
+          "code": "1603",
+          "name_kh": "បរកែវ",
+          "name_en": "Bar Kaev"
+        },
+        {
+          "code": "1604",
+          "name_kh": "កូនមុំ",
+          "name_en": "Koun Mom"
+        },
+        {
+          "code": "1605",
+          "name_kh": "លំផាត់",
+          "name_en": "Lumphat"
+        },
+        {
+          "code": "1606",
+          "name_kh": "អូរជុំ",
+          "name_en": "Ou Chum"
+        },
+        {
+          "code": "1607",
+          "name_kh": "អូរយ៉ាដាវ",
+          "name_en": "Ou Ya Dav"
+        },
+        {
+          "code": "1608",
+          "name_kh": "តាវែង",
+          "name_en": "Ta Veaeng"
+        },
+        {
+          "code": "1609",
+          "name_kh": "វ៉ើនសៃ",
+          "name_en": "Veun Sai"
+        }
+      ]
+    },
+    {
+      "code": "17",
+      "name_kh": "សៀមរាប",
+      "name_en": "Siem Reap",
+      "districts": [
+        {
+          "code": "1701",
+          "name_kh": "អង្គរជុំ",
+          "name_en": "Angkor Chum"
+        },
+        {
+          "code": "1702",
+          "name_kh": "អង្គរធំ",
+          "name_en": "Angkor Thum"
+        },
+        {
+          "code": "1703",
+          "name_kh": "បន្ទាយស្រី",
+          "name_en": "Banteay Srei"
+        },
+        {
+          "code": "1704",
+          "name_kh": "ជីក្រែង",
+          "name_en": "Chi Kraeng"
+        },
+        {
+          "code": "1706",
+          "name_kh": "ក្រឡាញ់",
+          "name_en": "Kralanh"
+        },
+        {
+          "code": "1707",
+          "name_kh": "ពួក",
+          "name_en": "Puok"
+        },
+        {
+          "code": "1709",
+          "name_kh": "ប្រាសាទបាគង",
+          "name_en": "Prasat Bakong"
+        },
+        {
+          "code": "1710",
+          "name_kh": "ក្រុងសៀមរាប",
+          "name_en": "Krong Siem Reap"
+        },
+        {
+          "code": "1711",
+          "name_kh": "សូទ្រនិគម",
+          "name_en": "Soutr Nikom"
+        },
+        {
+          "code": "1712",
+          "name_kh": "ស្រីស្នំ",
+          "name_en": "Srei Snam"
+        },
+        {
+          "code": "1713",
+          "name_kh": "ស្វាយលើ",
+          "name_en": "Svay Leu"
+        },
+        {
+          "code": "1714",
+          "name_kh": "វារិន",
+          "name_en": "Varin"
+        },
+        {
+          "code": "1715",
+          "name_kh": "ក្រុងរុនតាឯកតេជោសែន",
+          "name_en": "Krong Run Ta Aek Techo Sen"
+        }
+      ]
+    },
+    {
+      "code": "18",
+      "name_kh": "ព្រះសីហនុ",
+      "name_en": "Preah Sihanouk",
+      "districts": [
+        {
+          "code": "1801",
+          "name_kh": "ក្រុងព្រះសីហនុ",
+          "name_en": "Krong Preah Sihanouk"
+        },
+        {
+          "code": "1802",
+          "name_kh": "ព្រៃនប់",
+          "name_en": "Prey Nob"
+        },
+        {
+          "code": "1803",
+          "name_kh": "ស្ទឹងហាវ",
+          "name_en": "Stueng Hav"
+        },
+        {
+          "code": "1804",
+          "name_kh": "កំពង់សិលា",
+          "name_en": "Kampong Seila"
+        },
+        {
+          "code": "1805",
+          "name_kh": "ក្រុងកោះរ៉ុង",
+          "name_en": "Krong Koh Rong"
+        }
+      ]
+    },
+    {
+      "code": "19",
+      "name_kh": "ស្ទឹងត្រែង",
+      "name_en": "Stung Treng",
+      "districts": [
+        {
+          "code": "1901",
+          "name_kh": "សេសាន",
+          "name_en": "Sesan"
+        },
+        {
+          "code": "1902",
+          "name_kh": "សៀមបូក",
+          "name_en": "Siem Bouk"
+        },
+        {
+          "code": "1903",
+          "name_kh": "សៀមប៉ាង",
+          "name_en": "Siem Pang"
+        },
+        {
+          "code": "1904",
+          "name_kh": "ក្រុងស្ទឹងត្រែង",
+          "name_en": "Krong Stung Treng"
+        },
+        {
+          "code": "1905",
+          "name_kh": "ថាឡាបារីវ៉ាត់",
+          "name_en": "Thala Barivat"
+        },
+        {
+          "code": "1906",
+          "name_kh": "បូរីអូរស្វាយសែនជ័យ",
+          "name_en": "Borei O Svay Senchey"
+        }
+      ]
+    },
+    {
+      "code": "20",
+      "name_kh": "ស្វាយរៀង",
+      "name_en": "Svay Rieng",
+      "districts": [
+        {
+          "code": "2001",
+          "name_kh": "ចន្ទ្រា",
+          "name_en": "Chantrea"
+        },
+        {
+          "code": "2002",
+          "name_kh": "កំពង់រោទិ៍",
+          "name_en": "Kampong Rou"
+        },
+        {
+          "code": "2003",
+          "name_kh": "រំដួល",
+          "name_en": "Romdoul"
+        },
+        {
+          "code": "2004",
+          "name_kh": "រមាសហែក",
+          "name_en": "Romeas Haek"
+        },
+        {
+          "code": "2005",
+          "name_kh": "ស្វាយជ្រំ",
+          "name_en": "Svay Chrum"
+        },
+        {
+          "code": "2006",
+          "name_kh": "ក្រុងស្វាយរៀង",
+          "name_en": "Krong Svay Rieng"
+        },
+        {
+          "code": "2007",
+          "name_kh": "ស្វាយទាប",
+          "name_en": "Svay Teab"
+        },
+        {
+          "code": "2008",
+          "name_kh": "ក្រុងបាវិត",
+          "name_en": "Krong Bavet"
+        }
+      ]
+    },
+    {
+      "code": "21",
+      "name_kh": "តាកែវ",
+      "name_en": "Takeo",
+      "districts": [
+        {
+          "code": "2101",
+          "name_kh": "អង្គរបុរី",
+          "name_en": "Angkor Borei"
+        },
+        {
+          "code": "2102",
+          "name_kh": "បាទី",
+          "name_en": "Bati"
+        },
+        {
+          "code": "2103",
+          "name_kh": "បូរីជលសារ",
+          "name_en": "Borei Cholsar"
+        },
+        {
+          "code": "2104",
+          "name_kh": "គិរីវង់",
+          "name_en": "Kiri Vong"
+        },
+        {
+          "code": "2105",
+          "name_kh": "កោះអណ្តែត",
+          "name_en": "Koh Andaet"
+        },
+        {
+          "code": "2106",
+          "name_kh": "ព្រៃកប្បាស",
+          "name_en": "Prey Kabbas"
+        },
+        {
+          "code": "2107",
+          "name_kh": "សំរោង",
+          "name_en": "Samraong"
+        },
+        {
+          "code": "2108",
+          "name_kh": "ក្រុងដូនកែវ",
+          "name_en": "Krong Doun Kaev"
+        },
+        {
+          "code": "2109",
+          "name_kh": "ត្រាំកក់",
+          "name_en": "Tram Kak"
+        },
+        {
+          "code": "2110",
+          "name_kh": "ទ្រាំង",
+          "name_en": "Treang"
+        }
+      ]
+    },
+    {
+      "code": "22",
+      "name_kh": "ឧត្តរមានជ័យ",
+      "name_en": "Oddar Meanchey",
+      "districts": [
+        {
+          "code": "2201",
+          "name_kh": "អន្លង់វែង",
+          "name_en": "Anlong Veaeng"
+        },
+        {
+          "code": "2202",
+          "name_kh": "បន្ទាយអំពិល",
+          "name_en": "Banteay Ampil"
+        },
+        {
+          "code": "2203",
+          "name_kh": "ចុងកាល់",
+          "name_en": "Chong Kal"
+        },
+        {
+          "code": "2204",
+          "name_kh": "ក្រុងសំរោង",
+          "name_en": "Krong Samraong"
+        },
+        {
+          "code": "2205",
+          "name_kh": "ត្រពាំងប្រាសាទ",
+          "name_en": "Trapeang Prasat"
+        }
+      ]
+    },
+    {
+      "code": "23",
+      "name_kh": "កែប",
+      "name_en": "Kep",
+      "districts": [
+        {
+          "code": "2301",
+          "name_kh": "ដំណាក់ចង្អើរ",
+          "name_en": "Damnak Chang'aeur"
+        },
+        {
+          "code": "2302",
+          "name_kh": "ក្រុងកែប",
+          "name_en": "Krong Kep"
+        }
+      ]
+    },
+    {
+      "code": "24",
+      "name_kh": "ប៉ៃលិន",
+      "name_en": "Pailin",
+      "districts": [
+        {
+          "code": "2401",
+          "name_kh": "ក្រុងប៉ៃលិន",
+          "name_en": "Krong Pailin"
+        },
+        {
+          "code": "2402",
+          "name_kh": "សាលាក្រៅ",
+          "name_en": "Sala Krau"
+        }
+      ]
+    },
+    {
+      "code": "25",
+      "name_kh": "ត្បូងឃ្មុំ",
+      "name_en": "Tboung Khmum",
+      "districts": [
+        {
+          "code": "2501",
+          "name_kh": "ដំបែ",
+          "name_en": "Dambae"
+        },
+        {
+          "code": "2502",
+          "name_kh": "ក្រូចឆ្មារ",
+          "name_en": "Krouch Chhma"
+        },
+        {
+          "code": "2503",
+          "name_kh": "មេមត់",
+          "name_en": "Memot"
+        },
+        {
+          "code": "2504",
+          "name_kh": "អូររាំងឪ",
+          "name_en": "Ou Reang Ov"
+        },
+        {
+          "code": "2505",
+          "name_kh": "ពញាក្រែក",
+          "name_en": "Ponhea Kraek"
+        },
+        {
+          "code": "2506",
+          "name_kh": "ត្បូងឃ្មុំ",
+          "name_en": "Tboung Khmum"
+        },
+        {
+          "code": "2507",
+          "name_kh": "ក្រុងសួង",
+          "name_en": "Krong Suong"
+        }
+      ]
+    }
+  ]
+}
