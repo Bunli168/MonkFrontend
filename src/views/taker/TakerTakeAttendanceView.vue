@@ -40,11 +40,11 @@
                 <div class="row-pills-container d-flex flex-nowrap gap-2 pb-2 px-2" style="overflow-x: auto;">
                     <button v-for="(row, idx) in seatingRows" :key="idx" 
                         @click="selectRow(row)"
-                        class="btn px-3 border flex-shrink-0 d-flex align-items-center btn-sm"
-                        :class="activeRow?.id === row.id ? 'btn-primary' : 'btn-light'"
+                        class="btn px-3 flex-shrink-0 d-flex align-items-center btn-sm row-btn"
+                        :class="activeRow?.id === row.id ? 'btn-primary text-white border-primary' : 'btn-outline-secondary text-body'"
                     >
                         <span>Row {{ row.row_num }}</span>
-                        <span class="badge rounded-pill ms-1" :class="activeRow?.id === row.id ? 'bg-white text-primary' : 'bg-secondary bg-opacity-25 text-dark'">
+                        <span class="badge rounded-pill ms-1" :class="activeRow?.id === row.id ? 'bg-white text-primary' : 'bg-secondary bg-opacity-25 text-body'">
                             {{ getMonksCountByRow(row.id) }}
                         </span>
                         <i v-show="isRowConfirmedById(row.id)" class="fas fa-check-circle ms-1" :class="activeRow?.id === row.id ? 'text-white' : 'text-success'"></i>
@@ -93,7 +93,7 @@
                         <BaseTable 
                         :columns="colDefs" 
                         :rows="activeRowMonks" 
-                        :selectable="true"
+                        :selectable="true" selectionHeader="Absent"
                         :hideIndexOnMobile="true"
                         :stackOnMobile="false"
                         v-model:selection="selectedAbsentMonks"
@@ -589,4 +589,5 @@ watch(activeRow, () => {
     background-color: var(--bs-danger);
     border-color: var(--bs-danger);
 }
+
 </style>
