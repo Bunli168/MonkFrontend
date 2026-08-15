@@ -1,73 +1,35 @@
 <template>
     <div class="card border-0" style="background-color: var(--surface-ground);">
         <!-- Filters Bar -->
-        <div class="card border-0 shadow-sm rounded-4 mb-3" style="background-color: var(--surface-card);">
-            <div class="card-body p-3">
-                <!-- Status Filter -->
-                <div class="mb-3 mb-md-0">
-                    <label class="form-label text-muted small fw-bold text-uppercase mb-1 d-block">Status</label>
-                    <div class="d-grid d-md-flex gap-1 p-1 rounded-3" style="grid-template-columns: 1fr 1fr; background: #f1f5f9;">
-                        <button 
-                            type="button" 
-                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 text-nowrap flex-fill flex-md-grow-0"
-                            :class="statusFilter === '' ? 'bg-white shadow-sm text-dark' : 'bg-transparent text-muted'"
-                            @click="statusFilter = ''">
-                            All
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
-                            :class="statusFilter === 'approved' ? 'bg-white shadow-sm text-success' : 'bg-transparent text-muted'"
-                            @click="statusFilter = 'approved'">
-                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #22c55e;"></span>
-                            Approved
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
-                            :class="statusFilter === (authStore.isSuperAdmin ? 'pending_superadmin' : 'pending') ? 'bg-white shadow-sm text-warning' : 'bg-transparent text-muted'"
-                            @click="statusFilter = authStore.isSuperAdmin ? 'pending_superadmin' : 'pending'">
-                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #f59e0b;"></span>
-                            Pending
-                        </button>
-                        <button 
-                            type="button" 
-                            class="btn px-3 px-md-4 py-2 fw-medium rounded-3 border-0 d-flex align-items-center justify-content-center gap-2 text-nowrap flex-fill flex-md-grow-0"
-                            :class="statusFilter === 'rejected' ? 'bg-white shadow-sm text-danger' : 'bg-transparent text-muted'"
-                            @click="statusFilter = 'rejected'">
-                            <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background: #ef4444;"></span>
-                            Rejected
-                        </button>
-                    </div>
+        <div class="mb-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 w-100">
+            <!-- Left Side: Status Filters -->
+            <div class="d-flex align-items-center w-100 w-lg-auto">
+                <BaseFilter v-model="statusFilter" :options="statusFilterOptions" :wrap="true" />
+            </div>
+            
+            <!-- Right Side: Row & Kudi Filters -->
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 justify-content-end w-100 w-lg-auto">
+                <div class="row-select w-100" style="min-width: 150px;">
+                    <BaseSelect 
+                        v-model="selectedRowFilter" 
+                        placeholder="Row"
+                        :options="[{label: 'All Rows', value: ''}, {label: '⚠️ Unassigned Row', value: 'unassigned'}, ...seatingRows.map(r => ({label: 'Row ' + r.row_num, value: r.row_num}))]"
+                    />
                 </div>
-                <!-- Row & Kudi Filters -->
-                <div class="d-flex gap-2 gap-md-3 mt-3">
-                    <div class="flex-fill" style="min-width: 0;">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
-                        <select v-model="selectedRowFilter" class="form-select form-select-sm form-select-md-default">
-                            <option value="">All Rows</option>
-                            <option value="unassigned">⚠️ Unassigned</option>
-                            <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
-                                Row {{ row.row_num }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="flex-fill" style="min-width: 0;">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
-                        <select v-model="selectedKudiFilter" class="form-select form-select-sm form-select-md-default">
-                            <option value="">All Kudis</option>
-                            <option value="unassigned">⚠️ Unassigned</option>
-                            <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name">
-                                {{ kudi.name || `Kudi ${kudi.id}` }}
-                            </option>
-                        </select>
-                    </div>
+                <div class="kudi-select w-100" style="min-width: 150px;">
+                    <BaseSelect 
+                        v-model="selectedKudiFilter" 
+                        placeholder="Kudi"
+                        :options="[{label: 'All Kudis', value: ''}, {label: '⚠️ Unassigned Kudi', value: 'unassigned'}, ...kudiList.map(k => ({label: k.name || `Kudi ${kudi.id}`, value: k.name}))]"
+                    />
                 </div>
             </div>
         </div>
 
         <!-- Table -->
-        <BaseTable 
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <BaseTable 
             :columns="colDefs" 
             :rows="paginatedRequests" 
             :totalRecords="filteredRequests.length"
@@ -137,8 +99,10 @@
                 </span>
             </template>
         </BaseTable>
+            </div>
+        </div>
 
-        <!-- Confirm Status Modal -->
+        <!-- Details Modal -->
         <BaseModal v-model="showConfirmModal" title="Confirm Action" size="sm">
             <p class="mb-4 text-muted fw-medium">Are you sure you want to {{ confirmAction === 'approved' ? 'approve' : 'reject' }} this leave request?</p>
             <div class="d-flex justify-content-end gap-2">
@@ -162,6 +126,8 @@ import BaseBadge from '@/components/base/BaseBadge.vue';
 import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseSelectButton from '@/components/base/BaseSelectButton.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const props = defineProps({
@@ -186,13 +152,20 @@ const isUpdatingStatus = ref(false);
 const confirmAction = ref('');
 const confirmId = ref(null);
 
-const filterOptions = computed(() => {
+const statusFilterOptions = computed(() => {
     const pendingValue = authStore.isSuperAdmin ? 'pending_superadmin' : 'pending';
+    
+    // Calculate counts for badges
+    const allCount = requests.value.length;
+    const approvedCount = requests.value.filter(r => r.status === 'approved').length;
+    const pendingCount = requests.value.filter(r => r.status === pendingValue || (pendingValue === 'pending' && r.status === 'pending_mekudi')).length;
+    const rejectedCount = requests.value.filter(r => r.status === 'rejected').length;
+
     return [
-        { label: 'All Requests', value: '' },
-        { label: 'Approved', value: 'approved' },
-        { label: 'Pending', value: pendingValue },
-        { label: 'Rejected', value: 'rejected' }
+        { label: 'All Requests', value: '', badge: allCount, variant: 'primary' },
+        { label: 'Pending', value: pendingValue, badge: pendingCount, variant: 'warning' },
+        { label: 'Approved', value: 'approved', badge: approvedCount, variant: 'success' },
+        { label: 'Rejected', value: 'rejected', badge: rejectedCount, variant: 'danger' }
     ];
 });
 

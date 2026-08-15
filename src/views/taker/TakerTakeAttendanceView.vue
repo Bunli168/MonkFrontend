@@ -109,9 +109,7 @@
                                 <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold overflow-hidden" 
                                      style="width: 35px; height: 35px; font-size: 0.9rem; flex-shrink: 0;">
                                     <img v-if="monk.profile?.avatar_url || monk.profile?.avatarUrl" :src="$authImg(monk.profile?.avatar_url || monk.profile?.avatarUrl)" class="w-100 h-100 object-fit-cover" />
-                                    <template v-else>
-                                        {{ monk.fullName.charAt(0).toUpperCase() }}
-                                    </template>
+                                    <img v-else src="/app-logo.png" class="w-100 h-100 object-fit-cover bg-white" />
                                 </div>
                                 <div class="flex-grow-1" style="min-width: 0;">
                                     <div class="fw-bold text-dark d-flex align-items-center gap-2" style="font-size: 0.95rem;">
@@ -155,9 +153,7 @@
                             <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm overflow-hidden" 
                                  style="width: 48px; height: 48px; font-size: 1.2rem; flex-shrink: 0;">
                                 <img v-if="monk.profile?.avatar_url || monk.profile?.avatarUrl" :src="$authImg(monk.profile?.avatar_url || monk.profile?.avatarUrl)" class="w-100 h-100 object-fit-cover" />
-                                <template v-else>
-                                    {{ monk.fullName.charAt(0).toUpperCase() }}
-                                </template>
+                                <img v-else src="/app-logo.png" class="w-100 h-100 object-fit-cover bg-white" />
                             </div>
                             
                             <div class="flex-grow-1" style="min-width: 0;">

@@ -12,7 +12,7 @@
                         <div class="user-profile-avatar d-flex align-items-center justify-content-center text-muted rounded-circle overflow-hidden border"
                             style="width: 80px; height: 80px; background-color: rgba(0,0,0,0.03);">
                             <img v-if="authStore.user?.profile?.avatarUrl" :src="$authImg(authStore.user.profile.avatarUrl)" class="w-100 h-100 object-fit-cover">
-                            <span v-else class="fs-2 fw-bold text-muted">{{ form.surname_name ? form.surname_name.charAt(0) : 'S' }}</span>
+                            <img v-else src="/app-logo.png" class="w-100 h-100 object-fit-cover bg-white" />
                         </div>
                         <div>
                             <h4 class="fw-bold mb-1" style="color: var(--text-heading-color);">{{ form.surname_name || '—' }}</h4>

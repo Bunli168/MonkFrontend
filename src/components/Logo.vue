@@ -1,46 +1,34 @@
 <template>
-    <svg width="100%" height="100%" viewBox="0 0 110 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="tnak-logo">
-        <defs>
-            <linearGradient id="td-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="var(--primary-color)" stop-opacity="1"/>
-                <stop offset="100%" stop-color="var(--primary-color)" stop-opacity="0.5"/>
-            </linearGradient>
-        </defs>
-        
-        <g class="td-draw-group">
-            <path class="td-shape td-spark" pathLength="100" d="M 17 3 Q 17 8 12 8 Q 17 8 17 13 Q 17 8 22 8 Q 17 8 17 3 Z" />
-
-            <path class="td-shape td-bubble-1" pathLength="100" d="M 8 14 A 3 3 0 0 1 11 17 A 3 3 0 0 1 8 20 L 4 22 L 5.4 18.5 A 3 3 0 0 1 8 14 Z" />
-            
-            <circle class="td-shape td-bubble-2" pathLength="100" cx="17" cy="17" r="3" />
-  
-            <circle class="td-shape td-bubble-3" pathLength="100" cx="8" cy="26" r="3" />
-            
-            <path class="td-shape td-bubble-4" pathLength="100" d="M 17 23 A 3 3 0 0 1 19.6 27.5 L 22 30 L 17 29 A 3 3 0 0 1 14 26 A 3 3 0 0 1 17 23 Z" />
-            
-            <path class="td-shape td-t" pathLength="100" d="M 45 90 
-                     L 37.5 90 
-                     A 7.5 7.5 0 0 1 30 82.5 
-                     L 30 50 
-                     L 20 50 
-                     A 7.5 7.5 0 0 1 20 35 
-                     L 80 35 
-                     L 80 50 
-                     L 45 50 
-                     Z" />
-
-            <!-- The D (Digital Forward Motion & Hidden Checkmark) -->
-            <path class="td-shape td-d" pathLength="100" d="M 30 25 
-                     L 65 25 
-                     A 25 25 0 0 1 65 75 
-                     L 50 60 
-                     L 50 90 
-                     L 65 90 
-                     A 40 40 0 0 0 65 10 
-                     L 30 10 
-                     A 7.5 7.5 0 0 0 30 25 
-                     Z" />
-        </g>
+    <svg 
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 449.5 290.5"
+     width="100%" height="100%"
+     class="tnak-logo">
+    <defs>
+        <linearGradient id="td-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--primary-color)" stop-opacity="1"/>
+            <stop offset="100%" stop-color="var(--primary-color)" stop-opacity="0.5"/>
+        </linearGradient>
+    </defs>
+    <g class="td-draw-group">
+        <path class="td-shape td-shape-1" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" fill="url(#td-gradient)"
+         d="M246.701,29.542 C246.344,93.479 245.987,157.415 245.630,221.351 C243.494,223.602 240.950,225.420 238.129,226.709 C235.426,227.944 232.523,228.669 229.556,228.852 C229.556,229.924 229.556,230.995 229.556,232.067 C247.416,231.710 265.275,231.352 283.134,230.995 C283.134,230.281 283.134,229.567 283.134,228.852 C278.936,229.409 274.668,228.297 271.347,225.637 C268.641,223.471 266.777,220.445 265.989,217.065 C265.632,155.986 265.275,94.907 264.918,33.829 C265.749,29.919 267.990,26.419 271.347,24.185 C275.791,21.227 281.473,20.950 286.349,23.113 C286.349,21.684 286.349,20.256 286.349,18.827 C267.418,18.827 248.487,18.827 229.556,18.827 C229.057,20.252 229.034,21.335 229.556,22.042 C230.896,23.852 235.873,22.108 239.200,23.113 C242.224,24.026 244.699,26.291 246.701,29.542 Z"/>
+        <path class="td-shape td-shape-2" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" fill="url(#td-gradient)"
+         d="M331.354,20.970 C338.785,19.278 345.363,21.722 348.499,26.328 C349.968,28.485 350.659,31.076 350.642,33.829 C349.149,37.879 347.364,41.811 345.285,45.616 C339.245,56.668 332.242,63.298 324.925,71.333 C320.342,76.366 315.231,83.881 309.923,90.621 C300.153,103.028 290.315,114.971 279.920,127.054 C291.260,145.111 303.401,162.265 316.353,178.489 C320.963,184.264 325.602,189.841 330.500,195.500 C341.086,207.733 352.015,219.325 363.500,230.500 C376.716,231.022 389.932,231.545 403.149,232.067 C402.932,231.211 402.716,230.356 402.500,229.500 C394.166,230.742 385.781,229.486 378.500,225.500 C375.151,223.666 372.134,221.310 369.500,218.500 C344.998,185.161 320.495,151.821 295.993,118.482 C317.781,91.693 339.570,64.904 361.358,38.115 C366.779,31.637 373.767,26.790 381.718,24.185 C386.549,22.602 391.606,21.887 396.719,22.042 C396.719,20.970 396.719,19.898 396.719,18.827 C374.574,18.470 352.428,18.113 330.283,17.755 C330.640,18.827 330.997,19.898 331.354,20.970 Z"/>
+        <path class="td-shape td-shape-3" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" fill="url(#td-gradient)"
+         d="M183.479,40.258 C182.896,76.469 182.542,112.270 182.408,148.485 C182.329,169.966 182.329,191.298 182.408,212.779 C182.062,214.377 181.334,215.849 180.265,217.065 C178.621,218.934 176.309,220.040 173.835,220.280 C180.622,220.280 187.408,220.280 194.195,220.280 C192.523,219.573 191.052,218.471 189.909,217.065 C188.890,215.811 188.160,214.349 187.766,212.779 C187.408,190.990 187.051,169.202 186.694,147.414 C186.694,111.695 186.694,75.977 186.694,40.258 C185.623,40.258 184.551,40.258 183.479,40.258 Z"/>
+        <path class="td-shape td-shape-4" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" fill="url(#td-gradient)"
+         d="M448.154,283.502 C433.331,287.817 418.232,289.179 403.149,286.716 C372.159,281.657 321.228,234.487 272.419,146.342 C263.823,130.819 250.305,108.979 237.500,89.500 C233.223,82.994 222.775,69.173 214.500,58.500 C203.413,44.201 194.993,34.554 182.500,25.500 C158.346,7.995 136.293,2.280 118.114,1.682 C87.357,0.670 59.932,13.406 40.962,30.614 C15.339,53.858 -12.540,101.885 8.816,147.414 C28.392,189.148 81.003,209.612 114.900,196.705 C148.175,184.035 158.306,140.757 158.834,140.984 C159.306,141.189 152.497,176.424 123.472,191.348 C87.625,209.779 35.831,187.967 15.245,149.557 C-6.524,108.940 13.022,63.450 35.605,39.187 C50.732,22.934 80.503,2.091 118.500,6.500 C145.737,9.660 165.644,24.961 184.500,44.500 C219.537,80.806 239.930,117.993 257.417,150.628 C267.380,169.221 276.783,185.984 287.421,200.992 C329.980,261.036 377.994,285.049 402.077,287.788 C417.697,289.564 433.161,287.915 448.154,283.502 Z"/>
+        <path class="td-shape td-shape-5" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill-opacity="0" fill="url(#td-gradient)"
+         d="M160.140,140.624 C157.760,141.299 155.235,141.113 153.212,139.815 C151.263,138.564 150.020,136.326 149.549,133.296 C148.515,126.637 153.305,118.378 159.823,115.871 C160.187,115.731 164.171,115.221 166.167,113.451 C167.289,112.456 169.028,109.251 169.512,104.667 C169.661,103.253 169.686,101.820 169.588,100.368 C169.897,100.460 170.206,100.552 170.515,100.644 C170.117,104.379 169.546,108.262 168.663,110.769 C168.470,111.319 167.928,112.832 168.317,114.480 C168.827,116.635 170.536,117.797 171.588,118.690 C176.379,122.754 177.158,129.157 177.219,131.739 C177.341,136.914 175.802,139.629 173.897,141.169 C171.667,142.971 168.079,143.886 164.892,142.498 C163.729,141.991 162.711,141.210 161.870,140.213 C160.878,142.583 159.754,144.887 158.498,147.123 C157.801,148.363 157.079,149.556 156.304,150.750 C156.192,150.568 156.079,150.386 155.966,150.204 C156.973,148.825 157.828,147.347 158.520,145.786 C159.254,144.130 159.796,142.403 160.140,140.624 Z"/>
+        <path class="td-shape td-shape-6" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+         d="M67.887,26.958 C70.067,25.412 72.705,24.691 75.234,25.283 C77.670,25.855 79.743,27.685 81.315,30.602 C84.769,37.010 82.869,47.149 77.135,52.053 C76.815,52.327 72.942,54.282 71.547,56.805 C70.763,58.222 70.147,62.113 71.308,66.956 C71.666,68.450 72.157,69.919 72.781,71.362 C72.433,71.380 72.085,71.398 71.737,71.415 C70.796,67.468 69.977,63.307 69.972,60.436 C69.970,59.806 69.977,58.070 68.986,56.532 C67.690,54.520 65.530,53.953 64.136,53.424 C57.792,51.013 54.689,44.772 53.697,42.165 C51.706,36.939 52.294,33.618 53.679,31.364 C55.300,28.724 58.625,26.498 62.371,26.763 C63.738,26.860 65.056,27.287 66.273,27.1000 C66.428,25.229 66.742,22.477 67.215,19.747 C67.478,18.232 67.782,16.757 68.141,15.261 C68.321,15.406 68.502,15.551 68.682,15.696 C68.154,17.464 67.817,19.277 67.675,21.116 C67.524,23.067 67.595,25.022 67.887,26.958 Z"/>
+        <text class="td-text td-shape-7" kerning="auto" font-family="Myriad Pro" fill="url(#td-gradient)" transform="matrix( 4.34375704343652, 0, 0, 4.34375704343652,19.7979026024959, 108.294836489945)" font-size="10px"><tspan font-size="10px" font-family="Kh Ang NiTean" fill="url(#td-gradient)">&#6044;&#6031;&#6098;&#6031;&#6035;&#6070;&#6018;&#6044;&#6096;&#6035;</tspan></text>
+        <text class="td-text td-shape-8" kerning="auto" font-family="Myriad Pro" stroke-width="1px" stroke="url(#td-gradient)" fill-opacity="0" stroke-opacity="1" transform="matrix( 4.34375704343652, 0, 0, 4.34375704343652,19.7979026024959, 108.294836489945)" font-size="10px"><tspan font-size="10px" font-family="Kh Ang NiTean" fill="url(#td-gradient)">&#6044;&#6031;&#6098;&#6031;&#6035;&#6070;&#6018;&#6044;&#6096;&#6035;</tspan></text>
+        <path class="td-shape td-shape-9" pathLength="100" fill-rule="evenodd"  stroke="url(#td-gradient)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+         d="M62.685,113.077 L152.072,113.077 L152.072,116.864 L62.685,116.864 L62.685,113.077 Z"/>
+    </g>
     </svg>
 </template>
 
@@ -50,26 +38,27 @@
 }
 
 .td-shape {
-    fill: url(#td-gradient);
-    stroke: url(#td-gradient);
-    stroke-width: 1px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
     fill-opacity: 0;
-    
     animation: draw-shape 1.2s cubic-bezier(0.8, 0, 0.2, 1) forwards;
 }
 
-.td-t { animation-delay: 0s; }
-.td-d { animation-delay: 0.15s; }
-.td-bubble-1 { animation-delay: 0.3s; }
-.td-bubble-2 { animation-delay: 0.35s; }
-.td-bubble-3 { animation-delay: 0.4s; }
-.td-bubble-4 { animation-delay: 0.45s; }
-.td-spark { animation-delay: 0.5s; }
+/* Text elements only fade in because stroke-dasharray doesn't work the same on text */
+.td-text {
+    opacity: 0;
+    animation: fade-in 1.2s ease-in-out forwards;
+}
+
+.td-shape-1 { animation-delay: 0.1s; }
+.td-shape-2 { animation-delay: 0.2s; }
+.td-shape-3 { animation-delay: 0.3s; }
+.td-shape-4 { animation-delay: 0.4s; }
+.td-shape-5 { animation-delay: 0.5s; }
+.td-shape-6 { animation-delay: 0.6s; }
+.td-shape-7 { animation-delay: 0.7s; }
+.td-shape-8 { animation-delay: 0.8s; }
+.td-shape-9 { animation-delay: 0.9s; }
 
 @keyframes draw-shape {
     0% {
@@ -83,6 +72,18 @@
     100% {
         stroke-dashoffset: 0;
         fill-opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    60% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
 </style>

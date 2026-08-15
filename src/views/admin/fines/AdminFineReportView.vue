@@ -16,46 +16,36 @@
         <div :class="isComponent ? '' : 'container-fluid px-3 px-md-4'">
 
             <!-- Search & Filter Bar -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: var(--surface-card);">
-                <div class="card-body p-3">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-5 col-lg-6">
-                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search</label>
-                            <div class="position-relative">
-                                <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
-                                <input
-                                    type="text"
-                                    class="form-control ps-5"
-                                    placeholder="Search by payer or collector…"
-                                    v-model="searchQuery"
-                                />
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-3">
-                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
-                            <select v-model="selectedRowFilter" class="form-select">
-                                <option value="">All Rows</option>
-                                <option value="unassigned">⚠️ Unassigned Row</option>
-                                <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
-                                    Row {{ row.row_num }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-3">
-                            <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
-                            <select v-model="selectedKudiFilter" class="form-select">
-                                <option value="">All Kudis</option>
-                                <option value="unassigned">⚠️ Unassigned Kudi</option>
-                                <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name">
-                                    {{ kudi.name || `Kudi ${kudi.id}` }}
-                                </option>
-                            </select>
-                        </div>
+            <div class="mb-4 d-flex flex-column flex-lg-row align-items-lg-center justify-content-end gap-3 w-100">
+                <!-- Filters -->
+                <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100 w-lg-auto">
+                    <div class="search-input w-100" style="min-width: 280px;">
+                        <BaseInput 
+                            type="text" 
+                            v-model="searchQuery" 
+                            placeholder="Search by payer or collector…"
+                            :prefixIcon="Search"
+                            clearable
+                        />
+                    </div>
+                    <div class="row-select w-100" style="min-width: 150px;">
+                        <BaseSelect 
+                            v-model="selectedRowFilter" 
+                            placeholder="Row"
+                            :options="[{label: 'All Rows', value: ''}, {label: '⚠️ Unassigned Row', value: 'unassigned'}, ...seatingRows.map(r => ({label: 'Row ' + r.row_num, value: r.row_num}))]"
+                        />
+                    </div>
+                    <div class="kudi-select w-100" style="min-width: 150px;">
+                        <BaseSelect 
+                            v-model="selectedKudiFilter" 
+                            placeholder="Kudi"
+                            :options="[{label: 'All Kudis', value: ''}, {label: '⚠️ Unassigned Kudi', value: 'unassigned'}, ...kudiList.map(k => ({label: k.name || `Kudi ${kudi.id}`, value: k.name}))]"
+                        />
                     </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
                     <div v-if="isLoading" class="text-center py-5">
                         <div class="spinner-border text-primary" role="status"></div>
@@ -134,7 +124,10 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
+import { Search } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
 
 const colDefs = [
     { field: 'payment_date', header: 'Date (កាលបរិច្ឆេទ)', class: 'mobile-stack' },
@@ -318,7 +311,7 @@ onMounted(async () => {
 }
 .total-footer__item {
     display: flex;
-    flex-column: column;
+    flex-direction: column;
     align-items: center;
 }
 .total-footer__label {

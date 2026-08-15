@@ -1,13 +1,6 @@
 <template>
     <div class="user-view d-flex flex-column gap-3">
-        <!-- Title Banner -->
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-3 rounded" style="background-color: var(--body-bg-color); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-            <div>
-                <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">
-                    Users Management <span class="d-none d-md-inline">/ គ្រប់គ្រងអ្នកប្រើប្រាស់</span>
-                </h5>
-            </div>
-        </div>
+       
 
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2" style="background-color: var(--surface-ground);">
         <div>

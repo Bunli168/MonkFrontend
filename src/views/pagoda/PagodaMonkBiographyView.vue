@@ -18,7 +18,7 @@
                         <img v-if="viewedUserAvatar || (!props.userId && authStore.user?.profile?.avatarUrl)" 
                              :src="$authImg(viewedUserAvatar || authStore.user?.profile?.avatarUrl)" 
                              class="w-100 h-100 rounded-circle object-fit-cover">
-                        <span v-else>{{ form.surname_name ? form.surname_name.charAt(0).toUpperCase() : 'M' }}</span>
+                        <img v-else src="/app-logo.png" class="w-100 h-100 rounded-circle object-fit-cover bg-white" />
                     </div>
                     <div class="flex-grow-1">
                         <h4 class="mb-1 fw-bold" style="color: var(--text-heading-color);">{{ form.surname_name || 'N/A' }}</h4>

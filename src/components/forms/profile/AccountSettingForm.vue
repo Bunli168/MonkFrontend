@@ -155,7 +155,7 @@
         <BaseModal v-model="showInstallModal" title="How to Install App" size="sm">
             <div class="text-center py-3">
                 <div class="mb-3">
-                    <Download :size="48" class="text-primary mb-2" />
+                    <img src="/app-logo.png" width="80" height="80" class="mb-3 object-fit-contain rounded-circle shadow-sm bg-white p-1" alt="App Logo" />
                     <h6>កម្មវិធីនេះត្រូវបានដំឡើងរួចហើយ! <br><span class="text-muted fw-normal">(App is already installed or requires manual install)</span></h6>
                 </div>
                 

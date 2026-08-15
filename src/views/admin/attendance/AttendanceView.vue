@@ -5,11 +5,13 @@
                 <h5 class="mb-0 fw-bold" style="color: var(--text-heading-color);">Attendance & Reports</h5>
             </div>
             <!-- Season Dropdown -->
-            <select v-model="selectedSeasonId" @change="onSeasonChange" class="form-select w-100 w-sm-auto" style="max-width: 250px;" v-if="seasons.length > 0">
-                <option v-for="season in seasons" :key="season.id" :value="season.id">
-                    {{ season.name }}
-                </option>
-            </select>
+            <div class="w-100 w-sm-auto" style="max-width: 250px;" v-if="seasons.length > 0">
+                <BaseSelect 
+                    v-model="selectedSeasonId" 
+                    :options="seasons.map(s => ({label: s.name, value: s.id}))" 
+                    @update:modelValue="onSeasonChange"
+                />
+            </div>
         </div>
 
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2" style="background-color: var(--surface-ground);">
@@ -19,25 +21,6 @@
                         <div class="d-flex align-items-center gap-2">
                             <CalendarCheck :size="16" class="text-primary" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'attendance'}">Master Attendance</span>
-                        </div>
-                    </Tab>
-
-                    <Tab value="unassigned">
-                        <div class="d-flex align-items-center gap-2">
-                            <UserX :size="16" class="text-danger" />
-                            <span :class="{'d-none d-md-inline': activeTab !== 'unassigned'}">Unassigned Members</span>
-                            <span
-                                v-if="unassignedMonksCount > 0"
-                                class="badge rounded-pill ms-1"
-                                style="background: #f59e0b; color: #fff; font-size: 0.68rem; padding: 2px 7px; line-height: 1.5;"
-                            >{{ unassignedMonksCount }}</span>
-                        </div>
-                    </Tab>
-
-                    <Tab value="report">
-                        <div class="d-flex align-items-center gap-2">
-                            <History :size="16" class="text-info" />
-                            <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
                         </div>
                     </Tab>
 
@@ -53,10 +36,29 @@
                         </div>
                     </Tab>
 
+                    <Tab value="report">
+                        <div class="d-flex align-items-center gap-2">
+                            <History :size="16" class="text-info" />
+                            <span :class="{'d-none d-md-inline': activeTab !== 'report'}">Payment History</span>
+                        </div>
+                    </Tab>
+
                     <Tab value="takers">
                         <div class="d-flex align-items-center gap-2">
                             <UsersRound :size="16" class="text-success" />
                             <span :class="{'d-none d-md-inline': activeTab !== 'takers'}">Attendance Takers</span>
+                        </div>
+                    </Tab>
+
+                    <Tab value="unassigned">
+                        <div class="d-flex align-items-center gap-2">
+                            <UserX :size="16" class="text-danger" />
+                            <span :class="{'d-none d-md-inline': activeTab !== 'unassigned'}">Unassigned Members</span>
+                            <span
+                                v-if="unassignedMonksCount > 0"
+                                class="badge rounded-pill ms-1"
+                                style="background: #f59e0b; color: #fff; font-size: 0.68rem; padding: 2px 7px; line-height: 1.5;"
+                            >{{ unassignedMonksCount }}</span>
                         </div>
                     </Tab>
                 </TabList>
@@ -66,38 +68,38 @@
                 <!-- Tab 1: Master Attendance -->
                 <TabPanel value="attendance">
                     <!-- Filters Section -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body bg-white rounded-3 p-3">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-12 col-sm-6 col-md-3">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Date</label>
-                                    <input type="date" v-model="selectedDate" class="form-control" @change="fetchMonks">
-                                </div>
-                                <div class="col-12 col-sm-6 col-md-4">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Monk</label>
-                                    <div class="position-relative">
-                                        <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
-                                        <input type="text" class="form-control ps-5" placeholder="Name or phone..." v-model="searchQuery">
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Row</label>
-                                    <select v-model="selectedRowFilter" class="form-select">
-                                        <option value="">All Rows</option>
-                                        <option v-for="row in seatingRows" :key="row.id" :value="row.row_num">
-                                            Row {{ row.row_num }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
-                                    <select v-model="selectedKudiFilter" class="form-select">
-                                        <option value="">All Kudis</option>
-                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
-                                            {{ kudi.name || `Kudi ${kudi.id}` }}
-                                        </option>
-                                    </select>
-                                </div>
+                    <div class="mb-4">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <BaseInput 
+                                    type="date" 
+                                    v-model="selectedDate" 
+                                    label="Date"
+                                    @update:modelValue="fetchMonks"
+                                />
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <BaseInput 
+                                    type="text" 
+                                    v-model="searchQuery" 
+                                    label="Search Monk"
+                                    placeholder="Name or phone..."
+                                    :prefixIcon="Search"
+                                />
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <BaseSelect 
+                                    v-model="selectedRowFilter" 
+                                    label="Row"
+                                    :options="[{label: 'All Rows', value: ''}, ...seatingRows.map(r => ({label: 'Row ' + r.row_num, value: r.row_num}))]"
+                                />
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <BaseSelect 
+                                    v-model="selectedKudiFilter" 
+                                    label="Kudi"
+                                    :options="[{label: 'All Kudis', value: ''}, ...kudiList.map(k => ({label: k.name || `Kudi ${kudi.id}`, value: k.name || k.id}))]"
+                                />
                             </div>
                         </div>
                     </div>
@@ -122,35 +124,26 @@
                                             <img :src="`https://neakavorn.work.gd${monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url}`" 
                                                  class="w-100 h-100 object-fit-cover" />
                                         </div>
-                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-gradient text-white flex-shrink-0" 
-                                             :class="getStatusColor(monk.attendance?.status)"
-                                             style="width: 40px; height: 40px; font-size: 1.1rem;">
-                                            {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
+                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0 bg-white" 
+                                             style="width: 40px; height: 40px;">
+                                            <img src="/app-logo.png" class="w-100 h-100 object-fit-cover rounded-circle" />
                                         </div>
                                         <span class="fw-bold text-dark text-decoration-underline-hover">{{ monk.fullName }}</span>
                                     </div>
                                 </template>
 
                                 <template #kudi="{ data: monk }">
-                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
-                                        {{ monk.kudiNumber || 'Unassigned' }}
-                                    </span>
+                                    <span class="text-primary fw-medium">{{ monk.kudiNumber || '—' }}</span>
+                                </template>
+                                <template #row="{ data: monk }">
+                                    <span class="text-primary fw-medium">{{ monk.rowNumber || '—' }}</span>
+                                </template>
+                                <template #seat="{ data: monk }">
+                                    <span class="text-primary fw-medium">{{ monk.seatNumber || '—' }}</span>
                                 </template>
 
                                 <template #phone="{ data: monk }">
                                     <span class="text-muted">{{ monk.phone || monk.chhaya_number || 'N/A' }}</span>
-                                </template>
-
-                                <template #row_number="{ data: monk }">
-                                    <span :class="monk.rowNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
-                                        {{ monk.rowNumber ? 'Row ' + monk.rowNumber : 'Unassigned' }}
-                                    </span>
-                                </template>
-
-                                <template #seat_number="{ data: monk }">
-                                    <span :class="monk.seatNumber ? 'fw-medium' : 'badge bg-warning-subtle text-warning border border-warning-subtle'">
-                                        {{ monk.seatNumber ? 'Seat ' + monk.seatNumber : 'Unassigned' }}
-                                    </span>
                                 </template>
 
                                 <template #absents="{ data: monk }">
@@ -162,23 +155,25 @@
                                 </template>
 
                                 <template #role="{ data: monk }">
-                                    <span class="badge rounded-pill border"
-                                          :class="(monk.role || '').toLowerCase().includes('bhikkhu') ? 'bg-info bg-opacity-10 text-info border-info' : 'bg-secondary bg-opacity-10 text-secondary border-secondary'">
-                                        {{ monk.role || 'Member' }}
-                                    </span>
+                                    <BaseBadge 
+                                        :variant="(monk.role || '').toLowerCase().includes('bhikkhu') ? 'info' : 'secondary'"
+                                        :label="monk.role || 'Member'"
+                                        pill
+                                        size="sm"
+                                    />
                                 </template>
 
                                 <template #status="{ data: monk }">
-                                    <div class="btn-group w-100 shadow-sm" role="group">
-                                        <input type="radio" class="btn-check" :name="'status-'+monk.id" :id="'present-'+monk.id" autocomplete="off" :checked="!monk.attendance?.status || monk.attendance?.status === 'present'" @change="setStatus(monk, 'present')">
-                                        <label class="btn btn-sm btn-outline-success py-1" :for="'present-'+monk.id"><i class="fas fa-check me-1"></i> Present</label>
-
-                                        <input type="radio" class="btn-check" :name="'status-'+monk.id" :id="'absent-'+monk.id" autocomplete="off" :checked="monk.attendance?.status === 'absent'" @change="setStatus(monk, 'absent')">
-                                        <label class="btn btn-sm btn-outline-danger py-1" :for="'absent-'+monk.id"><i class="fas fa-times me-1"></i> Absent</label>
-
-                                        <input type="radio" class="btn-check" :name="'status-'+monk.id" :id="'permission-'+monk.id" autocomplete="off" :checked="monk.attendance?.status === 'permission'" @change="setStatus(monk, 'permission')">
-                                        <label class="btn btn-sm btn-outline-warning py-1" :for="'permission-'+monk.id"><i class="fas fa-bed me-1"></i> Leave</label>
-                                    </div>
+                                    <BaseSelectButton 
+                                        :modelValue="monk.attendance?.status || 'present'"
+                                        @update:modelValue="setStatus(monk, $event)"
+                                        :options="[
+                                            { label: 'Present', value: 'present' },
+                                            { label: 'Absent', value: 'absent' },
+                                            { label: 'Leave', value: 'permission' }
+                                        ]"
+                                        :allowEmpty="false"
+                                    />
                                 </template>
 
                                 <template #notes="{ data: monk }">
@@ -187,8 +182,8 @@
 
                                 <template #actions="{ data: monk }">
                                     <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" @click.stop="viewMonkProfile(monk)" title="View Profile">
-                                            <Eye :size="15" class="text-primary" />
+                                        <button type="button" class="btn btn-sm btn-link text-primary text-decoration-none fw-medium p-0" @click.stop="viewMonkProfile(monk)">
+                                            View
                                         </button>
                                     </div>
                                 </template>
@@ -197,27 +192,44 @@
                     </div>
                 </TabPanel>
 
-                <!-- Tab 2: Dedicated Unassigned Members Tab -->
+
+
+                <!-- Tab 2: Leave Requests Tab -->
+                <TabPanel value="leave">
+                    <AdminLeaveRequestsView ref="leaveViewRef" v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
+                </TabPanel>
+
+                <!-- Tab 3: Report Tab -->
+                <TabPanel value="report">
+                    <AdminFineReportView v-if="activeTab === 'report'" :isComponent="true" :seasonId="selectedSeasonId" />
+                </TabPanel>
+
+
+
+                <!-- Tab 4: Takers Tab -->
+                <TabPanel value="takers">
+                    <AdminTakersTableView v-if="activeTab === 'takers'" />
+                </TabPanel>
+
+                <!-- Tab 5: Dedicated Unassigned Members Tab -->
                 <TabPanel value="unassigned">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body bg-white rounded-3 p-3">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-12 col-md-7 col-lg-8">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Search Unassigned Member</label>
-                                    <div class="position-relative">
-                                        <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
-                                        <input type="text" class="form-control ps-5" placeholder="Search by name or phone…" v-model="unassignedSearchQuery">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-5 col-lg-4">
-                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Kudi</label>
-                                    <select v-model="unassignedKudiFilter" class="form-select">
-                                        <option value="">All Kudis</option>
-                                        <option v-for="kudi in kudiList" :key="kudi.id || kudi.name" :value="kudi.name || kudi.id">
-                                            {{ kudi.name || `Kudi ${kudi.id}` }}
-                                        </option>
-                                    </select>
-                                </div>
+                    <div class="mb-4">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-md-7 col-lg-8">
+                                <BaseInput 
+                                    type="text" 
+                                    v-model="unassignedSearchQuery" 
+                                    label="Search Unassigned Member"
+                                    placeholder="Search by name or phone…"
+                                    :prefixIcon="Search"
+                                />
+                            </div>
+                            <div class="col-12 col-md-5 col-lg-4">
+                                <BaseSelect 
+                                    v-model="unassignedKudiFilter" 
+                                    label="Kudi"
+                                    :options="[{label: 'All Kudis', value: ''}, ...kudiList.map(k => ({label: k.name || `Kudi ${kudi.id}`, value: k.name || k.id}))]"
+                                />
                             </div>
                         </div>
                     </div>
@@ -241,9 +253,9 @@
                                             <img :src="`https://neakavorn.work.gd${monk.profile?.avatar_url || monk.UserProfile?.avatar_url || monk.avatar_url}`" 
                                                  class="w-100 h-100 object-fit-cover" />
                                         </div>
-                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm bg-warning text-white flex-shrink-0" 
-                                             style="width: 40px; height: 40px; font-size: 1.1rem;">
-                                            {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
+                                        <div v-else class="avatar rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0 bg-white" 
+                                             style="width: 40px; height: 40px;">
+                                            <img src="/app-logo.png" class="w-100 h-100 object-fit-cover rounded-circle" />
                                         </div>
                                         <div class="d-flex flex-column min-w-0">
                                             <span class="fw-bold text-dark text-decoration-underline-hover text-truncate">{{ monk.fullName }}</span>
@@ -253,25 +265,17 @@
                                 </template>
 
                                 <template #kudi="{ data: monk }">
-                                    <span :class="monk.kudiNumber ? 'fw-medium' : 'badge bg-secondary-subtle text-secondary'">
-                                        {{ monk.kudiNumber || 'Unassigned' }}
-                                    </span>
+                                    <span class="text-primary fw-medium">{{ monk.kudiNumber || '—' }}</span>
+                                </template>
+                                <template #row="{ data: monk }">
+                                    <span class="text-primary fw-medium">{{ monk.rowNumber || '—' }}</span>
+                                </template>
+                                <template #seat="{ data: monk }">
+                                    <span class="text-primary fw-medium">{{ monk.seatNumber || '—' }}</span>
                                 </template>
 
                                 <template #phone="{ data: monk }">
                                     <span class="text-muted">{{ monk.phone || monk.chhaya_number || 'N/A' }}</span>
-                                </template>
-
-                                <template #row_number>
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
-                                        Unassigned
-                                    </span>
-                                </template>
-
-                                <template #seat_number>
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
-                                        Unassigned
-                                    </span>
                                 </template>
 
                                 <template #absents="{ data: monk }">
@@ -283,36 +287,24 @@
                                 </template>
 
                                 <template #role="{ data: monk }">
-                                    <span class="badge rounded-pill border bg-secondary bg-opacity-10 text-secondary border-secondary">
-                                        {{ monk.role || 'Member' }}
-                                    </span>
+                                    <BaseBadge 
+                                        :variant="(monk.role || '').toLowerCase().includes('bhikkhu') ? 'info' : 'secondary'"
+                                        :label="monk.role || 'Member'"
+                                        pill
+                                        size="sm"
+                                    />
                                 </template>
 
                                 <template #actions="{ data: monk }">
                                     <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" @click.stop="viewMonkProfile(monk)" title="View Profile">
-                                            <Eye :size="15" class="text-primary" />
+                                        <button type="button" class="btn btn-sm btn-link text-primary text-decoration-none fw-medium p-0" @click.stop="viewMonkProfile(monk)">
+                                            View
                                         </button>
                                     </div>
                                 </template>
                             </BaseTable>
                         </div>
                     </div>
-                </TabPanel>
-
-                <!-- Tab 3: Report Tab -->
-                <TabPanel value="report">
-                    <AdminFineReportView v-if="activeTab === 'report'" :isComponent="true" :seasonId="selectedSeasonId" />
-                </TabPanel>
-
-                <!-- Tab 4: Leave Requests Tab -->
-                <TabPanel value="leave">
-                    <AdminLeaveRequestsView ref="leaveViewRef" v-if="activeTab === 'leave'" :seasonId="selectedSeasonId" />
-                </TabPanel>
-
-                <!-- Tab 5: Takers Tab -->
-                <TabPanel value="takers">
-                    <AdminTakersTableView v-if="activeTab === 'takers'" />
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -333,6 +325,10 @@ import { useToastStore } from '@/stores/toast';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseDrawer from '@/components/base/BaseDrawer.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseSelect from '@/components/base/BaseSelect.vue';
+import BaseSelectButton from '@/components/base/BaseSelectButton.vue';
+import BaseBadge from '@/components/base/BaseBadge.vue';
 import UserDetailView from '@/views/admin/users/UserDetailView.vue';
 import AdminFineReportView from '@/views/admin/fines/AdminFineReportView.vue';
 import AdminLeaveRequestsView from './AdminLeaveRequestsView.vue';
@@ -435,10 +431,11 @@ const colDefs = computed(() => {
         { field: 'name', header: 'Monk Name' },
         { field: 'role', header: 'Role' },
         { field: 'kudi', header: 'Kudi', class: 'text-center' },
+        { field: 'row', header: 'Row', class: 'text-center' },
+        { field: 'seat', header: 'Seat', class: 'text-center' },
         { field: 'phone', header: 'Phone' },
-        { field: 'row_number', header: 'Row' },
-        { field: 'seat_number', header: 'Seat' },
         { field: 'absents', header: 'Absents', class: 'text-center' },
+        { field: 'status', header: 'Status', class: 'text-center', style: 'min-width: 250px;' },
         { field: 'actions', header: 'Actions', class: 'text-center' }
     ];
 });
@@ -448,9 +445,9 @@ const unassignedColDefs = computed(() => {
         { field: 'name', header: 'Monk Name' },
         { field: 'role', header: 'Role' },
         { field: 'kudi', header: 'Kudi', class: 'text-center' },
+        { field: 'row', header: 'Row', class: 'text-center' },
+        { field: 'seat', header: 'Seat', class: 'text-center' },
         { field: 'phone', header: 'Phone' },
-        { field: 'row_number', header: 'Row' },
-        { field: 'seat_number', header: 'Seat' },
         { field: 'absents', header: 'Absents', class: 'text-center' },
         { field: 'actions', header: 'Actions', class: 'text-center' }
     ];

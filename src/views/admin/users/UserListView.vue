@@ -70,9 +70,9 @@
                     <div>
                     <div class="user-profile-avatar d-flex align-items-center justify-content-center text-muted"
                         style="border-radius: 50%;">
-                        <img v-if="data?.profile?.avatarUrl" :src="$authImg(data.profile.avatarUrl)" class="img-fluid"
+                        <img v-if="data?.profile?.avatarUrl" :src="$authImg(data.profile.avatarUrl)" class="img-fluid w-100 h-100 object-fit-cover"
                             style="border-radius: 50%;">
-                        <User v-else :size="20" />
+                        <img v-else src="/app-logo.png" class="img-fluid w-100 h-100 object-fit-cover" style="border-radius: 50%;" />
                     </div>
                     </div>
                     <div class="d-flex flex-column align-items-start" style="min-width: 0;">

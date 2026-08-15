@@ -14,7 +14,7 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
-      includeAssets: ['neakavorn-pagoda.png', 'robots.txt'],
+      includeAssets: ['app-logo.png', 'robots.txt'],
       manifest: {
         name: 'វត្តនាគវ័ន (Neakavorn Pagoda)',
         short_name: 'វត្តនាគវ័ន',
@@ -25,12 +25,12 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/neakavorn-pagoda.png',
+            src: '/app-logo.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/neakavorn-pagoda.png',
+            src: '/app-logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
