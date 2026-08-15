@@ -1,37 +1,7 @@
 import { ref, computed, reactive } from 'vue';
-import api from '@/api/api';
+import pobData from '@/assets/data/pob_locations.json';
 
-// Global cache
-let cache = null;
-let isFetching = false;
-let fetchPromise = null;
-
-const fetchBackendLocations = async () => {
-    if (cache) return cache;
-    if (isFetching && fetchPromise) return fetchPromise;
-
-    isFetching = true;
-    fetchPromise = (async () => {
-        try {
-            const res = await api.get('/locations/all');
-            const data = res.data;
-            if (data.success && data.data) {
-                cache = data.data;
-            } else {
-                cache = { provinces: [], districts: [], communes: [], villages: [] };
-            }
-        } catch (error) {
-            console.error('Failed to fetch local locations:', error);
-            cache = { provinces: [], districts: [], communes: [], villages: [] };
-        }
-        isFetching = false;
-        return cache;
-    })();
-
-    return fetchPromise;
-};
-
-export function useLocation() {
+export function usePobLocation() {
     const provinces = ref([]);
     const districts = ref([]);
     const communes = ref([]);
@@ -50,10 +20,9 @@ export function useLocation() {
     const fetchProvinces = async () => {
         isLoadingProvinces.value = true;
         try {
-            const data = await fetchBackendLocations();
-            provinces.value = data.provinces.map(p => ({
-                province_code: p.id,
-                province_kh: p.name,
+            provinces.value = pobData.provinces.map(p => ({
+                province_code: p.code,
+                province_kh: p.name_kh,
                 province_en: p.name_en
             })).sort((a, b) => a.province_kh.localeCompare(b.province_kh));
         } finally {
@@ -68,14 +37,16 @@ export function useLocation() {
         }
         isLoadingDistricts.value = true;
         try {
-            const data = await fetchBackendLocations();
-            districts.value = data.districts
-                .filter(d => String(d.province_id) === String(provinceCode))
-                .map(d => ({
-                    district_code: d.id,
-                    district_kh: d.name,
+            const prov = pobData.provinces.find(p => String(p.code) === String(provinceCode));
+            if (prov && prov.districts) {
+                districts.value = prov.districts.map(d => ({
+                    district_code: d.code,
+                    district_kh: d.name_kh,
                     district_en: d.name_en
                 })).sort((a, b) => a.district_kh.localeCompare(b.district_kh));
+            } else {
+                districts.value = [];
+            }
         } finally {
             isLoadingDistricts.value = false;
         }
@@ -88,14 +59,25 @@ export function useLocation() {
         }
         isLoadingCommunes.value = true;
         try {
-            const data = await fetchBackendLocations();
-            communes.value = data.communes
-                .filter(c => String(c.district_id) === String(districtCode))
-                .map(c => ({
-                    commune_code: c.id,
-                    commune_kh: c.name,
+            let foundDist = null;
+            for (const prov of pobData.provinces) {
+                if (prov.districts) {
+                    const dist = prov.districts.find(d => String(d.code) === String(districtCode));
+                    if (dist) {
+                        foundDist = dist;
+                        break;
+                    }
+                }
+            }
+            if (foundDist && foundDist.communes) {
+                communes.value = foundDist.communes.map(c => ({
+                    commune_code: c.code,
+                    commune_kh: c.name_kh,
                     commune_en: c.name_en
                 })).sort((a, b) => a.commune_kh.localeCompare(b.commune_kh));
+            } else {
+                communes.value = [];
+            }
         } finally {
             isLoadingCommunes.value = false;
         }
@@ -108,14 +90,29 @@ export function useLocation() {
         }
         isLoadingVillages.value = true;
         try {
-            const data = await fetchBackendLocations();
-            villages.value = data.villages
-                .filter(v => String(v.commune_id) === String(communeCode))
-                .map(v => ({
-                    village_code: v.id,
-                    village_kh: v.name,
+            let foundComm = null;
+            for (const prov of pobData.provinces) {
+                if (prov.districts) {
+                    for (const dist of prov.districts) {
+                        if (dist.communes) {
+                            const comm = dist.communes.find(c => String(c.code) === String(communeCode));
+                            if (comm) {
+                                foundComm = comm;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (foundComm && foundComm.villages) {
+                villages.value = foundComm.villages.map(v => ({
+                    village_code: v.code,
+                    village_kh: v.name_kh,
                     village_en: v.name_en
                 })).sort((a, b) => a.village_kh.localeCompare(b.village_kh));
+            } else {
+                villages.value = [];
+            }
         } finally {
             isLoadingVillages.value = false;
         }
@@ -126,14 +123,14 @@ export function useLocation() {
         districts,
         communes,
         villages,
-        isLoadingProvinces,
-        isLoadingDistricts,
-        isLoadingCommunes,
-        isLoadingVillages,
         provinceOptions,
         districtOptions,
         communeOptions,
         villageOptions,
+        isLoadingProvinces,
+        isLoadingDistricts,
+        isLoadingCommunes,
+        isLoadingVillages,
         fetchProvinces,
         fetchDistricts,
         fetchCommunes,
