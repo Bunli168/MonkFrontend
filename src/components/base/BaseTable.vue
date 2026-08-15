@@ -3,7 +3,7 @@
         <DataTable removableSort resizableColumns columnResizeMode="expand" :value="tableRows" :lazy="true"
             :paginator="true" :totalRecords="totalRecords" :rows="perPage" :first="firstRowIndex" :sortField="sortBy"
             :sortOrder="primeSortOrder" @page="onServerPage" @sort="onServerSort" :rowClass="getRowClass"
-            v-model:selection="internalSelection" :dataKey="dataKey" @rowClick="(e) => $emit('row-click', e.data)"
+            :dataKey="dataKey" @rowClick="(e) => $emit('row-click', e.data)"
             :paginatorTemplate="dynamicPaginatorTemplate"
             currentPageReportTemplate="{first} to {last} of {totalRecords}" :rowsPerPageOptions="dynamicRowsPerPageOptions"
             :alwaysShow="dynamicRowsPerPageOptions.length > 1">
@@ -14,7 +14,20 @@
                 </div>
             </template>
 
-            <Column v-if="selectable" selectionMode="multiple" headerStyle="width: 3rem"></Column>
+            
+            <Column v-if="selectable" headerStyle="width: 3rem; text-align: center" bodyStyle="text-align: center">
+                <template #header>
+                    <div class="form-check m-0 d-flex justify-content-center w-100" @click.stop>
+                        <span v-if="selectionHeader" class="fw-bold text-danger">{{ selectionHeader }}</span>
+                        <input v-else class="form-check-input m-0" type="checkbox" :checked="isAllSelected" @change="toggleAllSelection" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                    </div>
+                </template>
+                <template #body="{ data }">
+                    <div class="form-check m-0 d-flex justify-content-center w-100" @click.stop>
+                        <input class="form-check-input m-0" type="checkbox" :checked="isRowSelected(data)" @change="toggleRowSelection(data)" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                    </div>
+                </template>
+            </Column>
 
             <Column v-if="showIndex" header="No." headerStyle="width: 5rem" :sortable="true" sortField="id" :class="hideIndexOnMobile ? 'd-none d-md-table-cell' : ''" :headerClass="hideIndexOnMobile ? 'd-none d-md-table-cell' : ''">
                 <template #body="{ index }">
@@ -80,7 +93,8 @@ const props = defineProps({
     hideIndexOnMobile: { type: Boolean, default: false },
     stackOnMobile: { type: Boolean, default: true },
     dataKey: { type: String, default: 'id' },
-    selection: { type: Array, default: () => [] }
+    selection: { type: Array, default: () => [] },
+    selectionHeader: { type: String, default: "" }
 });
 
 const emit = defineEmits(['update:page', 'update:perPage', 'update:per-page', 'update:sortBy', 'update:sort-by', 'update:sortOrder', 'update:sort-order', 'refresh-data', 'update:selection', 'row-click']);
@@ -102,6 +116,56 @@ const getRowNumber = (index) => {
 const primeSortOrder = computed(() => props.sortOrder === 'desc' ? -1 : 1);
 
 const showSkeleton = computed(() => props.loading);
+
+
+const isRowSelected = (data) => {
+    if (!props.selection || !data) return false;
+    return props.selection.some(s => s[props.dataKey] === data[props.dataKey]);
+};
+
+const toggleRowSelection = (data) => {
+    if (!data) return;
+    const current = [...(props.selection || [])];
+    const index = current.findIndex(s => s[props.dataKey] === data[props.dataKey]);
+    
+    if (index !== -1) {
+        current.splice(index, 1);
+    } else {
+        current.push(data);
+    }
+    internalSelection.value = current;
+};
+
+const isAllSelected = computed(() => {
+    if (!props.rows || props.rows.length === 0) return false;
+    if (!props.selection || props.selection.length === 0) return false;
+    
+    return props.rows.every(row => 
+        props.selection.some(s => s[props.dataKey] === row[props.dataKey])
+    );
+});
+
+const toggleAllSelection = (e) => {
+    const checked = e.target.checked;
+    if (checked) {
+        const current = [...(props.selection || [])];
+        const newSelection = [...current];
+        
+        props.rows.forEach(row => {
+            const exists = newSelection.some(s => s[props.dataKey] === row[props.dataKey]);
+            if (!exists) {
+                newSelection.push(row);
+            }
+        });
+        internalSelection.value = newSelection;
+    } else {
+        const current = [...(props.selection || [])];
+        const newSelection = current.filter(s => {
+            return !props.rows.some(row => row[props.dataKey] === s[props.dataKey]);
+        });
+        internalSelection.value = newSelection;
+    }
+};
 
 const tableRows = computed(() => {
     return props.loading ? Array(props.perPage).fill({}) : props.rows;
