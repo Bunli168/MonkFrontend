@@ -161,21 +161,23 @@ const props = defineProps({
 
 const dynamicSchema = computed(() => creationMode.value === 'email' ? userSchemas.create : userSchemas.createAuto);
 
+const getDefaultValues = () => ({
+    email: "",
+    firstName: "",
+    lastName: "",
+    dob: "",
+    gender: "Male",
+    pob: "",
+    roleId: 3,
+    kut_id: authStore.isSuperAdmin ? null : (authStore.user?.profile?.kut_id || authStore.user?.kut_id || null),
+    seating_row_id: null,
+    seat_number: null
+});
+
 const { validate, setValues, errors, resetForm } = useForm({
     validationSchema: dynamicSchema,
     validateOnMount: false,
-    initialValues: {
-        email: "",
-        firstName: "",
-        lastName: "",
-        dob: "",
-        gender: "Male",
-        pob: "",
-        roleId: 3,
-        kut_id: null,
-        seating_row_id: null,
-        seat_number: null
-    }
+    initialValues: getDefaultValues()
 });
 
 const { value: email } = useField('email');
@@ -191,18 +193,7 @@ const { value: seat_number } = useField('seat_number');
 
 watch(creationMode, (newMode) => {
     resetForm({
-        values: {
-            email: "",
-            firstName: "",
-            lastName: "",
-            dob: "",
-            gender: "Male",
-            pob: "",
-            roleId: newMode === 'auto' ? 3 : 3,
-            kut_id: null,
-            seating_row_id: null,
-            seat_number: null
-        }
+        values: getDefaultValues()
     });
 });
 
@@ -216,13 +207,15 @@ const initForm = () => {
             gender: 'Male',
             pob: '',
             roleId: props.initialData?.role?.id || 3,
-            kut_id: authStore.user?.profile?.kut_id || 1,
+            kut_id: props.initialData?.profile?.kut_id || props.initialData?.kut_id || (authStore.isSuperAdmin ? null : (authStore.user?.profile?.kut_id || authStore.user?.kut_id || null)),
             seating_row_id: props.initialData?.seating_row_id || props.initialData?.profile?.seating_row_id || null,
             seat_number: props.initialData?.seat_number || props.initialData?.profile?.seat_number || null
         });
     } else {
         creationMode.value = authStore.isSuperAdmin ? 'email' : 'auto';
-        resetForm();
+        resetForm({
+            values: getDefaultValues()
+        });
     }
 };
 
