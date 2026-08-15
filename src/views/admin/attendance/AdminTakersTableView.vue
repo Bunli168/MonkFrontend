@@ -7,24 +7,23 @@
             </div>
             
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100 ms-sm-auto mt-2 mt-sm-0" style="max-width: 500px;">
-                <div class="position-relative flex-grow-1">
-                    <Search size="16" class="position-absolute text-muted" style="left: 1rem; top: 50%; transform: translateY(-50%);" />
-                    <input 
+                <div class="search-input flex-grow-1 w-100">
+                    <BaseInput 
                         v-model="searchQuery" 
-                        type="text" 
-                        class="form-control rounded border-0 shadow-sm py-2" 
-                        style="padding-left: 2.5rem;"
                         placeholder="Search by name, email, or phone..." 
+                        :prefixIcon="Search"
+                        clearable
                     />
                 </div>
-                <BaseButton @click="showCreateModal = true" variant="primary" class="fw-bold shadow-sm rounded text-nowrap px-4 py-2 d-flex justify-content-center align-items-center mt-2 mt-sm-0">
+                <BaseButton @click="showCreateModal = true" variant="primary" class="d-flex align-items-center justify-content-center px-4 w-100 w-sm-auto text-nowrap mt-2 mt-sm-0">
                     <Plus size="16" class="me-1" /> Add Taker
                 </BaseButton>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-            <BaseTable 
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <BaseTable 
                 :columns="colDefs" 
                 :rows="paginatedTakers" 
                 :totalRecords="filteredTakers.length"
@@ -36,8 +35,8 @@
             >
                 <template #name="{ data: row }">
                     <div class="d-flex align-items-center gap-3 py-1">
-                        <div class="avatar-circle bg-primary-soft text-primary fw-bold flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;">
-                            {{ row.name ? row.name.charAt(0).toUpperCase() : 'U' }}
+                        <div class="avatar-circle bg-white shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;">
+                            <img src="/app-logo.png" class="w-100 h-100 object-fit-cover rounded-circle" />
                         </div>
                         <div>
                             <div class="fw-bold text-dark">{{ row.name }}</div>
@@ -69,26 +68,22 @@
                 </template>
 
                 <template #actions="{ data: row }">
-                    <BaseButton @click="openAssignModal(row)" variant="outline-primary" size="sm" class="rounded-pill text-nowrap">
-                        <i class="fas fa-tasks me-1"></i> Assign Rows
-                    </BaseButton>
+                    <BaseActionMenu :items="getActionItems(row)" />
                 </template>
             </BaseTable>
+            </div>
         </div>
 
         <BaseModal v-model="showCreateModal" title="Create New Attendance Taker" size="sm">
             <form @submit.prevent="createTaker">
                 <div class="mb-3">
-                    <label class="form-label fw-bold small text-muted">Full Name</label>
-                    <input type="text" v-model="newTaker.name" class="form-control" placeholder="e.g. Sok San" required />
+                    <BaseInput v-model="newTaker.name" label="Full Name" placeholder="e.g. Sok San" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small text-muted">Email (Optional)</label>
-                    <input type="email" v-model="newTaker.email" class="form-control" placeholder="example@pagoda.com" />
+                    <BaseInput type="email" v-model="newTaker.email" label="Email (Optional)" placeholder="example@pagoda.com" />
                 </div>
                 <div class="mb-4">
-                    <label class="form-label fw-bold small text-muted">Phone Number</label>
-                    <input type="text" v-model="newTaker.phone" class="form-control" placeholder="e.g. 012345678" required />
+                    <BaseInput type="text" v-model="newTaker.phone" label="Phone Number" placeholder="e.g. 012345678" required />
                 </div>
                 <div class="d-flex justify-content-end gap-2">
                     <BaseButton type="button" variant="outline-secondary" @click="showCreateModal = false">Cancel</BaseButton>
@@ -129,10 +124,12 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { Search, Plus } from '@lucide/vue';
+import { Search, Plus, ListChecks, Edit, Trash2 } from '@lucide/vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
 import BaseModal from '@/components/base/BaseModal.vue';
+import BaseActionMenu from '@/components/base/BaseActionMenu.vue';
 import api from '@/api/api';
 import { useToastStore } from '@/stores/toast';
 
@@ -147,7 +144,7 @@ const colDefs = [
     { field: 'name', header: 'Taker Name', width: '25%', class: 'mobile-stack' },
     { field: 'phone', header: 'Phone Number', width: '20%' },
     { field: 'assigned_rows', header: 'Assigned Rows', width: '40%', class: 'mobile-stack' },
-    { field: 'actions', header: 'Actions', width: '15%', class: 'text-end mobile-stack', sortable: false }
+    { field: 'actions', header: 'Actions', width: '15%', class: 'text-center mobile-stack', sortable: false }
 ];
 
 const showCreateModal = ref(false);
@@ -175,6 +172,37 @@ const openAssignModal = (taker) => {
     selectedRowIds.value = taker.assigned_rows.map(r => r.id);
     initialRowIds.value = [...selectedRowIds.value];
     showAssignModal.value = true;
+};
+
+const editTaker = (taker) => {
+    toast.showToast('Edit feature coming soon', 'info');
+};
+
+const deleteTaker = (taker) => {
+    toast.showToast('Delete feature coming soon', 'info');
+};
+
+const getActionItems = (row) => {
+    return [
+        {
+            label: 'Assign Rows',
+            icon: ListChecks,
+            command: () => openAssignModal(row),
+            iconClass: 'text-primary'
+        },
+        {
+            label: 'Edit',
+            icon: Edit,
+            command: () => editTaker(row),
+            iconClass: 'text-warning'
+        },
+        {
+            label: 'Delete',
+            icon: Trash2,
+            command: () => deleteTaker(row),
+            iconClass: 'text-danger'
+        }
+    ];
 };
 
 const saveAssignedRows = async () => {

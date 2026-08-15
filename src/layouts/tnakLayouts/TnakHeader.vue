@@ -45,7 +45,7 @@
                              :class="{ 'active-profile': route.name === 'pagoda-profile' || isOpen }"
                              @click="toggle" style="cursor: pointer;">
                             <div class="avatar-default" :class="{ 'is-hidden': isOpen }">
-                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/neakavorn-pagoda.png'"
+                                <img :src="$authImg(authStore.user?.profile?.avatarUrl) || '/app-logo.png'"
                                      alt="User Avatar" 
                                      class="w-100 h-100 object-fit-cover" />
                             </div>

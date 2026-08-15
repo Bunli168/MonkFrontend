@@ -1,13 +1,5 @@
 <template>
     <div class="system-settings-container d-flex flex-column gap-3">
-        <!-- Title Banner -->
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-3 rounded" style="background-color: var(--body-bg-color); border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-            <div>
-                <h5 class="fw-bold mb-1" style="color: var(--text-heading-color);">System Settings</h5>
-                <p class="mb-0 text-muted" style="font-size: 13px;">Manage global configurations that rarely change.</p>
-            </div>
-        </div>
-
         <!-- Tab Navigation -->
         <div class="card border-0 shadow-sm" style="background-color: var(--surface-card);">
             <div class="border-bottom px-3" style="background-color: var(--surface-card);">

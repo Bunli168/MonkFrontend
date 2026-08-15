@@ -118,9 +118,7 @@
                         <div class="d-flex align-items-center gap-3 py-1">
                             <div class="member-avatar">
                                 <img v-if="monk.profile?.avatar_url || monk.profile?.avatarUrl" :src="$authImg(monk.profile?.avatar_url || monk.profile?.avatarUrl)" class="w-100 h-100 object-fit-cover" />
-                                <template v-else>
-                                    {{ monk.fullName ? monk.fullName.charAt(0).toUpperCase() : 'U' }}
-                                </template>
+                                <img v-else src="/app-logo.png" class="w-100 h-100 object-fit-cover bg-white" />
                             </div>
                             <div class="flex-grow-1" style="min-width: 0;">
                                 <div class="fw-semibold text-dark" style="font-size: 0.92rem;">{{ monk.fullName }}</div>

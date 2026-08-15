@@ -1,5 +1,5 @@
 <template>
-    <div class="settings-view">
+    <div class="settings-view d-flex flex-column gap-3">
         <Tabs v-model:value="activeTab" scrollable class="card gap-2 p-2"
             style="background-color: var(--surface-ground);">
             <div>
@@ -28,7 +28,7 @@
             <TabPanels class="p-0 bg-transparent">
                 <TabPanel value="profile">
                     <div class="row g-3">
-                        <div class="col-lg-6 col-md-12 d-flex flex-column gap-3">
+                        <div class="col-lg-8 col-md-12 d-flex flex-column gap-3">
                             <div class="card p-3 gap-3"
                                 style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <ProfileForm ref="profileFormRef" :initialData="currentUser" :disabled="!isEditMode" />
@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         
-                        <div class="col-lg-6 col-md-12 d-flex flex-column gap-3">
+                        <div class="col-lg-4 col-md-12 d-flex flex-column gap-3">
                             <div class="card p-3 gap-3"
                                 style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <AccountSettingForm />
@@ -74,7 +74,7 @@
                 </TabPanel>
                 <TabPanel value="password">
                     <div class="row">
-                        <div class="col-lg-7 col-md-12">
+                        <div class="col-lg-8 col-md-12">
                             <div class="card p-3 gap-3"
                                 style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <ChangePasswordForm />
@@ -84,7 +84,7 @@
                 </TabPanel>
                 <TabPanel value="appearance">
                     <div class="row g-3">
-                        <div class="col-lg-6 col-md-12">
+                        <div class="col-lg-8 col-md-12">
                             <div class="card p-3 gap-3" style="background-color: var(--body-bg-color); border-radius: var(--border-inner-radius)">
                                 <AppearanceForm />
                             </div>
