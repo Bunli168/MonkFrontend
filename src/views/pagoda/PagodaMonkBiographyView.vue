@@ -27,10 +27,10 @@
                     <div class="d-flex gap-2 w-100 w-sm-auto mt-2 mt-sm-0">
                         <BaseButton variant="outline-primary" @click="showPersonalQrModal = true" class="w-100 w-sm-auto d-flex align-items-center gap-1">
                             <QrCode :size="16" />
-                            <span>My QR Code / កូដ QR</span>
+                            <span>My QR Code<span class="d-none d-sm-inline"> / កូដ QR</span></span>
                         </BaseButton>
                         <BaseButton variant="outline-secondary" @click="startEdit" style="background-color: transparent; color: var(--text-heading-color); border-color: var(--border-color);" class="w-100 w-sm-auto">
-                            Edit / កែសម្រួល
+                            <span>Edit<span class="d-none d-sm-inline"> / កែសម្រួល</span></span>
                         </BaseButton>
                     </div>
                 </div>
