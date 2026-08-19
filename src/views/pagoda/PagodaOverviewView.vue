@@ -13,7 +13,7 @@ import OverViewTeacher from './components/OverViewTeacher.vue';
 
 const authStore = useAuthStore();
 onMounted(async () => {
-  await authStore.getProfile();
+  // getProfile is already handled in router.beforeEach
 })
 
 </script>

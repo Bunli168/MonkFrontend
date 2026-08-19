@@ -412,7 +412,7 @@ const fetchSurvey = async () => {
         let ownProfile = null;
         if (!props.userId) {
             try {
-                await authStore.fetchProfile();
+                // Profile data is already loaded and guaranteed by router.beforeEach
                 ownProfile = authStore.user?.profile || null;
             } catch (e) {
                 console.error("Failed to fetch profile in biography view:", e);

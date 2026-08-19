@@ -669,7 +669,7 @@ const fetchSurvey = async () => {
         let ownProfile = null;
         if (!props.userId) {
             try {
-                await authStore.getProfile();
+                // Profile data is already loaded and guaranteed by router.beforeEach
                 ownProfile = authStore.user?.profile || null;
             } catch (e) { /* ignore */ }
         }
