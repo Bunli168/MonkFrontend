@@ -16,7 +16,7 @@ watch(() => route.path, () => {
 });
 
 onMounted(async () => {
-    await authStore.getProfile();
+    // getProfile is already handled in router.beforeEach
 })
 
 </script>
@@ -36,9 +36,11 @@ onMounted(async () => {
         <main class="content-wrapper" :class="{ collapsed: !sidebar.isExpanded }">
             <DashboardHeader />
             <div class="container-fluid p-lg-4 p-3">
-                <router-view v-slot="{ Component }">
+                <router-view v-slot="{ Component, route }">
                     <transition name="fade" mode="out-in">
-                        <component :is="Component" />
+                        <keep-alive>
+                            <component :is="Component" :key="route.name" />
+                        </keep-alive>
                     </transition>
                 </router-view>
             </div>
